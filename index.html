@@ -862,11 +862,11 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
       <div class="ob-img-bg">
         <div style="position:absolute;inset:0;background:#0a0a0f"></div>
         <!-- Logo centrado -->
-        <div style="position:absolute;top:0;left:0;right:0;bottom:35%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+        <div style="position:absolute;top:0;left:0;right:0;bottom:30%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8%;gap:16px">
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:4px;height:52px;background:var(--y);border-radius:3px"></div>
+            <div style="width:5px;height:60px;background:var(--y);border-radius:3px"></div>
             <div>
-              <div style="font-family:system-ui,sans-serif;font-size:36px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1">InstaCompras</div>
+              <div style="font-family:system-ui,sans-serif;font-size:42px;font-weight:900;color:#fff;letter-spacing:-1.5px;line-height:1">InstaCompras</div>
               <div style="display:flex;align-items:center;gap:6px;margin-top:5px">
                 <div style="width:8px;height:8px;border-radius:50%;background:var(--rd);animation:pulse-live 2s infinite"></div>
                 <div style="font-size:11px;font-weight:800;color:var(--rd);letter-spacing:4px">EN VIVO</div>
@@ -893,11 +893,11 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <div class="ob-slide" id="ob-1">
       <div class="ob-img-bg">
         <div style="position:absolute;inset:0;background:#0a0a0f"></div>
-        <div style="position:absolute;top:0;left:0;right:0;bottom:35%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+        <div style="position:absolute;top:0;left:0;right:0;bottom:30%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8%;gap:16px">
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:4px;height:52px;background:var(--y);border-radius:3px"></div>
+            <div style="width:5px;height:60px;background:var(--y);border-radius:3px"></div>
             <div>
-              <div style="font-family:system-ui,sans-serif;font-size:36px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1">InstaCompras</div>
+              <div style="font-family:system-ui,sans-serif;font-size:42px;font-weight:900;color:#fff;letter-spacing:-1.5px;line-height:1">InstaCompras</div>
               <div style="display:flex;align-items:center;gap:6px;margin-top:5px">
                 <div style="width:8px;height:8px;border-radius:50%;background:var(--rd);animation:pulse-live 2s infinite"></div>
                 <div style="font-size:11px;font-weight:800;color:var(--rd);letter-spacing:4px">EN VIVO</div>
@@ -924,11 +924,11 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <div class="ob-slide" id="ob-2">
       <div class="ob-img-bg">
         <div style="position:absolute;inset:0;background:#0a0a0f"></div>
-        <div style="position:absolute;top:0;left:0;right:0;bottom:35%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+        <div style="position:absolute;top:0;left:0;right:0;bottom:30%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8%;gap:16px">
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:4px;height:52px;background:var(--y);border-radius:3px"></div>
+            <div style="width:5px;height:60px;background:var(--y);border-radius:3px"></div>
             <div>
-              <div style="font-family:system-ui,sans-serif;font-size:36px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1">InstaCompras</div>
+              <div style="font-family:system-ui,sans-serif;font-size:42px;font-weight:900;color:#fff;letter-spacing:-1.5px;line-height:1">InstaCompras</div>
               <div style="display:flex;align-items:center;gap:6px;margin-top:5px">
                 <div style="width:8px;height:8px;border-radius:50%;background:var(--rd);animation:pulse-live 2s infinite"></div>
                 <div style="font-size:11px;font-weight:800;color:var(--rd);letter-spacing:4px">EN VIVO</div>
@@ -2114,30 +2114,41 @@ function buildCats(){
 }
 function buildGrid(list){
   list=list||PRODS;
-  document.getElementById('pgrid').innerHTML=list.map((p,i)=>{
-    const idx=PRODS.indexOf(p);
-    const disc=Math.round((1-p.p/p.op)*100);
-    const s=SELLERS[p.s];
-    return `
-    <div class="pcard" onclick="openProd(${idx})">
-      <div class="pcard-img ${BG[i%4]}">
-        <img src="${p.img}" onerror="this.style.display='none'" loading="lazy">
-        <div class="pcard-disc">-${disc}%</div>
-        ${p.live?`<div class="pcard-live-dot"><div class="lbadge" style="font-size:7px;padding:2px 5px">LIVE</div></div>`:''}
-        <button class="pcard-qadd" onclick="event.stopPropagation();quickAdd(${idx})">🛒</button>
+  const grid=document.getElementById('pgrid');
+  if(!grid)return;
+  // Render first 8 immediately, rest in next frame for smooth home load
+  const first=list.slice(0,8);
+  const rest=list.slice(8);
+  grid.innerHTML=first.map((p,i)=>prodCard(p,i,list)).join('');
+  if(rest.length){
+    requestAnimationFrame(()=>{
+      grid.innerHTML+=rest.map((p,i)=>prodCard(p,i+8,list)).join('');
+    });
+  }
+}
+function prodCard(p,i,list){
+  const idx=PRODS.indexOf(p);
+  const disc=Math.round((1-p.p/p.op)*100);
+  const s=SELLERS[p.s];
+  return `<div class="pcard" onclick="openProd(${idx})">
+    <div class="pcard-img ${BG[i%4]}">
+      <img src="${p.img}" onerror="this.style.display='none'" loading="lazy">
+      <div class="pcard-disc">-${disc}%</div>
+      ${p.live?`<div class="pcard-live-dot"><div class="lbadge" style="font-size:7px;padding:2px 5px">LIVE</div></div>`:''}
+      <button class="pcard-qadd" onclick="event.stopPropagation();quickAdd(${idx})">🛒</button>
+    </div>
+    <div class="pcard-body">
+      <div class="pcard-name">${p.n}</div>
+      <div class="pcard-seller-row">
+        <div class="pcard-seller-dot">${s.e}</div>
+        <div class="pcard-seller-name">${s.n}</div>
       </div>
-      <div class="pcard-body">
-        <div class="pcard-name">${p.n}</div>
-        <div class="pcard-seller-row">
-          <div class="pcard-seller-dot">${s.e}</div>
-          <div class="pcard-seller-name">${s.n}</div>
-        </div>
-        <div class="pcard-price-row">
-          <div class="pcard-price">$${p.p}</div>
-          <div class="pcard-old">$${p.op}</div>
-        </div>
+      <div class="pcard-price-row">
+        <div class="pcard-price">$${p.p}</div>
+        <div class="pcard-old">$${p.op}</div>
       </div>
-    </div>`}).join('');
+    </div>
+  </div>`;
 }
 function buildSellers(q){
   const list=q?SELLERS.filter(s=>s.n.toLowerCase().includes(q.toLowerCase())||s.cat.toLowerCase().includes(q.toLowerCase())):SELLERS;
@@ -2189,6 +2200,8 @@ function goHome(){
   stopChat();
   const ob=document.getElementById('s-onboard');
   if(ob){ob.classList.remove('on');ob.style.display='none';}
+  // Pre-build grid before transition so home is ready
+  setTimeout(()=>buildGrid(),0);
   go('home',false);
 }
 
@@ -2854,14 +2867,19 @@ function doLogin(){
   const pass=document.getElementById('login-pass').value.trim();
   if(!email||!pass){toast('⚠️ Completa todos los campos');return;}
   toast('✅ ¡Bienvenido de vuelta!');
-  setTimeout(()=>obSkip(),700);
+  // Ocultar register screen inmediatamente y forzar home
+  const reg=document.getElementById('s-register');
+  if(reg){reg.classList.remove('on');}
+  const ob=document.getElementById('s-onboard');
+  if(ob){ob.classList.remove('on');ob.style.display='none';}
+  setTimeout(()=>{buildGrid();go('home',false);},400);
 }
 function regSocial(type){
   const msg=type==='Google'?'🌐 Conectando con Google…':'🌐 Conectando...';
   toast(msg);
   setTimeout(()=>{
     toast(`✅ Sesión iniciada con ${type}`);
-    setTimeout(()=>obSkip(),700);
+    setTimeout(()=>goHome(),600);
   },1500);
 }
 function regSubmit(){
@@ -2869,7 +2887,11 @@ function regSubmit(){
   const phone=document.getElementById('reg-phone').value.trim();
   if(!name||!phone){toast('⚠️ Completa tu nombre y teléfono');return;}
   toast(accType==='seller'?`📡 ¡Cuenta de vendedor creada, ${name.split(' ')[0]}! En revisión 24h`:`🎉 ¡Bienvenido, ${name.split(' ')[0]}!`);
-  setTimeout(()=>obSkip(),800);
+  const reg=document.getElementById('s-register');
+  if(reg){reg.classList.remove('on');}
+  const ob=document.getElementById('s-onboard');
+  if(ob){ob.classList.remove('on');ob.style.display='none';}
+  setTimeout(()=>{buildGrid();go('home',false);},400);
 }
 function regLogin(){authMode('login');}
 
