@@ -230,9 +230,20 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 /* ═══ PRODUCT DETAIL ═══ */
 #s-prod{background:var(--dk)}
-.pd-hero{position:relative;width:100%;height:270px;overflow:hidden;background:var(--dk3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:90px}
-.pd-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.pd-hero span{position:relative;z-index:1}
+.pd-hero{position:relative;width:100%;height:310px;overflow:hidden;background:#000;flex-shrink:0}
+.pd-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85}
+.pd-hero span{display:none}
+.pd-hero-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pd-hero-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.5) 0%,transparent 40%,transparent 55%,var(--dk) 100%);pointer-events:none;z-index:2}
+.pd-live-bar{position:absolute;bottom:0;left:0;right:0;z-index:3;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.pd-live-pill{display:flex;align-items:center;gap:5px;background:var(--rd);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:900;color:#fff;letter-spacing:.3px}
+.pd-live-dot{width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse 1.5s infinite}
+.pd-chat-msg{background:rgba(0,0,0,.55);backdrop-filter:blur(6px);border-radius:12px 12px 12px 3px;padding:5px 9px;animation:fi .3s ease;max-width:100%}
+.pd-chat-user{font-size:9px;font-weight:800;color:var(--y);margin-bottom:1px}
+.pd-chat-text{font-size:11px;color:rgba(255,255,255,.9);line-height:1.3}
+@keyframes pd-heart-fly{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-90px) scale(.4);opacity:0}}
+.pd-heart{position:absolute;right:0;font-size:22px;animation:pd-heart-fly 1.8s cubic-bezier(.2,.8,.4,1) forwards}
+.pd-view-pill{background:rgba(0,0,0,.55);backdrop-filter:blur(8px);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:800;color:#fff}
 .pd-bk{position:absolute;top:13px;left:13px;z-index:2;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;border:none;color:#fff}
 .pd-wish{position:absolute;top:13px;right:13px;z-index:2;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:19px;border:none;transition:transform .2s}
 .pd-body{padding:15px}
@@ -346,10 +357,10 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .sp-hero-back:active{transform:scale(.88)}
 .sp-hero-share{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#fff;z-index:2}
 /* Avatar overlapping hero */
-.sp-avatar-wrap{position:absolute;bottom:-30px;left:20px;z-index:3}
+.sp-avatar-wrap{position:absolute;bottom:-34px;left:20px;z-index:3}
 .sp-avatar{width:68px;height:68px;border-radius:50%;background:var(--y);display:flex;align-items:center;justify-content:center;font-size:32px;border:3px solid var(--dk);box-shadow:0 4px 16px rgba(0,0,0,.4)}
 .sp-live-ring{position:absolute;inset:-4px;border-radius:50%;border:2.5px solid var(--rd);animation:pulse2 1.8s infinite}
-.sp-body{padding:40px 16px 16px}
+.sp-body{padding:46px 16px 16px}
 /* Name row */
 .sp-name-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
 .sp-name{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.3px;line-height:1}
@@ -723,23 +734,23 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 /* ═══ ONBOARDING ═══ */
 #s-onboard{background:var(--dk);z-index:100}
 .ob-slides{flex:1;position:relative;overflow:hidden}
-.ob-slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:0;opacity:0;transform:translateX(60px);transition:opacity .4s cubic-bezier(.4,0,.2,1),transform .4s cubic-bezier(.34,1.1,.64,1);pointer-events:none}
+.ob-slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:120px;opacity:0;transform:translateX(60px);transition:opacity .4s cubic-bezier(.4,0,.2,1),transform .4s cubic-bezier(.34,1.1,.64,1);pointer-events:none}
 .ob-slide.on{opacity:1;transform:none;pointer-events:all}
 .ob-slide.out{opacity:0;transform:translateX(-60px);transition:opacity .25s ease,transform .25s ease}
 /* full-bleed image area */
 .ob-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55}
 .ob-img-bg{position:absolute;inset:0;z-index:0}
 /* gradient overlay */
-.ob-grad{position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(10,10,15,.2) 0%,rgba(10,10,15,.15) 40%,rgba(10,10,15,.95) 75%,var(--dk) 100%)}
+.ob-grad{position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(10,10,15,.1) 0%,rgba(10,10,15,.2) 35%,rgba(10,10,15,.88) 60%,var(--dk) 100%)}
 /* content card at bottom */
-.ob-content{position:relative;z-index:2;width:100%;padding:0 28px 32px;text-align:center}
-.ob-icon{font-size:48px;margin-bottom:16px;animation:ob-ico-in .5s .1s cubic-bezier(.34,1.56,.64,1) both}
+.ob-content{position:relative;z-index:2;width:100%;padding:0 28px 0;text-align:center}
+.ob-icon{font-size:42px;margin-bottom:12px;animation:ob-ico-in .5s .1s cubic-bezier(.34,1.56,.64,1) both}
 @keyframes ob-ico-in{from{transform:scale(0) rotate(-10deg);opacity:0}to{transform:none;opacity:1}}
-.ob-title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:.5px;color:#fff;line-height:1.1;margin-bottom:10px;animation:ob-txt-in .5s .2s both;text-shadow:0 2px 20px rgba(0,0,0,.5)}
+.ob-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.5px;color:#fff;line-height:1.1;margin-bottom:8px;animation:ob-txt-in .5s .2s both;text-shadow:0 2px 20px rgba(0,0,0,.5)}
 @keyframes ob-txt-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-.ob-desc{font-size:14px;color:rgba(255,255,255,.65);line-height:1.6;max-width:300px;margin:0 auto 28px;animation:ob-txt-in .5s .3s both}
+.ob-desc{font-size:13px;color:rgba(255,255,255,.65);line-height:1.55;max-width:300px;margin:0 auto 22px;animation:ob-txt-in .5s .3s both}
 /* dot indicators */
-.ob-dots{display:flex;gap:7px;justify-content:center;margin-bottom:24px;animation:ob-txt-in .4s .35s both}
+.ob-dots{display:flex;gap:7px;justify-content:center;margin-bottom:20px;animation:ob-txt-in .4s .35s both}
 .ob-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.25);transition:all .3s cubic-bezier(.34,1.3,.64,1)}
 .ob-dot.on{width:24px;border-radius:4px;background:var(--y)}
 /* buttons */
@@ -748,7 +759,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .ob-skip{margin-top:12px;font-size:12px;color:rgba(255,255,255,.4);cursor:pointer;font-weight:700;padding:4px;transition:color .15s;animation:ob-txt-in .4s .45s both}
 .ob-skip:hover{color:rgba(255,255,255,.7)}
 /* top skip button */
-.ob-top-skip{position:absolute;top:52px;right:20px;z-index:10;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:6px 14px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;color:rgba(255,255,255,.7);cursor:pointer;transition:all .15s}
+.ob-top-skip{position:absolute;top:168px;right:20px;z-index:10;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:6px 14px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;color:rgba(255,255,255,.7);cursor:pointer;transition:all .15s}
 .ob-top-skip:hover{color:#fff}
 /* ═══ REGISTER screen ═══ */
 #s-register{background:var(--dk);z-index:100;overflow-y:auto}
@@ -862,7 +873,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
       <div class="ob-img-bg">
         <div style="position:absolute;inset:0;background:#0a0a0f"></div>
         <!-- Logo centrado -->
-        <div style="position:absolute;top:0;left:0;right:0;bottom:30%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8%;gap:16px">
+        <div style="position:absolute;top:0;left:0;right:0;bottom:44%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8%;gap:16px">
           <div style="display:flex;align-items:center;gap:10px">
             <div style="width:5px;height:60px;background:var(--y);border-radius:3px"></div>
             <div>
@@ -873,7 +884,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
               </div>
             </div>
           </div>
-          <div style="font-size:13px;color:rgba(255,208,0,.5);font-weight:700;letter-spacing:1px">Venezuela 🇻🇪</div>
+          
         </div>
         <div class="ob-grad"></div>
       </div>
@@ -893,7 +904,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <div class="ob-slide" id="ob-1">
       <div class="ob-img-bg">
         <div style="position:absolute;inset:0;background:#0a0a0f"></div>
-        <div style="position:absolute;top:0;left:0;right:0;bottom:30%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8%;gap:16px">
+        <div style="position:absolute;top:0;left:0;right:0;bottom:44%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8%;gap:16px">
           <div style="display:flex;align-items:center;gap:10px">
             <div style="width:5px;height:60px;background:var(--y);border-radius:3px"></div>
             <div>
@@ -904,7 +915,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
               </div>
             </div>
           </div>
-          <div style="font-size:13px;color:rgba(255,208,0,.5);font-weight:700;letter-spacing:1px">Venezuela 🇻🇪</div>
+          
         </div>
         <div class="ob-grad"></div>
       </div>
@@ -924,7 +935,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <div class="ob-slide" id="ob-2">
       <div class="ob-img-bg">
         <div style="position:absolute;inset:0;background:#0a0a0f"></div>
-        <div style="position:absolute;top:0;left:0;right:0;bottom:30%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8%;gap:16px">
+        <div style="position:absolute;top:0;left:0;right:0;bottom:44%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8%;gap:16px">
           <div style="display:flex;align-items:center;gap:10px">
             <div style="width:5px;height:60px;background:var(--y);border-radius:3px"></div>
             <div>
@@ -935,7 +946,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
               </div>
             </div>
           </div>
-          <div style="font-size:13px;color:rgba(255,208,0,.5);font-weight:700;letter-spacing:1px">Venezuela 🇻🇪</div>
+          
         </div>
         <div class="ob-grad"></div>
       </div>
@@ -951,7 +962,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
       </div>
     </div>
   </div>
-  <button class="ob-top-skip" onclick="obSkip()">Saltar</button>
+  
 </div>
 
 <!-- LOGIN / REGISTER -->
@@ -1161,9 +1172,15 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 <div id="s-home" class="scr">
   <div class="top">
     <div class="logo">
-      <div style="display:flex;align-items:center;gap:7px">
-        <div style="font-family:system-ui,sans-serif;font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px">InstaCompras</div>
-        <div style="width:7px;height:7px;border-radius:50%;background:var(--rd);flex-shrink:0;animation:pulse-live 2s infinite"></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:4px;height:28px;background:var(--y);border-radius:2px;flex-shrink:0"></div>
+        <div>
+          <div style="font-family:system-ui,sans-serif;font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px;line-height:1">InstaCompras</div>
+          <div style="display:flex;align-items:center;gap:5px;margin-top:2px">
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--rd);flex-shrink:0;animation:pulse-live 2s infinite"></div>
+            <div style="font-size:9px;font-weight:800;color:var(--rd);letter-spacing:3px">EN VIVO</div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="top-r">
@@ -1276,10 +1293,41 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 <div id="s-prod" class="scr">
   <div class="sb" style="padding-bottom:90px">
     <div class="pd-hero" id="pd-hero">
+      <!-- Fallback imagen producto -->
       <img id="pd-img" src="" onerror="this.style.display='none'">
-      <span id="pd-emo">👟</span>
-      <button class="pd-bk" onclick="goBack()">←</button>
-      <button class="pd-wish" id="pd-wish" onclick="toggleWish()">🤍</button>
+      <!-- Video stream embed -->
+      <!-- Simulador Live Stream -->
+      <div id="pd-video-wrap" style="position:absolute;inset:0;z-index:1;display:none;overflow:hidden">
+        <!-- Imagen de fondo con blur/scale para dar sensacion de stream -->
+        <img id="pd-stream-bg" src="" style="position:absolute;inset:-10%;width:120%;height:120%;object-fit:cover;filter:blur(18px) brightness(.5);transform:scale(1.1)">
+        <!-- Imagen producto centrada nítida -->
+        <img id="pd-stream-img" src="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2">
+        <!-- Scanlines overlay para look de stream -->
+        <div style="position:absolute;inset:0;z-index:3;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);pointer-events:none"></div>
+        <!-- Chat simulado -->
+        <div id="pd-chat-msgs" style="position:absolute;left:10px;bottom:60px;z-index:4;display:flex;flex-direction:column;gap:5px;max-width:65%;pointer-events:none"></div>
+        <!-- Corazones flotantes -->
+        <div id="pd-hearts" style="position:absolute;right:14px;bottom:60px;z-index:4;width:36px;pointer-events:none"></div>
+        <!-- Recording dot top-left -->
+        <div style="position:absolute;top:14px;left:14px;z-index:4;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);border-radius:20px;padding:4px 10px">
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--rd);animation:pulse 1.2s infinite"></div>
+          <span style="font-size:10px;font-weight:900;color:#fff;letter-spacing:.5px">EN VIVO</span>
+        </div>
+      </div>
+      <span id="pd-emo" style="display:none">👟</span>
+      <div class="pd-hero-grad"></div>
+      <!-- Controles top -->
+      <button class="pd-bk" onclick="goBack()" style="z-index:5">←</button>
+      <button class="pd-wish" id="pd-wish" onclick="toggleWish()" style="z-index:5">🤍</button>
+      <!-- Live bar bottom -->
+      <div class="pd-live-bar" id="pd-live-bar" style="display:none">
+        <div class="pd-live-pill"><div class="pd-live-dot"></div>EN VIVO</div>
+        <div class="pd-view-pill">👁 <span id="pd-viewers">247</span> viendo</div>
+        <div id="pd-seller-mini" style="margin-left:auto;display:flex;align-items:center;gap:6px;cursor:pointer" onclick="openStream(PRODS[curProd]?.s)">
+          <div id="pd-sav-mini" style="width:24px;height:24px;border-radius:50%;background:var(--y);display:flex;align-items:center;justify-content:center;font-size:12px">🛍️</div>
+          <div style="font-size:11px;font-weight:800;color:#fff" id="pd-sname-mini"></div>
+        </div>
+      </div>
     </div>
     <div class="pd-body">
       <div class="pd-title" id="pd-title"></div>
@@ -1288,6 +1336,20 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         <div><div class="pd-sname" id="pd-sname"></div><div class="pd-sfoll" id="pd-sfoll"></div></div>
         <div style="margin-left:auto"><div class="lbadge" style="font-size:8px">EN VIVO</div></div>
       </div>
+      <!-- Subasta con countdown -->
+      <button id="pd-auction-btn" onclick="openAuction(curProd)" style="width:100%;background:linear-gradient(135deg,rgba(255,59,59,.12),rgba(255,59,59,.06));border:1.5px solid rgba(255,59,59,.45);border-radius:13px;padding:13px 16px;font-family:'Nunito',sans-serif;cursor:pointer;color:#fff;transition:all .18s;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <span style="font-size:20px">🔨</span>
+          <div style="text-align:left">
+            <div style="font-size:13px;font-weight:900;color:var(--rd)">Participar en Subasta</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.5);font-weight:700">Oferta actual: <span id="pd-bid-cur">$0</span></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;background:rgba(255,59,59,.18);border-radius:20px;padding:5px 11px">
+          <span style="font-size:13px">⏱</span>
+          <span id="pd-auction-timer" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--rd);letter-spacing:1px;min-width:44px">3:00</span>
+        </div>
+      </button>
       <div class="pd-prow">
         <div class="pd-price" id="pd-price"></div>
         <div class="pd-cur">USD</div>
@@ -1298,28 +1360,8 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         <span class="ptag y">📦 Envío rápido</span>
         <span class="ptag y">✅ Verificado</span>
       </div>
-      <div class="lbl">Talla / Variante</div>
-      <div class="sizes" id="pd-sizes"></div>
-      <div class="lbl">Cantidad</div>
-      <div class="qty-row">
-        <button class="qbtn" onclick="chgQty(-1)">−</button>
-        <div class="qnum" id="qnum">1</div>
-        <button class="qbtn" onclick="chgQty(1)">+</button>
-        <span style="font-size:11px;color:var(--mu);margin-left:4px" id="stock-l"></span>
-      </div>
       <div class="lbl">Descripción</div>
       <div class="pd-desc" id="pd-desc"></div>
-      <div class="lbl">Métodos de Pago</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px">
-        <span class="ptag y">💜 Zelle</span><span class="ptag y">🏦 Pago Móvil</span>
-        <span class="ptag y">₿ Binance</span><span class="ptag y">⬡ Reserve</span>
-        <span class="ptag y">💵 Efectivo</span>
-      </div>
-      <div class="pd-acts">
-        <button class="acart" onclick="addCart()">🛒 Al Carrito</button>
-        <button class="abuy" onclick="buyNow()">⚡ Comprar Ahora</button>
-      </div>
-      <button style="width:100%;background:transparent;border:1.5px solid rgba(255,59,59,.35);border-radius:11px;padding:12px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer;color:var(--rd);transition:all .18s;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:7px" onclick="openAuction(curProd)">🔨 Participar en Subasta</button>
     </div>
   </div>
 </div>
@@ -1337,13 +1379,15 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 <!-- SELLER PROFILE -->
 <div id="s-seller" class="scr">
-  <!-- Hero banner -->
-  <div class="sp-hero" id="sp-hero">
-    <div class="sp-hero-bg"></div>
-    <img class="sp-hero-img" id="sp-hero-img" src="" onerror="this.style.display='none'">
-    <div class="sp-hero-grad"></div>
-    <button class="sp-hero-back" onclick="goBack()">←</button>
-    <button class="sp-hero-share" onclick="toast('🔗 Link copiado')">↗</button>
+  <!-- Hero + avatar en wrapper relativo para evitar clip por overflow:hidden -->
+  <div style="position:relative;flex-shrink:0">
+    <div class="sp-hero" id="sp-hero">
+      <div class="sp-hero-bg"></div>
+      <img class="sp-hero-img" id="sp-hero-img" src="" onerror="this.style.display='none'">
+      <div class="sp-hero-grad"></div>
+      <button class="sp-hero-back" onclick="goBack()">←</button>
+      <button class="sp-hero-share" onclick="toast('🔗 Link copiado')">↗</button>
+    </div>
     <div class="sp-avatar-wrap">
       <div class="sp-avatar" id="sp-av-emoji">🛍️</div>
       <div class="sp-live-ring" id="sp-live-ring"></div>
@@ -1643,8 +1687,28 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         <div class="co-row"><span class="co-l">Ciudad</span><span class="co-v">Caracas, VE</span></div>
         <div class="co-row"><span class="co-l">Método</span><span class="co-v">🏍️ Moto · $3 USD</span></div>
       </div>
-      <div class="co-sec-t">💳 Método de Pago</div>
-      <div id="co-pays"></div>
+      <div class="co-sec-t">⚡ Pagar con InstaCreditos</div>
+      <div id="co-pays">
+        <div style="background:linear-gradient(135deg,rgba(255,208,0,.1),rgba(255,208,0,.05));border:1.5px solid rgba(255,208,0,.3);border-radius:14px;padding:16px;margin-bottom:4px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:9px">
+              <div style="width:36px;height:36px;border-radius:10px;background:var(--y);display:flex;align-items:center;justify-content:center;font-size:18px">⚡</div>
+              <div>
+                <div style="font-size:13px;font-weight:900;color:var(--y)">InstaCreditos</div>
+                <div style="font-size:10px;color:var(--mu)">1 InstaCredito = 1 USD</div>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:11px;color:var(--mu);margin-bottom:2px">Tu saldo</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y);line-height:1">500 IC</div>
+            </div>
+          </div>
+          <div style="background:rgba(255,208,0,.08);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:6px">
+            <span style="font-size:12px">✅</span>
+            <span style="font-size:11px;color:rgba(255,255,255,.65)">Pago instantáneo · Sin comisiones · Seguro</span>
+          </div>
+        </div>
+      </div>
       <div class="co-sec-t">🧾 Resumen</div>
       <div class="co-card" id="co-sum"></div>
     </div>
@@ -2074,7 +2138,7 @@ const PRODS=[
   {n:'Peluche Grande',s:26,p:12,op:20,img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',e:'🧸',sz:['30cm','50cm','80cm'],d:'Peluche suave hipoalergénico. Ideal para bebés y niños.',live:false},
   {n:'Six Pack Cerveza',s:27,p:15,op:20,img:'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&q=80',e:'🍺',sz:['Polar','Solera','Regional'],d:'Six pack artesanal venezolano. Frío y listo para entrega.',live:true},
   {n:'Suculentas x3',s:28,p:10,op:16,img:'https://images.unsplash.com/photo-1459156212016-c812468e2115?w=400&q=80',e:'🪴',sz:['Pequeñas','Medianas'],d:'Trio de suculentas en maceta cerámica. Fácil cuidado, decorativas.',live:false},
-  {n:'Jordan 4 Retro',s:29,p:145,op:180,img:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80',e:'👟',sz:['7','8','9','10','11'],d:'Air Jordan 4 Retro originales. Caja sellada, factura incluida.',live:true},
+  {n:'PlayStation 5',s:29,p:520,op:600,img:'https://images.unsplash.com/photo-1607853202273-797f1c22a38e?w=400&q=80',e:'🎮',sz:['Disco','Digital'],d:'PS5 nueva sellada. 825GB SSD, ray tracing, 4K HDR. Control DualSense incluido.',live:true},
   {n:'Vape Desechable',s:30,p:30,op:42,img:'https://images.unsplash.com/photo-1574482620881-6a8c03fd21d0?w=400&q=80',e:'💨',sz:['Menta','Fresa','Mango','Tabaco'],d:'Vape desechable 5000 puffs. Múltiples sabores disponibles.',live:false},
   {n:'Cámara Instax Mini',s:31,p:180,op:220,img:'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&q=80',e:'📷',sz:['Rosa','Blanco','Negro'],d:'Fujifilm Instax Mini 12. Fotos instantáneas, incluye 10 films.',live:true},
   {n:'Bikini 2 Piezas',s:32,p:22,op:32,img:'https://images.unsplash.com/photo-1570727595740-de919ecb1bf2?w=400&q=80',e:'🩱',sz:['XS','S','M','L'],d:'Bikini de verano, tela con UV protection. Colores vibrantes.',live:false},
@@ -2324,31 +2388,65 @@ function spawnParticle(el,text){
 }
 
 // ═══ PRODUCT ═══
+// Video URLs por tipo de producto
+const PD_VIDEOS={
+  ps5:'https://www.youtube.com/embed/RRU3l52R9i4?autoplay=1&mute=1&loop=1&controls=0&modestbranding=1&playsinline=1&rel=0',
+  iphone:'https://www.youtube.com/embed/XKfgdklWd7A?autoplay=1&mute=1&loop=1&controls=0&modestbranding=1&playsinline=1&rel=0',
+  jordan:'https://www.youtube.com/embed/oyk7mN-Ghb8?autoplay=1&mute=1&loop=1&controls=0&modestbranding=1&playsinline=1&rel=0',
+  headphones:'https://www.youtube.com/embed/jLpYPFnFNBE?autoplay=1&mute=1&loop=1&controls=0&modestbranding=1&playsinline=1&rel=0',
+  default:'https://www.youtube.com/embed/LMDSxzTjMM4?autoplay=1&mute=1&loop=1&controls=0&modestbranding=1&playsinline=1&rel=0'
+};
+function pdGetVideo(p){
+  const n=p.n.toLowerCase();
+  if(n.includes('playstation')||n.includes('ps5'))return PD_VIDEOS.ps5;
+  if(n.includes('iphone'))return PD_VIDEOS.iphone;
+  if(n.includes('jordan')||n.includes('nike'))return PD_VIDEOS.jordan;
+  if(n.includes('sony')||n.includes('xm5')||n.includes('auricular')||n.includes('headphone'))return PD_VIDEOS.headphones;
+  return PD_VIDEOS.default;
+}
 function openProd(idx){
   curProd=idx;qty=1;curSz=PRODS[idx].sz[0];
   const p=PRODS[idx];const s=SELLERS[p.s];
-  document.getElementById('pd-img').src=p.img||'';
+  // Hero: mostrar video si producto live, si no mostrar imagen
+  const videoWrap=document.getElementById('pd-video-wrap');
+  const imgEl=document.getElementById('pd-img');
+  const liveBar=document.getElementById('pd-live-bar');
+  const iframe=document.getElementById('pd-iframe');
+  if(p.live){
+    videoWrap.style.display='block';
+    imgEl.style.display='none';
+    liveBar.style.display='flex';
+    // Simulador live stream
+    const sbg=document.getElementById('pd-stream-bg');
+    const simg=document.getElementById('pd-stream-img');
+    if(sbg)sbg.src=p.img||'';
+    if(simg)simg.src=p.img||'';
+    document.getElementById('pd-viewers').textContent=~~(Math.random()*400+80);
+    document.getElementById('pd-sav-mini').textContent=s.e;
+    document.getElementById('pd-sname-mini').textContent=s.n;
+    startPdLiveSim(s);
+  }else{
+    stopPdLiveSim();
+    videoWrap.style.display='none';
+    imgEl.style.display='block';
+    imgEl.src=p.img||'';
+    liveBar.style.display='none';
+  }
   document.getElementById('pd-emo').textContent=p.e;
   document.getElementById('pd-title').textContent=p.n;
   document.getElementById('pd-price').textContent=`$${p.p}`;
   document.getElementById('pd-old').textContent=`$${p.op}`;
   document.getElementById('pd-desc').textContent=p.d;
-  document.getElementById('stock-l').textContent=`Quedan ${~~(Math.random()*8+2)} uds.`;
-  document.getElementById('qnum').textContent=1;
+
   document.getElementById('pd-sav').textContent=s.e;
   document.getElementById('pd-sname').textContent=s.n;
   document.getElementById('pd-sfoll').textContent=`${s.f} seguidores`;
   document.getElementById('pd-seller').onclick=()=>openStream(p.s);
   document.getElementById('pd-wish').textContent=wish.has(idx)?'❤️':'🤍';
-  document.getElementById('pd-sizes').innerHTML=p.sz.map((v,i)=>`<button class="sbtn ${i===0?'on':''}" onclick="selSz(this,'${v}')">${v}</button>`).join('');
   go('prod');
 }
-function selSz(btn,v){
-  document.querySelectorAll('#pd-sizes .sbtn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  curSz=v;
-}
-function chgQty(d){qty=Math.max(1,Math.min(10,qty+d));document.getElementById('qnum').textContent=qty;}
+function selSz(btn,v){curSz=v;}
+function chgQty(d){qty=Math.max(1,Math.min(10,qty+d));}
 function toggleWish(){
   const btn=document.getElementById('pd-wish');
   wish.has(curProd)?wish.delete(curProd):wish.add(curProd);
@@ -2436,7 +2534,7 @@ function placeOrder(){
     <div class="ok-row"><span class="ok-row-l">N° Pedido</span><span style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px">${num}</span></div>
     <div class="ok-row"><span class="ok-row-l">Fecha</span><span>${dateStr}</span></div>
     <div class="ok-row"><span class="ok-row-l">Productos</span><span>${cart.length} ítem(s)</span></div>
-    <div class="ok-row"><span class="ok-row-l">Pago</span><span>${PAYOPTS[selPay].i} ${PAYOPTS[selPay].n}</span></div>
+    <div class="ok-row"><span class="ok-row-l">Pago</span><span>⚡ InstaCreditos</span></div>
     <div class="ok-row"><span class="ok-row-l">Total</span><span>$${tot} USD</span></div>`;
   document.getElementById('st-spent').textContent=parseInt(document.getElementById('st-spent').textContent)+tot;
   document.getElementById('st-buy').textContent=parseInt(document.getElementById('st-buy').textContent)+1;
@@ -3200,7 +3298,7 @@ function openTrack(cartIdx){
   document.getElementById('track-prod-name').textContent=prod.n;
   document.getElementById('track-prod-seller').textContent=seller.n;
   document.getElementById('track-prod-price').textContent='$'+(item?prod.p*item.q:prod.p);
-  document.getElementById('track-pay').textContent=PAYOPTS[selPay]?.n||'Zelle';
+  document.getElementById('track-pay').textContent='⚡ InstaCreditos';
 
   // Timeline
   document.getElementById('track-timeline').innerHTML=TRACK_STEPS.map(s=>`
@@ -3217,6 +3315,87 @@ function openTrack(cartIdx){
 }
 
 // ═══ INIT ═══
+// Reorder PRODS for maximum visual impact (investor demo)
+const _ORDER=[0,1,16,29,11,6,35,31,34,10,3,36,22,4,37,18,2,5,7,8,9,12,13,14,15,17,19,20,21,23,24,25,26,27,28,30,32,33,38,39];
+const _origProds=[...PRODS];
+_ORDER.forEach((idx,i)=>{if(i<PRODS.length&&idx<_origProds.length)PRODS[i]=_origProds[idx];});
+
+
+
+// ═══ AUCTION COUNTDOWN TIMER ═══
+let _auctionTiv=null;
+function startAuctionTimer(){
+  clearInterval(_auctionTiv);
+  let secs=180; // 3 minutos
+  const el=document.getElementById('pd-auction-timer');
+  if(!el)return;
+  function tick(){
+    if(secs<=0){
+      clearInterval(_auctionTiv);
+      if(el)el.textContent='0:00';
+      return;
+    }
+    secs--;
+    const m=~~(secs/60);
+    const s=String(secs%60).padStart(2,'0');
+    if(el)el.textContent=m+':'+s;
+    // Rojo pulsante cuando queda menos de 30s
+    const btn=document.getElementById('pd-auction-btn');
+    if(btn&&secs<30){btn.style.borderColor='rgba(255,59,59,.9)';}
+  }
+  tick();
+  _auctionTiv=setInterval(tick,1000);
+}
+
+// ═══ SIMULADOR LIVE STREAM (página producto) ═══
+let _pdChatIv=null,_pdHeartIv=null,_pdViewIv=null;
+const _PD_NAMES=['carlos.VE','luisa_mpn','el_pana99','yoli_shop','marleny07','pedro_mcs','cristivzla','rosary.ve'];
+const _PD_MSGS=['¡LO QUIERO! 🔥','⚡ Comprando ahora!','¿Quedan más unidades?','✅ Ya pagué','🇻🇪 Desde Maracaibo','¿Envían a todo el país?','🙌🙌🙌','¡Me encanta! 😍','¡Qué belleza! 🔥','Llegó rapidísimo el último 📦','🇻🇪 Desde Valencia','¡Tomado! ✅','segunda unidad para mi mamá 😂','ufff se ve brutal 🔥','¡Pídanlo ya! ⚡'];
+const _PD_HEARTS=['❤️','🧡','💛','💜','🤍','❤️‍🔥'];
+function startPdLiveSim(seller){
+  stopPdLiveSim();
+  const chat=document.getElementById('pd-chat-msgs');
+  const hearts=document.getElementById('pd-hearts');
+  const viewers=document.getElementById('pd-viewers');
+  if(!chat)return;
+  // Chat msgs
+  _pdChatIv=setInterval(()=>{
+    if(!chat)return;
+    const d=document.createElement('div');
+    d.className='pd-chat-msg';
+    const name=_PD_NAMES[~~(Math.random()*_PD_NAMES.length)];
+    const msg=_PD_MSGS[~~(Math.random()*_PD_MSGS.length)];
+    d.innerHTML=`<div class="pd-chat-user">${name}</div><div class="pd-chat-text">${msg}</div>`;
+    chat.appendChild(d);
+    while(chat.children.length>5)chat.removeChild(chat.firstChild);
+    chat.scrollTop=chat.scrollHeight;
+  },1800+~~(Math.random()*1200));
+  // Hearts
+  _pdHeartIv=setInterval(()=>{
+    if(!hearts)return;
+    const h=document.createElement('div');
+    h.className='pd-heart';
+    h.textContent=_PD_HEARTS[~~(Math.random()*_PD_HEARTS.length)];
+    h.style.bottom=(~~(Math.random()*20))+'px';
+    h.style.right=(~~(Math.random()*14))+'px';
+    hearts.appendChild(h);
+    setTimeout(()=>h.remove(),1900);
+  },600+~~(Math.random()*400));
+  // Viewers counter bump
+  _pdViewIv=setInterval(()=>{
+    if(!viewers)return;
+    const cur=parseInt(viewers.textContent)||100;
+    viewers.textContent=Math.max(10,cur+(~~(Math.random()*7)-2));
+  },3000);
+}
+function stopPdLiveSim(){
+  clearInterval(_pdChatIv);clearInterval(_pdHeartIv);clearInterval(_pdViewIv);
+  _pdChatIv=_pdHeartIv=_pdViewIv=null;
+  const chat=document.getElementById('pd-chat-msgs');
+  if(chat)chat.innerHTML='';
+  const hearts=document.getElementById('pd-hearts');
+  if(hearts)hearts.innerHTML='';
+}
 buildLiveStrip();buildCats();buildGrid();buildSellers();buildCoPays();updateCart();
 // Show initial unread count
 (()=>{const count=notifData.filter(n=>n.unread).length;const b=document.getElementById('notif-badge');if(b&&count){b.style.display='flex';b.textContent=count;}})();
