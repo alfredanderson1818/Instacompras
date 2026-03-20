@@ -328,7 +328,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .prof-banner{height:110px;background:linear-gradient(135deg,#111128,#0d1f4e,#111128);position:relative;flex-shrink:0}
 .prof-edit-banner{position:absolute;bottom:9px;right:12px;background:rgba(0,0,0,.5);border:none;border-radius:18px;padding:4px 10px;font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;color:#fff;cursor:pointer}
 .prof-body{padding:0 16px 16px;position:relative}
-.prof-av{position:absolute;top:-34px;left:16px;width:68px;height:68px;border-radius:50%;background:var(--y);display:flex;align-items:center;justify-content:center;font-size:33px;border:3px solid var(--dk)}
+.prof-av{position:absolute;top:-34px;left:16px;width:68px;height:68px;border-radius:50%;background:var(--y);display:flex;align-items:center;justify-content:center;font-size:33px;border:3px solid var(--dk);overflow:hidden;cursor:pointer}.prof-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}.prof-av-edit{position:absolute;top:-34px;left:16px;width:68px;height:68px;border-radius:50%;display:flex;align-items:flex-end;justify-content:center;cursor:pointer;z-index:2;padding-bottom:4px}.prof-av-edit-btn{background:rgba(0,0,0,.65);border-radius:20px;padding:2px 7px;font-size:9px;font-weight:800;color:#fff;backdrop-filter:blur(4px)}
 .prof-btns{display:flex;justify-content:flex-end;padding-top:9px;margin-bottom:32px;gap:7px}
 .prof-btn{background:var(--dk3);border:1.5px solid rgba(255,255,255,.09);border-radius:18px;padding:6px 14px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;color:var(--tx);cursor:pointer;transition:all .15s}
 .prof-btn:hover{border-color:rgba(255,208,0,.4);color:var(--y)}
@@ -1304,8 +1304,8 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         <img id="pd-stream-img" src="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2">
         <!-- Scanlines overlay para look de stream -->
         <div style="position:absolute;inset:0;z-index:3;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);pointer-events:none"></div>
-        <!-- Chat simulado -->
-        <div id="pd-chat-msgs" style="position:absolute;left:10px;bottom:60px;z-index:4;display:flex;flex-direction:column;gap:5px;max-width:65%;pointer-events:none"></div>
+        <!-- Bids feed en el stream (reemplaza chat) -->
+        <div id="pd-bids-feed" style="position:absolute;left:10px;bottom:60px;z-index:4;display:flex;flex-direction:column;gap:4px;max-width:68%;pointer-events:none"></div>
         <!-- Corazones flotantes -->
         <div id="pd-hearts" style="position:absolute;right:14px;bottom:60px;z-index:4;width:36px;pointer-events:none"></div>
         <!-- Recording dot top-left -->
@@ -1336,20 +1336,70 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         <div><div class="pd-sname" id="pd-sname"></div><div class="pd-sfoll" id="pd-sfoll"></div></div>
         <div style="margin-left:auto"><div class="lbadge" style="font-size:8px">EN VIVO</div></div>
       </div>
-      <!-- Subasta con countdown -->
-      <button id="pd-auction-btn" onclick="openAuction(curProd)" style="width:100%;background:linear-gradient(135deg,rgba(255,59,59,.12),rgba(255,59,59,.06));border:1.5px solid rgba(255,59,59,.45);border-radius:13px;padding:13px 16px;font-family:'Nunito',sans-serif;cursor:pointer;color:#fff;transition:all .18s;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
-        <div style="display:flex;align-items:center;gap:9px">
-          <span style="font-size:20px">🔨</span>
-          <div style="text-align:left">
-            <div style="font-size:13px;font-weight:900;color:var(--rd)">Participar en Subasta</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.5);font-weight:700">Oferta actual: <span id="pd-bid-cur">$0</span></div>
+      <!-- ═══ SUBASTA INLINE ═══ -->
+      <div id="auc-inline-card" style="background:linear-gradient(135deg,rgba(255,59,59,.1),rgba(255,59,59,.05));border:1.5px solid rgba(255,59,59,.3);border-radius:16px;overflow:hidden;margin-bottom:14px;transition:background .4s,border-color .4s">
+
+        <!-- HEADER: título + timer -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:1px solid rgba(255,59,59,.15)">
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="font-size:16px">🔨</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--rd);letter-spacing:.5px">Subasta en Vivo</span>
+            <div class="lbadge" style="font-size:7px;padding:2px 6px">EN VIVO</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);border:1px solid rgba(255,59,59,.3);border-radius:20px;padding:5px 12px">
+            <span style="font-size:11px">⏱</span>
+            <span id="pd-auction-timer" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--rd);letter-spacing:2px;min-width:42px;font-variant-numeric:tabular-nums">3:00</span>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;background:rgba(255,59,59,.18);border-radius:20px;padding:5px 11px">
-          <span style="font-size:13px">⏱</span>
-          <span id="pd-auction-timer" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--rd);letter-spacing:1px;min-width:44px">3:00</span>
+
+        <!-- OFERTA ACTUAL grande + saldo -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;background:rgba(0,0,0,.2)">
+          <div>
+            <div style="font-size:9px;font-weight:800;color:var(--mu);letter-spacing:.5px;margin-bottom:2px">OFERTA MÁS ALTA</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--rd);line-height:1" id="auc-current-bid">$0</div>
+            <div style="font-size:10px;color:var(--mu);margin-top:2px">Base: <span id="auc-start-price">$0</span></div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:9px;font-weight:800;color:var(--mu);letter-spacing:.4px;margin-bottom:2px">TU SALDO</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y);line-height:1" id="auc-wallet-display">250 IC</div>
+            <div onclick="openDeposit()" style="font-size:10px;font-weight:900;color:var(--y);cursor:pointer;margin-top:4px;opacity:.8">+ Recargar ›</div>
+          </div>
         </div>
-      </button>
+
+        <!-- BANNER ESTADO: ganando / perdiendo -->
+        <div id="auc-status-banner" style="display:none;align-items:center;gap:10px;margin:0 16px 12px;border-radius:10px;padding:10px 14px;border:1.5px solid"></div>
+
+        <!-- INPUT OFERTA — zona de acción principal -->
+        <div style="padding:0 16px 14px">
+          <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.4);margin-bottom:7px;letter-spacing:.4px">TU OFERTA — mín. <span id="auc-min-bid" style="color:var(--y)">$1</span></div>
+          <div style="display:flex;align-items:center;background:rgba(0,0,0,.45);border:2px solid rgba(255,59,59,.45);border-radius:14px;padding:10px 14px;margin-bottom:10px;gap:6px">
+            <span style="font-size:22px;font-weight:900;color:var(--rd);line-height:1">$</span>
+            <input type="number" id="auc-bid-input" placeholder="0" oninput="aucUpdateBtn()" style="flex:1;background:none;border:none;outline:none;font-family:'Bebas Neue',sans-serif;font-size:32px;color:#fff;width:100%;letter-spacing:.5px">
+            <span style="font-size:11px;font-weight:800;color:var(--mu)">IC</span>
+          </div>
+          <!-- Presets rápidos -->
+          <div class="auc-bid-presets" id="auc-presets" style="margin-bottom:12px"></div>
+          <!-- BOTÓN OFERTAR -->
+          <button class="auc-bid-btn" id="auc-bid-btn" onclick="placeBid()">🔨 Hacer Oferta</button>
+        </div>
+
+        <!-- OFERTAS RECIENTES como feed -->
+        <div style="border-top:1px solid rgba(255,255,255,.06)">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 4px">
+            <div style="font-size:9px;font-weight:800;color:var(--mu);letter-spacing:.5px;text-transform:uppercase">Ofertas recientes</div>
+          </div>
+          <div id="auc-bids-list" style="padding:0 16px 4px"></div>
+        </div>
+
+        <!-- CHAT MINI debajo de las ofertas -->
+        <div style="border-top:1px solid rgba(255,255,255,.04);padding:10px 16px 14px">
+          <div style="font-size:9px;font-weight:800;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">Chat del live</div>
+          <div id="pd-chat-msgs" style="display:flex;flex-direction:column;gap:5px;max-height:100px;overflow:hidden"></div>
+        </div>
+
+        <!-- Legal -->
+        <div style="padding:0 16px 10px;font-size:9px;color:rgba(255,255,255,.2);text-align:center">Al ofertar, tus InstaCreditos quedan reservados hasta el cierre.</div>
+      </div>
       <div class="pd-prow">
         <div class="pd-price" id="pd-price"></div>
         <div class="pd-cur">USD</div>
@@ -1491,32 +1541,60 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 <!-- PROFILE -->
 <div id="s-prof" class="scr">
+  <!-- Input de archivo oculto para foto de perfil -->
+  <input type="file" id="prof-av-input" accept="image/*" style="display:none" onchange="profUploadAv(this)">
+  <!-- Input de archivo oculto para portada -->
+  <input type="file" id="prof-banner-input" accept="image/*" style="display:none" onchange="profUploadBanner(this)">
   <div class="sb" style="padding-bottom:80px">
-    <div class="prof-banner"><button class="prof-edit-banner" onclick="toast('✏️ Editar portada')">✏️ Editar</button></div>
+    <div class="prof-banner" id="prof-banner-wrap" style="cursor:pointer" onclick="document.getElementById('prof-banner-input').click()">
+      <img id="prof-banner-img" src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80" style="width:100%;height:100%;object-fit:cover;opacity:.7;display:block">
+      <button class="prof-edit-banner" style="pointer-events:none">📷 Cambiar portada</button>
+    </div>
     <div class="prof-body">
-      <div class="prof-av">😊</div>
+      <!-- Avatar con foto real + botón upload encima -->
+      <div class="prof-av" id="prof-av" onclick="document.getElementById('prof-av-input').click()">
+        <img id="prof-av-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80" alt="avatar">
+      </div>
+      <div class="prof-av-edit" onclick="document.getElementById('prof-av-input').click()">
+        <div class="prof-av-edit-btn">📷 Editar</div>
+      </div>
       <div class="prof-btns">
-        <button class="prof-btn" onclick="toast('✏️ Editar perfil')">✏️ Editar</button>
+        <button class="prof-btn" onclick="openProfEdit()">✏️ Editar perfil</button>
         <button class="prof-btn" style="border-color:rgba(255,59,59,.3);color:var(--rd)" onclick="openDash()">📊 Mi Dashboard</button>
       </div>
-      <div class="prof-name">Juan Pérez</div>
-      <div class="prof-handle">@juanperez.ve · Caracas 🇻🇪</div>
+      <div class="prof-name" id="prof-name-display">Juan Pérez</div>
+      <div class="prof-handle" id="prof-handle-display">@juanperez.ve · Caracas 🇻🇪</div>
+      <div id="prof-bio-display" style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.55;margin-bottom:14px;padding:10px 12px;background:var(--dk3);border-radius:10px;border:1px solid rgba(255,255,255,.05)">Comprador apasionado 🛍️ · Caracas, Venezuela 🇻🇪</div>
       <div class="prof-stats">
         <div class="pst"><div class="pstn" id="st-buy">0</div><div class="pstl">Compras</div></div>
         <div class="pst"><div class="pstn" id="st-fol">0</div><div class="pstl">Siguiendo</div></div>
         <div class="pst"><div class="pstn">$<span id="st-spent">0</span></div><div class="pstl">Gastado</div></div>
       </div>
       <div class="pmenu">
-        <div class="pmi" onclick="goRegister();authMode('login')"><div class="pmic">🔐</div><div class="pmil">Iniciar Sesión / Registro</div><div class="pmia">›</div></div>
+        <div class="pmi" onclick="openWallet()"><div class="pmic">💰</div><div class="pmil">Mi Wallet</div><div class="pmib" id="wallet-prof-badge">250 IC</div><div class="pmia">›</div></div>
         <div class="pmi" onclick="nav('cart')"><div class="pmic">🛒</div><div class="pmil">Mi Carrito</div><div class="pmib" id="cart-prof-badge">0</div><div class="pmia">›</div></div>
-        <div class="pmi" onclick="openWallet()"><div class="pmic">💰</div><div class="pmil">Mi Wallet</div><div class="pmib" id="wallet-prof-badge">250 cr</div><div class="pmia">›</div></div>
         <div class="pmi" onclick="openDash()"><div class="pmic">📊</div><div class="pmil">Dashboard Vendedor</div><div class="pmia">›</div></div>
-        <div class="pmi" onclick="toast('📦 Mis pedidos')"><div class="pmic">📦</div><div class="pmil">Mis Pedidos</div><div class="pmia">›</div></div>
         <div class="pmi" onclick="openTrack(0)"><div class="pmic">🚚</div><div class="pmil">Seguimiento de Pedido</div><div class="pmia">›</div></div>
-        <div class="pmi" onclick="toast('❤️ Favoritos')"><div class="pmic">❤️</div><div class="pmil">Lista de Deseos</div><div class="pmia">›</div></div>
-        <div class="pmi" onclick="toast('💳 Métodos de pago')"><div class="pmic">💳</div><div class="pmil">Métodos de Pago</div><div class="pmia">›</div></div>
-        <div class="pmi" onclick="toast('⚙️ Configuración')"><div class="pmic">⚙️</div><div class="pmil">Configuración</div><div class="pmia">›</div></div>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal editar perfil -->
+  <div id="prof-edit-modal" style="position:absolute;inset:0;z-index:200;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);display:none;align-items:flex-end;justify-content:center">
+    <div style="width:100%;background:var(--dk2);border-radius:24px 24px 0 0;padding:24px 20px 40px;border-top:1px solid rgba(255,255,255,.08)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px">Editar Perfil</div>
+        <button onclick="closeProfEdit()" style="background:var(--dk3);border:1px solid rgba(255,255,255,.08);border-radius:50%;width:32px;height:32px;color:var(--mu);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+      </div>
+      <!-- Nombre -->
+      <div style="font-size:10px;font-weight:800;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px">Nombre</div>
+      <input id="prof-edit-name" type="text" maxlength="40" placeholder="Tu nombre" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 16px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;transition:border-color .15s" onfocus="this.style.borderColor='rgba(255,208,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+      <!-- Bio -->
+      <div style="font-size:10px;font-weight:800;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px">Bio</div>
+      <textarea id="prof-edit-bio" maxlength="120" rows="3" placeholder="Cuéntanos algo sobre ti…" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 16px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;resize:none;box-sizing:border-box;margin-bottom:6px;line-height:1.5;transition:border-color .15s" onfocus="this.style.borderColor='rgba(255,208,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'"></textarea>
+      <div style="text-align:right;font-size:10px;color:var(--mu);margin-bottom:18px"><span id="prof-bio-count">0</span>/120</div>
+      <!-- Guardar -->
+      <button onclick="saveProfEdit()" style="width:100%;background:var(--y);color:var(--dk);border:none;border-radius:13px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .15s">✅ Guardar cambios</button>
     </div>
   </div>
 </div>
@@ -1803,83 +1881,6 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
   </div>
 </div>
 
-<!-- AUCTION -->
-<div id="s-auction" class="scr">
-  <div class="auc-hdr">
-    <button class="bk" style="position:static;background:var(--dk3);border:1px solid rgba(255,255,255,.07)" onclick="goBack()">←</button>
-    <div class="auc-title">Subasta en Vivo</div>
-    <div class="lbadge" style="font-size:9px">EN VIVO</div>
-  </div>
-
-  <!-- Product image -->
-  <div class="auc-img">
-    <img id="auc-img" src="" onerror="this.style.display='none'">
-    <div class="auc-img-bg"></div>
-    <div style="position:absolute;bottom:16px;left:16px;right:70px;z-index:2">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;line-height:1.1" id="auc-prod-name">Nike Air Jordan 1</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:3px" id="auc-prod-seller">por MarisolShop</div>
-    </div>
-    <div class="auc-live-badge"><div class="lbadge">EN VIVO</div></div>
-  </div>
-
-  <div class="sb" style="padding-bottom:20px">
-    <!-- Countdown -->
-    <div class="auc-timer-wrap">
-      <div class="auc-timer-block"><div class="auc-timer-num" id="auc-h">00</div><div class="auc-timer-label">Horas</div></div>
-      <div class="auc-timer-sep">:</div>
-      <div class="auc-timer-block"><div class="auc-timer-num" id="auc-m">14</div><div class="auc-timer-label">Min</div></div>
-      <div class="auc-timer-sep">:</div>
-      <div class="auc-timer-block"><div class="auc-timer-num" id="auc-s">32</div><div class="auc-timer-label">Seg</div></div>
-    </div>
-
-    <!-- Current bid + leaderboard -->
-    <div class="auc-bid-card">
-      <div class="auc-bid-row">
-        <div>
-          <div class="auc-bid-label">Oferta actual</div>
-          <div class="auc-bid-value" id="auc-current-bid">$85</div>
-        </div>
-        <div style="text-align:right">
-          <div class="auc-bid-label">Precio inicial</div>
-          <div class="auc-bid-sub" id="auc-start-price">$50 USD</div>
-        </div>
-      </div>
-      <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Ofertas recientes</div>
-      <div class="auc-bids-list" id="auc-bids-list"></div>
-    </div>
-
-    <!-- Wallet balance -->
-    <div class="auc-wallet-row">
-      <div class="auc-wallet-ico">💰</div>
-      <div class="auc-wallet-info">
-        <div class="auc-wallet-label">Tus InstaCreditos</div>
-        <div class="auc-wallet-bal" id="auc-wallet-display">250 créditos</div>
-      </div>
-      <div class="auc-wallet-top" onclick="openDeposit()">+ Recargar</div>
-    </div>
-
-    <!-- Bid input -->
-    <div class="auc-input-wrap">
-      <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Tu oferta (mínimo <span id="auc-min-bid" style="color:var(--y)">$86</span>)</div>
-      <div class="auc-input-row">
-        <div class="auc-input-prefix">$</div>
-        <input class="auc-input" type="number" id="auc-bid-input" placeholder="0" oninput="aucUpdateBtn()">
-        <div class="auc-input-suffix">USD</div>
-      </div>
-    </div>
-    <div class="auc-bid-presets" id="auc-presets"></div>
-
-    <!-- Bid button -->
-    <button class="auc-bid-btn" id="auc-bid-btn" onclick="placeBid()">
-      🔨 Hacer Oferta
-    </button>
-
-    <!-- Legal -->
-    <div class="auc-legal">
-      <strong>⚠️ Compromiso de compra:</strong> Al hacer una oferta, tus créditos quedan reservados. Si ganas la subasta, el pago se descuenta <strong>automáticamente</strong> sin posibilidad de cancelación. Una oferta es un pacto de compra.
-    </div>
-  </div>
-</div>
 
 <!-- BOTTOM NAV -->
 <div class="nav" id="nav">
@@ -2240,7 +2241,7 @@ function go(id,push=true){
   const next=document.getElementById('s-'+id);
   if(next){next.classList.add('on');}
   if(push&&hist[hist.length-1]!==id)hist.push(id);
-  const hide=['stream','co','ok','onboard','register','seller','wallet','auction','deposit','dash','notif','track'].includes(id);
+  const hide=['stream','co','ok','onboard','register','seller','wallet','deposit','dash','notif','track'].includes(id);
   document.getElementById('nav').className='nav'+(hide?' hide':'');
   ['home','exp','cart','prof'].forEach(n=>document.getElementById('ni-'+n)?.classList.toggle('on',n===id));
 }
@@ -2258,7 +2259,17 @@ function addNavRipple(id){
   el.appendChild(r);
   setTimeout(()=>r.remove(),520);
 }
-function goBack(){if(hist.length>1){hist.pop();stopChat();go(hist[hist.length-1],false);}else goHome();}
+function goBack(){
+  if(hist.length>1){
+    hist.pop();stopChat();
+    const prev=hist[hist.length-1];
+    go(prev,false);
+    // Si volvemos a prod y el producto es live, reanudar simulador
+    if(prev==='prod'&&curProd!==null&&PRODS[curProd]?.live){
+      startPdLiveSim(SELLERS[PRODS[curProd].s]);
+    }
+  }else goHome();
+}
 function goHome(){
   hist=['home'];
   stopChat();
@@ -2443,6 +2454,8 @@ function openProd(idx){
   document.getElementById('pd-sfoll').textContent=`${s.f} seguidores`;
   document.getElementById('pd-seller').onclick=()=>openStream(p.s);
   document.getElementById('pd-wish').textContent=wish.has(idx)?'❤️':'🤍';
+  // Inicializar subasta inline
+  openAuction(idx);
   go('prod');
 }
 function selSz(btn,v){curSz=v;}
@@ -2790,34 +2803,79 @@ function depConfirm(){
 // ═══ AUCTION ═══
 let aucBids=[],aucCurrentBid=0,aucTimerIv=null,aucSecs=0,aucProdIdx=0;
 function openAuction(prodIdx){
-  aucProdIdx=prodIdx||0;const p=PRODS[aucProdIdx];const s=SELLERS[p.s];
+  aucProdIdx=prodIdx!=null?prodIdx:0;const p=PRODS[aucProdIdx];const s=SELLERS[p.s];
   aucCurrentBid=Math.floor(p.p*1.1);
-  const ai=document.getElementById('auc-img');if(ai)ai.src=p.img||'';
-  const an=document.getElementById('auc-prod-name');if(an)an.textContent=p.n;
-  const as=document.getElementById('auc-prod-seller');if(as)as.textContent=`por ${s.n}`;
-  const asp=document.getElementById('auc-start-price');if(asp)asp.textContent=`$${p.p} USD`;
+  const asp=document.getElementById('auc-start-price');if(asp)asp.textContent=`$${p.p}`;
   aucBids=[{user:'carlos.VE',amt:aucCurrentBid,me:false},{user:'luisa_mpn',amt:aucCurrentBid-5,me:false},{user:'el_pana99',amt:aucCurrentBid-12,me:false}];
   aucRenderBids();
   const acb=document.getElementById('auc-current-bid');if(acb)acb.textContent=`$${aucCurrentBid}`;
   const amb=document.getElementById('auc-min-bid');if(amb)amb.textContent=`$${aucCurrentBid+1}`;
   const abi=document.getElementById('auc-bid-input');if(abi)abi.value='';
-  const awd=document.getElementById('auc-wallet-display');if(awd)awd.textContent=`${walletBalance} créditos`;
+  const awd=document.getElementById('auc-wallet-display');if(awd)awd.textContent=`${walletBalance} IC`;
   aucRenderPresets();aucUpdateBtn();
   if(aucTimerIv)clearInterval(aucTimerIv);
   aucSecs=~~(Math.random()*600+300);aucTick();aucTimerIv=setInterval(aucTick,1000);
   setTimeout(aucAutoBot,8000+Math.random()*12000);
-  go('auction');
 }
 function aucTick(){
   aucSecs=Math.max(0,aucSecs-1);
-  const h=String(~~(aucSecs/3600)).padStart(2,'0');const m=String(~~((aucSecs%3600)/60)).padStart(2,'0');const s=String(aucSecs%60).padStart(2,'0');
-  ['auc-h','auc-m','auc-s'].forEach((id,i)=>{const e=document.getElementById(id);if(e)e.textContent=[h,m,s][i];});
-  if(aucSecs===0&&aucBids.length){clearInterval(aucTimerIv);toast(`🔨 ¡Subasta cerrada! Ganador: ${aucBids[0].user}`);}
+  const m=~~(aucSecs/60);const s=String(aucSecs%60).padStart(2,'0');
+  const el=document.getElementById('pd-auction-timer');
+  if(el){
+    el.textContent=m+':'+s;
+    el.style.color=aucSecs<30?'#ff6b35':aucSecs<60?'#ffaa00':'var(--rd)';
+  }
+  if(aucSecs===0){clearInterval(aucTimerIv);toast(`🔨 ¡Subasta cerrada!`);}
 }
 function aucRenderBids(){
   const el=document.getElementById('auc-bids-list');if(!el)return;
   const medals=['🥇','🥈','🥉'];
-  el.innerHTML=aucBids.slice(0,5).map((b,i)=>`<div class="auc-bid-item ${b.me?'winning':''}"><span class="auc-bid-rank">${medals[i]||''}</span><span class="auc-bid-user">${b.me?'Tú ✅':b.user}</span><span class="auc-bid-amt">$${b.amt}</span></div>`).join('');
+  const amWinning=aucBids.length>0&&aucBids[0].me;
+  const amBidding=aucBids.some(b=>b.me);
+  const myPos=aucBids.findIndex(b=>b.me);
+
+  // ── Cambiar color de TODA la tarjeta de subasta ──
+  const card=document.getElementById('auc-inline-card');
+  if(card&&amBidding){
+    if(amWinning){
+      card.style.background='linear-gradient(135deg,rgba(76,175,80,.18),rgba(76,175,80,.06))';
+      card.style.borderColor='rgba(76,175,80,.6)';
+      card.style.transition='background .4s ease,border-color .4s ease';
+    }else{
+      card.style.background='linear-gradient(135deg,rgba(255,59,59,.18),rgba(255,59,59,.07))';
+      card.style.borderColor='rgba(255,59,59,.65)';
+      card.style.transition='background .4s ease,border-color .4s ease';
+    }
+  }
+
+  // ── Status banner ──
+  const sb=document.getElementById('auc-status-banner');
+  if(sb){
+    if(!amBidding){
+      sb.style.display='none';
+    }else if(amWinning){
+      sb.style.display='flex';
+      sb.style.background='rgba(76,175,80,.2)';
+      sb.style.borderColor='rgba(76,175,80,.5)';
+      sb.innerHTML='<span style="font-size:22px">🏆</span><div><div style="font-size:13px;font-weight:900;color:#4CAF50">¡Vas ganando!</div><div style="font-size:10px;color:rgba(255,255,255,.5)">Tienes la oferta más alta</div></div>';
+    }else{
+      sb.style.display='flex';
+      sb.style.background='rgba(255,59,59,.18)';
+      sb.style.borderColor='rgba(255,59,59,.55)';
+      sb.innerHTML=`<span style="font-size:22px">😬</span><div><div style="font-size:13px;font-weight:900;color:var(--rd)">¡Te superaron!</div><div style="font-size:10px;color:rgba(255,255,255,.5)">Estás #${myPos+1} — oferta más para ganar</div></div>`;
+    }
+  }
+
+  // ── Lista de bids ──
+  el.innerHTML=aucBids.slice(0,5).map((b,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);animation:fi .25s ease">
+      <span style="font-size:14px;min-width:20px">${medals[i]||'·'}</span>
+      <div style="flex:1;font-size:12px;font-weight:${b.me?'900':'700'};color:${b.me?'var(--y)':'rgba(255,255,255,.7)'}">
+        ${b.me?'Tú ✅':b.user}
+        ${i===0?`<span style="font-size:9px;background:${b.me?'rgba(76,175,80,.25)':'rgba(255,59,59,.2)'};color:${b.me?'#4CAF50':'var(--rd)'};border-radius:4px;padding:1px 6px;margin-left:4px">LÍDER</span>`:''}
+      </div>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${b.me?'var(--y)':'rgba(255,255,255,.5)'}">\$${b.amt}</span>
+    </div>`).join('');
 }
 function aucRenderPresets(){
   const base=aucCurrentBid;
@@ -2847,14 +2905,17 @@ function placeBid(){
   toast(`🔒 Oferta $${v} reservada. ¡Vas ganando!`);
 }
 function aucAutoBot(){
-  if(!document.getElementById('s-auction').classList.contains('on'))return;
-  const bots=['marisolita22','pedro_mcs','yoli_shop','cristi_vzla'];
+  if(aucSecs<=0)return;
+  const bots=['marisolita22','pedro_mcs','yoli_shop','cristi_vzla','el_pana99'];
   const bot=bots[~~(Math.random()*bots.length)];const nb=aucCurrentBid+~~(Math.random()*8+1);
   aucCurrentBid=nb;aucBids.unshift({user:bot,amt:nb,me:false});aucBids=aucBids.slice(0,5);
   aucRenderBids();aucRenderPresets();
   const acb=document.getElementById('auc-current-bid');if(acb)acb.textContent=`$${nb}`;
   const amb=document.getElementById('auc-min-bid');if(amb)amb.textContent=`$${nb+1}`;
-  aucUpdateBtn();toast(`⬆️ ${bot} ofreció $${nb}`);
+  aucUpdateBtn();
+  // Si el usuario estaba ganando, notificar que lo superaron
+  const wasWinning=aucBids.length>1&&aucBids[1]?.me;
+  if(wasWinning)toast(`⚠️ ${bot} te superó con $${nb} — ¡oferta más!`);
   setTimeout(aucAutoBot,10000+Math.random()*20000);
 }
 
@@ -3270,11 +3331,74 @@ function showNotifBanner(icon, text, action){
   banner._t=setTimeout(()=>banner.classList.remove('on'),4000);
 }
 
-// First notif after 8s, then every 30s
+// First notif after 20s, then every 60s
 setTimeout(()=>{
   fireRealTimeNotif();
-  setInterval(fireRealTimeNotif,30000);
-},8000);
+  setInterval(fireRealTimeNotif,60000);
+},20000);
+
+
+// ═══ PROFILE EDIT ═══
+function openProfEdit(){
+  const modal=document.getElementById('prof-edit-modal');
+  if(!modal)return;
+  document.getElementById('prof-edit-name').value=document.getElementById('prof-name-display').textContent;
+  const h=document.getElementById('prof-handle-display').textContent.split('@')[1]?.split('·')[0]?.trim()||'';
+  document.getElementById('prof-edit-handle').value=h;
+  document.getElementById('prof-edit-bio').value=document.getElementById('prof-bio-display').textContent.trim();
+  updateBioCount();
+  modal.style.display='flex';
+  document.getElementById('prof-edit-name').focus();
+}
+function closeProfEdit(){
+  const modal=document.getElementById('prof-edit-modal');
+  if(modal)modal.style.display='none';
+}
+function updateBioCount(){
+  const ta=document.getElementById('prof-edit-bio');
+  const cnt=document.getElementById('prof-bio-count');
+  if(ta&&cnt)cnt.textContent=ta.value.length;
+}
+function saveProfEdit(){
+  const name=document.getElementById('prof-edit-name').value.trim();
+  const handle=document.getElementById('prof-edit-handle').value.trim();
+  const bio=document.getElementById('prof-edit-bio').value.trim();
+  if(!name){toast('⚠️ Escribe tu nombre');return;}
+  if(name)document.getElementById('prof-name-display').textContent=name;
+  if(handle)document.getElementById('prof-handle-display').textContent=`@${handle} · Caracas 🇻🇪`;
+  if(bio)document.getElementById('prof-bio-display').textContent=bio;
+  closeProfEdit();
+  toast('✅ Perfil actualizado');
+}
+// Counter live en textarea bio
+document.addEventListener('DOMContentLoaded',()=>{
+  const ta=document.getElementById('prof-edit-bio');
+  if(ta)ta.addEventListener('input',updateBioCount);
+});
+
+// ═══ PROFILE PHOTO UPLOAD ═══
+function profUploadAv(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=document.getElementById('prof-av-img');
+    if(img){img.src=e.target.result;}
+    toast('✅ Foto de perfil actualizada');
+  };
+  reader.readAsDataURL(file);
+  input.value='';
+}
+function profUploadBanner(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=document.getElementById('prof-banner-img');
+    if(img){img.src=e.target.result;img.style.opacity='.75';}
+    toast('✅ Portada actualizada');
+  };
+  reader.readAsDataURL(file);
+  input.value='';
+}
 
 // ═══ ORDER TRACKING ═══
 const TRACK_STEPS=[
@@ -3359,16 +3483,30 @@ function startPdLiveSim(seller){
   const viewers=document.getElementById('pd-viewers');
   if(!chat)return;
   // Chat msgs
+  // Feed en stream: alterna entre bids y chat
+  const bidsFeed=document.getElementById('pd-bids-feed');
+  const chatPanel=document.getElementById('pd-chat-msgs');
   _pdChatIv=setInterval(()=>{
-    if(!chat)return;
-    const d=document.createElement('div');
-    d.className='pd-chat-msg';
+    const isBid=Math.random()>.45;
     const name=_PD_NAMES[~~(Math.random()*_PD_NAMES.length)];
-    const msg=_PD_MSGS[~~(Math.random()*_PD_MSGS.length)];
-    d.innerHTML=`<div class="pd-chat-user">${name}</div><div class="pd-chat-text">${msg}</div>`;
-    chat.appendChild(d);
-    while(chat.children.length>5)chat.removeChild(chat.firstChild);
-    chat.scrollTop=chat.scrollHeight;
+    // Bid en stream feed
+    if(bidsFeed&&isBid){
+      const amt=aucCurrentBid>0?aucCurrentBid+~~(Math.random()*15+1):~~(Math.random()*50+20);
+      const d=document.createElement('div');
+      d.className='pd-chat-msg';
+      d.innerHTML=`<div class="pd-chat-user">🔨 ${name}</div><div class="pd-chat-text" style="color:var(--y);font-weight:800">Ofertó $${amt}</div>`;
+      bidsFeed.appendChild(d);
+      while(bidsFeed.children.length>4)bidsFeed.removeChild(bidsFeed.firstChild);
+    }
+    // Chat panel debajo
+    if(chatPanel){
+      const msg=_PD_MSGS[~~(Math.random()*_PD_MSGS.length)];
+      const d=document.createElement('div');
+      d.className='pd-chat-msg';
+      d.innerHTML=`<div class="pd-chat-user">${name}</div><div class="pd-chat-text">${msg}</div>`;
+      chatPanel.appendChild(d);
+      while(chatPanel.children.length>5)chatPanel.removeChild(chatPanel.firstChild);
+    }
   },1800+~~(Math.random()*1200));
   // Hearts
   _pdHeartIv=setInterval(()=>{
@@ -3393,6 +3531,8 @@ function stopPdLiveSim(){
   _pdChatIv=_pdHeartIv=_pdViewIv=null;
   const chat=document.getElementById('pd-chat-msgs');
   if(chat)chat.innerHTML='';
+  const bf=document.getElementById('pd-bids-feed');
+  if(bf)bf.innerHTML='';
   const hearts=document.getElementById('pd-hearts');
   if(hearts)hearts.innerHTML='';
 }
