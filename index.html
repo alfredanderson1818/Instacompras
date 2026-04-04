@@ -6,7 +6,7 @@
 <title>InstaCompras Live</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.0.js"></script>
+<script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.0.js" defer></script>
 <script>
 // ═══ FIREBASE REST API — sin SDK externo ═══
 const FB={
@@ -3913,6 +3913,7 @@ async function leaveAgoraChannel(){
 }
 
 async function joinAsAudience(channelName){
+  if(typeof AgoraRTC==='undefined'){toast('⚠️ SDK de stream no disponible');return;}
   try{
     await leaveAgoraChannel();
     agoraClient=AgoraRTC.createClient({mode:'live',codec:'h264'});
@@ -3945,6 +3946,7 @@ async function joinAsAudience(channelName){
 }
 
 async function joinAsHost(channelName){
+  if(typeof AgoraRTC==='undefined'){toast('⚠️ SDK de stream no disponible');return;}
   try{
     // Stop getUserMedia preview
     if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}
