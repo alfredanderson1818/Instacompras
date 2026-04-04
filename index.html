@@ -2577,6 +2577,18 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 <div class="toast" id="toast-el"></div>
 
+<!-- Auction Win Celebration -->
+<div id="win-overlay" style="position:fixed;inset:0;z-index:9999;pointer-events:none;display:none">
+  <canvas id="win-canvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+  <div id="win-card" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%) scale(0);transition:transform .45s cubic-bezier(.34,1.56,.64,1);background:linear-gradient(135deg,#1a1a25,#22222f);border:2px solid rgba(255,208,0,.5);border-radius:24px;padding:32px 28px;text-align:center;width:280px;box-shadow:0 0 60px rgba(255,208,0,.25)">
+    <div id="win-emoji" style="font-size:64px;line-height:1;margin-bottom:12px">🏆</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--y);letter-spacing:1px;margin-bottom:6px">¡GANASTE!</div>
+    <div id="win-item" style="font-size:14px;font-weight:800;color:#fff;margin-bottom:4px"></div>
+    <div id="win-price" style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--y);line-height:1;margin-bottom:20px"></div>
+    <button onclick="closeWinOverlay()" style="background:var(--y);color:var(--dk);border:none;border-radius:14px;padding:13px 32px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;width:100%;pointer-events:all">Ver mi pedido 📦</button>
+  </div>
+</div>
+
 <!-- Floating notification banner -->
 <div id="notif-banner">
   <div class="nb-icon">🔔</div>
@@ -3610,7 +3622,9 @@ function aucTick(){
     const iWon=aucBids.length>0&&aucBids[0].me;
     toast(`🔨 ¡Subasta cerrada! Ganador: ${winner} con $${aucCurrentBid}`);
     if(iWon){
+      const wonItem=aucBids.length>0?aucBids[0].item||'Subasta':'Subasta';
       pushNotif('🏆','auction',`¡Ganaste la subasta! Ítem por $${aucCurrentBid} — revisa tu pedido`,()=>openTrack(0),true);
+      setTimeout(()=>showWinCelebration(wonItem,aucCurrentBid),600);
     }
   }
 }
@@ -4320,6 +4334,72 @@ function endBroadcast(){
 // ═══ MODAL ═══
 function openModal(){initGoLive();}
 function closeModal(e,force){if(force||e?.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('on');}
+
+// ═══ WIN CELEBRATION ═══
+function closeWinOverlay(){
+  const ov=document.getElementById('win-overlay');
+  const card=document.getElementById('win-card');
+  card.style.transform='translate(-50%,-60%) scale(0)';
+  setTimeout(()=>{ov.style.display='none';},350);
+  openTrack(0);
+}
+
+function showWinCelebration(itemName,price){
+  const ov=document.getElementById('win-overlay');
+  const card=document.getElementById('win-card');
+  const canvas=document.getElementById('win-canvas');
+  document.getElementById('win-item').textContent=itemName;
+  document.getElementById('win-price').textContent='$'+price;
+  ov.style.display='block';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    card.style.transform='translate(-50%,-60%) scale(1)';
+  }));
+  // Confetti burst
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth||360;
+  canvas.height=canvas.offsetHeight||700;
+  const W=canvas.width,H=canvas.height;
+  const COLORS=['#FFD000','#FF3B3B','#00C896','#4A90FF','#FF6B35','#fff','#c084fc','#34d399'];
+  const SHAPES=['rect','circle','ribbon'];
+  const pieces=Array.from({length:140},()=>({
+    x:W/2+(Math.random()-.5)*80,
+    y:H*0.42,
+    vx:(Math.random()-.5)*18,
+    vy:-(Math.random()*22+10),
+    rot:Math.random()*360,
+    rotV:(Math.random()-.5)*12,
+    size:Math.random()*10+5,
+    color:COLORS[~~(Math.random()*COLORS.length)],
+    shape:SHAPES[~~(Math.random()*SHAPES.length)],
+    gravity:.55+Math.random()*.2,
+    opacity:1,
+    delay:Math.random()*300
+  }));
+  let start=null;
+  function draw(ts){
+    if(!start)start=ts;
+    const elapsed=ts-start;
+    ctx.clearRect(0,0,W,H);
+    let alive=false;
+    pieces.forEach(p=>{
+      if(elapsed<p.delay)return;
+      p.vy+=p.gravity;p.x+=p.vx;p.y+=p.vy;
+      p.rot+=p.rotV;p.vx*=.99;
+      if(p.y>H+20)return;
+      if(p.y>H*.65)p.opacity=Math.max(0,p.opacity-.03);
+      alive=true;
+      ctx.save();ctx.globalAlpha=p.opacity;ctx.fillStyle=p.color;
+      ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      if(p.shape==='rect'){ctx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);}
+      else if(p.shape==='circle'){ctx.beginPath();ctx.arc(0,0,p.size/2.5,0,Math.PI*2);ctx.fill();}
+      else{ctx.beginPath();ctx.moveTo(0,-p.size/2);ctx.lineTo(p.size/5,p.size/2);ctx.lineTo(-p.size/5,p.size/2);ctx.closePath();ctx.fill();}
+      ctx.restore();
+    });
+    if(alive)requestAnimationFrame(draw);else ctx.clearRect(0,0,W,H);
+  }
+  requestAnimationFrame(draw);
+  setTimeout(()=>{if(ov.style.display!=='none')closeWinOverlay();},6000);
+}
 
 // ═══ UTILS ═══
 function toast(msg){const t=document.getElementById('toast-el');t.textContent=msg;t.classList.add('on');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('on'),2300);}
