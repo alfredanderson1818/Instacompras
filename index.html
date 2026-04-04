@@ -3862,6 +3862,7 @@ let isMuted=false;
 
 // ═══ AGORA RTC ═══
 const AGORA_APP_ID='989149d167ca46ccbd90405fbd706abb';
+const AGORA_TEMP_TOKEN='007eJxTYDjltkXseur2n9WHUr4+j91gG73pqNecR0GvkwzD73rF/zRRYLC0sDQ0sUwxNDNPTjQxS05OSrE0MDEwTUtKMTcwS0xKEp95MbMhkJHBZ+UtJkYGCATxWRgyk+MNGBgAIcgh+A==';
 let agoraClient=null, agoraJoined=false;
 let agoraLocalVideo=null, agoraLocalAudio=null;
 
@@ -3893,9 +3894,9 @@ async function joinAsAudience(channelName){
     await leaveAgoraChannel();
     agoraClient=AgoraRTC.createClient({mode:'live',codec:'h264'});
     await agoraClient.setClientRole('audience');
-    await agoraClient.join(AGORA_APP_ID,channelName,null,null);
+    await agoraClient.join(AGORA_APP_ID, channelName, AGORA_TEMP_TOKEN, null);
     agoraJoined=true;
-    agoraClient.on('user-published',async(user,mediaType)=>{
+    agoraClient.on('user-published', async(user,mediaType)=>{
       await agoraClient.subscribe(user,mediaType);
       if(mediaType==='video'){
         const container=document.getElementById('sv-agora-video');
@@ -3927,7 +3928,7 @@ async function joinAsHost(channelName){
     await leaveAgoraChannel();
     agoraClient=AgoraRTC.createClient({mode:'live',codec:'h264'});
     await agoraClient.setClientRole('host');
-    await agoraClient.join(AGORA_APP_ID,channelName,null,null);
+    await agoraClient.join(AGORA_APP_ID, channelName, AGORA_TEMP_TOKEN, null);
     agoraJoined=true;
     // Create tracks
     [agoraLocalAudio,agoraLocalVideo]=await AgoraRTC.createMicrophoneAndCameraTracks(
