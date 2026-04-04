@@ -990,6 +990,9 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .bc-inp::placeholder{color:rgba(255,255,255,.4)}
 .bc-send{width:36px;height:36px;border-radius:50%;background:var(--y);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;transition:transform .15s}
 .bc-send:active{transform:scale(.88)}
+/* Duration selector pills */
+.bc-dur-opt{background:var(--dk3);border:2px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 6px;text-align:center;cursor:pointer;color:var(--mu);transition:all .2s}
+.bc-dur-opt.on{background:rgba(255,59,59,.12);border-color:rgba(255,59,59,.5);color:var(--rd)}
 
 /* bgs */
 .bgb{background:linear-gradient(135deg,#1a1a3e,#0d1f4e)}
@@ -2288,61 +2291,167 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
   <div class="bc-gt"></div>
   <div class="bc-gb"></div>
 
-  <!-- Top HUD -->
+  <!-- ── TOP HUD ── -->
   <div class="bc-top">
     <div class="bc-live-pill"><div class="bc-live-dot"></div><div class="bc-live-lbl">EN VIVO</div></div>
-    <div class="bc-viewers-pill">👁 <span id="bc-viewers">1</span></div>
+    <div class="bc-viewers-pill">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span id="bc-viewers">1</span>
+    </div>
     <div class="bc-timer" id="bc-timer">00:00</div>
     <button class="bc-end" onclick="endBroadcast()">Terminar</button>
   </div>
 
-  <!-- Right action buttons — SVG icons -->
+  <!-- ── RIGHT BUTTONS (flip + mic + share) ── -->
   <div class="bc-rights">
-    <!-- Flip camera -->
     <div class="bc-act" onclick="flipCamera()">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15"/></svg>
       <div class="bc-act-l">Voltear</div>
     </div>
-    <!-- Mic -->
     <div class="bc-act" id="bc-mute-btn" onclick="toggleMute()">
-      <svg id="bc-mic-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
+      <svg id="bc-mic-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
       <div class="bc-act-l" id="bc-mic-lbl">Mic</div>
     </div>
-    <!-- Agregar item -->
-    <div class="bc-act" onclick="bcAddItem()" style="background:rgba(255,208,0,.25);border-color:rgba(255,208,0,.4)">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--y)" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      <div class="bc-act-l" style="color:var(--y)">Agregar</div>
-    </div>
-    <!-- Subasta -->
-    <div class="bc-act" onclick="openAuction(bcProdIdx)">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6l4-4 2.5 2.5-5 5 2 2 5-5 7 7z"/><path d="M14 14l6 6"/><path d="M2 22l5-5"/></svg>
-      <div class="bc-act-l">Subasta</div>
-    </div>
-    <!-- Compartir -->
     <div class="bc-act" onclick="shareStream()">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
       <div class="bc-act-l">Compartir</div>
     </div>
   </div>
 
-  <!-- Bottom -->
-  <div class="bc-bottom">
-    <!-- Featured product -->
-    <div class="bc-prod-bar" id="bc-prod-bar" onclick="cycleBcProd()">
-      <div class="bc-pt" id="bc-pt"><span id="bc-pe">👟</span></div>
-      <div style="flex:1;min-width:0">
-        <div class="bc-pn" id="bc-pn">Nike Air Jordan 1</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.45)" id="bc-prod-sub">Toca para cambiar item</div>
+  <!-- ── ACTIVE AUCTION OVERLAY (shown while auction runs) ── -->
+  <div id="bc-auc-overlay" style="display:none;position:absolute;top:80px;left:12px;right:12px;z-index:8;pointer-events:none">
+    <div style="background:rgba(0,0,0,.82);backdrop-filter:blur(16px);border-radius:18px;border:1px solid rgba(255,59,59,.4);padding:14px 16px;pointer-events:all">
+      <!-- Header row -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:7px">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--rd);animation:pulse-live 1s infinite"></div>
+          <div style="font-size:11px;font-weight:900;color:var(--rd);letter-spacing:1.5px">SUBASTA ACTIVA</div>
+        </div>
+        <button onclick="bcEndAuction()" style="background:rgba(255,59,59,.2);border:1px solid rgba(255,59,59,.3);border-radius:8px;padding:4px 10px;color:var(--rd);font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer">Terminar</button>
       </div>
-      <div class="bc-pp" id="bc-pp">$120</div>
+      <!-- Item name -->
+      <div style="font-size:13px;font-weight:900;color:#fff;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="bc-auc-item-name">—</div>
+      <!-- Timer + Bid row -->
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div style="flex:1;background:rgba(255,59,59,.12);border:1px solid rgba(255,59,59,.25);border-radius:12px;padding:10px 12px;text-align:center">
+          <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:.7px;text-transform:uppercase;margin-bottom:3px">Tiempo</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--rd);line-height:1;letter-spacing:1px" id="bc-auc-timer-display">2:00</div>
+        </div>
+        <div style="flex:1;background:rgba(255,208,0,.08);border:1px solid rgba(255,208,0,.2);border-radius:12px;padding:10px 12px;text-align:center">
+          <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:.7px;text-transform:uppercase;margin-bottom:3px">Oferta líder</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--y);line-height:1" id="bc-auc-top-bid">$0</div>
+        </div>
+      </div>
+      <!-- Recent bids -->
+      <div id="bc-auc-bids-feed" style="display:flex;flex-direction:column;gap:4px;max-height:70px;overflow:hidden"></div>
+    </div>
+  </div>
+
+  <!-- ── BOTTOM ── -->
+  <div class="bc-bottom">
+    <!-- Item bar -->
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <!-- Current item -->
+      <div class="bc-prod-bar" id="bc-prod-bar" onclick="bcShowItemPanel()" style="flex:1;margin-bottom:0;cursor:pointer">
+        <div class="bc-pt" id="bc-pt"><span id="bc-pe">📦</span></div>
+        <div style="flex:1;min-width:0">
+          <div class="bc-pn" id="bc-pn">¿Qué vas a vender?</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.4)" id="bc-prod-sub">Toca para editar item</div>
+        </div>
+        <div class="bc-pp" id="bc-pp">—</div>
+      </div>
+      <!-- Auction button -->
+      <div id="bc-auc-btn" onclick="bcShowAucPanel()" style="width:52px;flex-shrink:0;background:rgba(255,59,59,.15);border:1.5px solid rgba(255,59,59,.35);border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:all .15s;padding:8px 0">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--rd)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6l4-4 2.5 2.5-5 5 2 2 5-5 7 7z"/><path d="M14 14l6 6"/><path d="M2 22l5-5"/></svg>
+        <div style="font-size:8px;font-weight:900;color:var(--rd);letter-spacing:.3px">SUBASTA</div>
+      </div>
     </div>
     <!-- Chat -->
     <div class="bc-msgs" id="bc-msgs"></div>
     <div class="bc-inp-row">
-      <input class="bc-inp" id="bc-inp" type="text" placeholder="Escribe algo…" onkeydown="if(event.key==='Enter')bcSend()">
-      <div class="bc-send" onclick="bcSend()">➤</div>
+      <input class="bc-inp" id="bc-inp" type="text" placeholder="Escribe algo al chat…" onkeydown="if(event.key==='Enter')bcSend()">
+      <div class="bc-send" onclick="bcSend()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--dk)" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </div>
     </div>
   </div>
+
+  <!-- ── AUCTION SETUP PANEL (slides up) ── -->
+  <div id="bc-auc-panel" style="display:none;position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);align-items:flex-end">
+    <div style="width:100%;background:var(--dk2);border-radius:24px 24px 0 0;padding:20px 20px 40px;border-top:1px solid rgba(255,255,255,.08)">
+
+      <!-- Handle + title -->
+      <div style="width:36px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:0 auto 18px"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;display:flex;align-items:center;gap:8px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--rd)" stroke-width="2" stroke-linecap="round"><path d="M14.5 17.5L3 6l4-4 2.5 2.5-5 5 2 2 5-5 7 7z"/><path d="M14 14l6 6"/></svg>
+            Nueva Subasta
+          </div>
+          <div style="font-size:12px;color:var(--mu);margin-top:2px">La mejor oferta gana al terminar el tiempo</div>
+        </div>
+        <button onclick="bcHideAucPanel()" style="background:var(--dk3);border:1px solid rgba(255,255,255,.08);border-radius:50%;width:32px;height:32px;color:var(--mu);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
+      </div>
+
+      <!-- Item name -->
+      <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">¿Qué vas a subastar?</div>
+      <input id="bc-auc-name" type="text" placeholder="Ej: iPhone 13, Silla usada, Barajitas Pokémon…" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;box-sizing:border-box;margin-bottom:14px;transition:border-color .15s" onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+
+      <!-- Starting bid -->
+      <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Oferta mínima de inicio</div>
+      <div style="display:flex;align-items:center;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:11px 14px;margin-bottom:18px;transition:border-color .15s" onfocus-within="this.style.borderColor='rgba(255,208,0,.5)'">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--y);margin-right:6px">$</span>
+        <input id="bc-auc-start" type="number" placeholder="0" min="0" style="background:none;border:none;outline:none;color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:24px;width:100%;letter-spacing:.5px" onfocus="this.parentNode.style.borderColor='rgba(255,208,0,.5)'" onblur="this.parentNode.style.borderColor='rgba(255,255,255,.08)'">
+      </div>
+
+      <!-- Duration selector -->
+      <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Duración</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:22px">
+        <div class="bc-dur-opt on" data-secs="10" onclick="bcSelDur(this,10)">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px">10</div>
+          <div style="font-size:9px;font-weight:800;color:inherit;opacity:.7;margin-top:1px">SEG</div>
+        </div>
+        <div class="bc-dur-opt" data-secs="30" onclick="bcSelDur(this,30)">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px">30</div>
+          <div style="font-size:9px;font-weight:800;color:inherit;opacity:.7;margin-top:1px">SEG</div>
+        </div>
+        <div class="bc-dur-opt" data-secs="60" onclick="bcSelDur(this,60)">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px">1</div>
+          <div style="font-size:9px;font-weight:800;color:inherit;opacity:.7;margin-top:1px">MIN</div>
+        </div>
+        <div class="bc-dur-opt" data-secs="120" onclick="bcSelDur(this,120)">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px">2</div>
+          <div style="font-size:9px;font-weight:800;color:inherit;opacity:.7;margin-top:1px">MIN</div>
+        </div>
+      </div>
+
+      <!-- Start button -->
+      <button onclick="bcStartAuction()" style="width:100%;background:var(--rd);color:#fff;border:none;border-radius:14px;padding:16px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M14.5 17.5L3 6l4-4 2.5 2.5-5 5 2 2 5-5 7 7z"/><path d="M14 14l6 6"/><path d="M2 22l5-5"/></svg>
+        Iniciar Subasta
+      </button>
+    </div>
+  </div>
+
+  <!-- ── ITEM EDIT PANEL (slides up) ── -->
+  <div id="bc-item-panel" style="display:none;position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);align-items:flex-end">
+    <div style="width:100%;background:var(--dk2);border-radius:24px 24px 0 0;padding:20px 20px 40px;border-top:1px solid rgba(255,255,255,.08)">
+      <div style="width:36px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:0 auto 18px"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px">Item actual</div>
+        <button onclick="bcHideItemPanel()" style="background:var(--dk3);border:1px solid rgba(255,255,255,.08);border-radius:50%;width:32px;height:32px;color:var(--mu);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+      </div>
+      <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Nombre del item</div>
+      <input id="bc-item-name-inp" type="text" placeholder="¿Qué estás vendiendo?" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;box-sizing:border-box;margin-bottom:14px;transition:border-color .15s" onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+      <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Precio</div>
+      <div style="display:flex;align-items:center;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:11px 14px;margin-bottom:20px">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--y);margin-right:6px">$</span>
+        <input id="bc-item-price-inp" type="number" placeholder="0" min="0" style="background:none;border:none;outline:none;color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:24px;width:100%" onfocus="this.parentNode.style.borderColor='rgba(255,208,0,.5)'" onblur="this.parentNode.style.borderColor='rgba(255,255,255,.08)'">
+      </div>
+      <button onclick="bcSaveItem()" style="width:100%;background:var(--y);color:var(--dk);border:none;border-radius:14px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .2s">Actualizar Item</button>
+    </div>
+  </div>
+
 </div>
 
 <div class="toast" id="toast-el"></div>
@@ -2702,21 +2811,7 @@ function likeStream(){
   toast('❤️ ¡Te gustó el stream!');
 }
 function shareStream(){toast('🔗 Link copiado al portapapeles');}
-function bcAddItem(){
-  // Quick modal to add a new item to sell during stream
-  const name=window.prompt('¿Qué vas a vender ahora?\nEj: Silla de oficina, barajitas Pokémon, iPhone 12…');
-  if(!name||!name.trim())return;
-  const price=window.prompt('¿Precio? (deja vacío para subastar)');
-  const pn=document.getElementById('bc-pn');
-  const pp=document.getElementById('bc-pp');
-  const pe=document.getElementById('bc-pe');
-  if(pn)pn.textContent=name.trim();
-  if(pp)pp.textContent=price?'$'+price.replace(/[^0-9.]/g,''):'🔨 Subasta';
-  if(pe)pe.textContent='📦';
-  document.getElementById('bc-prod-sub').textContent='Nuevo item agregado';
-  toast('✅ Item actualizado en el stream');
-  if(!price||!price.trim()){setTimeout(()=>openAuction(bcProdIdx),800);}
-}
+function bcAddItem(){ bcShowItemPanel(); }
 function quickAdd(pi){addItem(pi,PRODS[pi].sz[0],1);animateCartBadge();toast(`✅ ${PRODS[pi].n} al carrito`);}
 
 function animateCartBadge(){
@@ -3527,6 +3622,133 @@ function stopCamera(){
   if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}
 }
 
+// ═══ BROADCAST AUCTION SYSTEM ═══
+let bcAucSecs=120, bcAucIv=null, bcAucTopBid=0, bcAucName='', bcSelDurSecs=10;
+
+function bcShowAucPanel(){
+  if(bcAucIv){toast('⚠️ Ya hay una subasta activa');return;}
+  const p=document.getElementById('bc-auc-panel');
+  if(p){p.style.display='flex';}
+  // Pre-fill with current item name
+  const nameInp=document.getElementById('bc-auc-name');
+  const curName=document.getElementById('bc-pn')?.textContent;
+  if(nameInp&&curName&&curName!=='¿Qué vas a vender?') nameInp.value=curName;
+}
+function bcHideAucPanel(){
+  const p=document.getElementById('bc-auc-panel');
+  if(p) p.style.display='none';
+}
+function bcShowItemPanel(){
+  const p=document.getElementById('bc-item-panel');
+  if(p) p.style.display='flex';
+}
+function bcHideItemPanel(){
+  const p=document.getElementById('bc-item-panel');
+  if(p) p.style.display='none';
+}
+function bcSaveItem(){
+  const name=(document.getElementById('bc-item-name-inp')?.value||'').trim();
+  const price=(document.getElementById('bc-item-price-inp')?.value||'').trim();
+  if(!name){toast('⚠️ Escribe el nombre del item');return;}
+  const pn=document.getElementById('bc-pn');
+  const pp=document.getElementById('bc-pp');
+  const pe=document.getElementById('bc-pe');
+  if(pn) pn.textContent=name;
+  if(pp) pp.textContent=price?'$'+price:'—';
+  if(pe) pe.textContent='📦';
+  document.getElementById('bc-prod-sub').textContent='Item activo';
+  bcHideItemPanel();
+  toast('✅ Item actualizado');
+}
+function bcSelDur(el,secs){
+  bcSelDurSecs=secs;
+  document.querySelectorAll('.bc-dur-opt').forEach(d=>d.classList.remove('on'));
+  el.classList.add('on');
+}
+function bcStartAuction(){
+  const name=(document.getElementById('bc-auc-name')?.value||'').trim();
+  const startBid=parseFloat(document.getElementById('bc-auc-start')?.value)||0;
+  if(!name){toast('⚠️ Escribe qué vas a subastar');return;}
+  bcAucName=name; bcAucTopBid=startBid; bcAucSecs=bcSelDurSecs;
+  bcHideAucPanel();
+  // Show overlay
+  const overlay=document.getElementById('bc-auc-overlay');
+  if(overlay) overlay.style.display='block';
+  const nameEl=document.getElementById('bc-auc-item-name');
+  if(nameEl) nameEl.textContent=name;
+  const topBidEl=document.getElementById('bc-auc-top-bid');
+  if(topBidEl) topBidEl.textContent=startBid?'$'+startBid:'Sin oferta';
+  // Glow the auction button
+  const aucBtn=document.getElementById('bc-auc-btn');
+  if(aucBtn){aucBtn.style.background='rgba(255,59,59,.4)';aucBtn.style.borderColor='var(--rd)';}
+  // Update item bar
+  const pn=document.getElementById('bc-pn');
+  if(pn) pn.textContent='🔨 '+name;
+  const pp=document.getElementById('bc-pp');
+  if(pp) pp.textContent=startBid?'$'+startBid:'Abierta';
+  // Start countdown
+  bcAucIv=setInterval(bcAucTick,1000);
+  bcAucTick();
+  // Announce in chat
+  addBcMsg('🔨','Sistema',`🔨 ¡SUBASTA INICIADA! "${name}" — ${bcSelDurSecs<60?bcSelDurSecs+'seg':bcSelDurSecs/60+'min'} — Oferta mínima: $${startBid}`);
+  // Simulate bids
+  setTimeout(()=>bcSimBid(),3000+Math.random()*4000);
+  toast('🔨 ¡Subasta iniciada!');
+}
+function bcAucTick(){
+  bcAucSecs=Math.max(0,bcAucSecs-1);
+  const m=~~(bcAucSecs/60);
+  const s=String(bcAucSecs%60).padStart(2,'0');
+  const timerEl=document.getElementById('bc-auc-timer-display');
+  if(timerEl){
+    timerEl.textContent=m+':'+s;
+    timerEl.style.color=bcAucSecs<=10?'#ff6b35':bcAucSecs<=30?'#ffaa00':'var(--rd)';
+  }
+  if(bcAucSecs===0){
+    clearInterval(bcAucIv);bcAucIv=null;
+    bcAucEnd();
+  }
+}
+function bcSimBid(){
+  if(!bcAucIv||bcAucSecs<=3)return;
+  const users=['carlos.ve','luisa_mpn','el_pana99','maria2024','jose_rdz','pedro_ven'];
+  const user=users[~~(Math.random()*users.length)];
+  const increment=[1,2,5,10,15][~~(Math.random()*5)];
+  bcAucTopBid+=increment;
+  const topBidEl=document.getElementById('bc-auc-top-bid');
+  if(topBidEl) topBidEl.textContent='$'+bcAucTopBid;
+  // Add to bids feed
+  const feed=document.getElementById('bc-auc-bids-feed');
+  if(feed){
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-top:1px solid rgba(255,255,255,.06);animation:fi .2s ease';
+    row.innerHTML=`<span style="font-size:11px;font-weight:800;color:var(--y)">@${user}</span><span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff">$${bcAucTopBid}</span>`;
+    feed.prepend(row);
+    while(feed.children.length>3)feed.removeChild(feed.lastChild);
+  }
+  addBcMsg('💛',user,`Oferta: $${bcAucTopBid}`);
+  // Schedule next bid
+  if(bcAucIv&&bcAucSecs>5) setTimeout(()=>bcSimBid(),2000+Math.random()*5000);
+}
+function bcAucEnd(){
+  const overlay=document.getElementById('bc-auc-overlay');
+  if(overlay) overlay.style.display='none';
+  const aucBtn=document.getElementById('bc-auc-btn');
+  if(aucBtn){aucBtn.style.background='rgba(255,59,59,.15)';aucBtn.style.borderColor='rgba(255,59,59,.35)';}
+  const winner=bcAucTopBid>0?`¡Ganador con $${bcAucTopBid}! 🏆`:'Sin ofertas.';
+  addBcMsg('🔨','Sistema',`🔨 SUBASTA CERRADA: "${bcAucName}" — ${winner}`);
+  toast(`🔨 Subasta cerrada — ${winner}`);
+  // Reset item bar
+  const pn=document.getElementById('bc-pn');
+  if(pn) pn.textContent='¿Qué vas a vender?';
+  const pp=document.getElementById('bc-pp');
+  if(pp) pp.textContent='—';
+}
+function bcEndAuction(){
+  clearInterval(bcAucIv);bcAucIv=null;
+  bcAucSecs=0;bcAucEnd();
+}
+
 function startBroadcast(){
   const title=document.getElementById('gl-title').value.trim()||'Stream en vivo 🔴';
   if(!cameraStream){toast('⚠️ Activa la cámara primero');return;}
@@ -3575,6 +3797,8 @@ function startBroadcast(){
   // Push notif to "audience"
   pushNotif('🔴','live',`<strong>Tú</strong> estás en vivo ahora — ${title}`,()=>go('broadcast'));
   go('broadcast');
+  // If auction mode selected, auto-open auction panel
+  if(glSaleType==='auction'){setTimeout(()=>bcShowAucPanel(),1000);}
 }
 
 function updateBcProd(){
