@@ -6,6 +6,7 @@
 <title>InstaCompras Live</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.0.js"></script>
 <script>
 // ═══ FIREBASE REST API — sin SDK externo ═══
 const FB={
@@ -1105,7 +1106,6 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
             <div class="ob-dot on"></div><div class="ob-dot"></div><div class="ob-dot"></div>
           </div>
           <button class="ob-btn" onclick="obNext()">Siguiente →</button>
-          <div class="ob-skip" onclick="obSkip()">Saltar introducción</div>
         </div>
       </div>
     </div>
@@ -1145,7 +1145,6 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
             <div class="ob-dot"></div><div class="ob-dot on"></div><div class="ob-dot"></div>
           </div>
           <button class="ob-btn" onclick="obNext()">Siguiente →</button>
-          <div class="ob-skip" onclick="obSkip()">Saltar introducción</div>
         </div>
       </div>
     </div>
@@ -1186,7 +1185,6 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
             <div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot on"></div>
           </div>
           <button class="ob-btn" onclick="goRegister()">Crear cuenta gratis 🔥</button>
-          <div class="ob-skip" onclick="obSkip()">Entrar sin cuenta</div>
         </div>
       </div>
     </div>
@@ -1279,6 +1277,11 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none"
         onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
 
+      <input id="reg-cedula" type="text" placeholder="Número de cédula (ej: V-12345678)" autocomplete="off"
+        style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none"
+        onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'"
+        oninput="this.value=this.value.toUpperCase().replace(/[^VEve0-9-]/g,'')">
+
       <div style="position:relative">
         <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--mu);font-weight:700;pointer-events:none">@</span>
         <input id="reg-username" type="text" placeholder="nombre_de_usuario" autocomplete="off"
@@ -1295,6 +1298,10 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none"
         onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
 
+      <input id="reg-pass2" type="password" placeholder="Repetir contraseña" autocomplete="new-password"
+        style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none"
+        onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+
       <input id="reg-city" type="text" placeholder="Ciudad (Caracas, Valencia…)"
         style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none"
         onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
@@ -1302,9 +1309,6 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
       <!-- Seller extra -->
       <div id="seller-fields" style="display:none;flex-direction:column;gap:12px">
         <input id="reg-shop" type="text" placeholder="Nombre de tu tienda"
-          style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none"
-          onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
-        <input id="reg-cat" type="text" placeholder="Categoría principal (Ropa, Tecnología…)"
           style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none"
           onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
         <div style="background:rgba(255,208,0,.07);border:1px solid rgba(255,208,0,.2);border-radius:10px;padding:11px 13px;font-size:11px;color:rgba(255,255,255,.6);line-height:1.6">
@@ -1457,6 +1461,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
   <!-- Video hero -->
   <div class="sv" id="sv">
     <img id="sv-img" src="" onerror="this.style.display='none'">
+    <div id="sv-agora-video" style="position:absolute;inset:0;z-index:2;display:none;background:#000"></div>
     <div class="sv-gradient"></div>
     <div class="sv-topbar">
       <div class="sv-top-left">
@@ -2381,6 +2386,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 <!-- BROADCAST (live stream screen) -->
 <div id="s-broadcast" class="scr">
   <video id="bc-video" class="bc-video" autoplay muted playsinline></video>
+  <div id="bc-agora-video" style="position:absolute;inset:0;z-index:1;display:none;background:#000"></div>
   <div class="bc-gt"></div>
   <div class="bc-gb"></div>
 
@@ -2982,7 +2988,10 @@ function addNavRipple(id){
 }
 function goBack(){
   if(hist.length>1){
+    const leaving=hist[hist.length-1];
     hist.pop();stopChat();
+    // Leave Agora if we were watching a stream
+    if(leaving==='stream'){leaveAgoraChannel();}
     const prev=hist[hist.length-1];
     go(prev,false);
     // Si volvemos a prod y el producto es live, reanudar simulador
@@ -3052,6 +3061,8 @@ function openStream(idx){
     </div>`).join('');
   svTab('chat');
   go('stream');
+  // Join Agora channel as viewer
+  joinAsAudience(getChannelForSeller(idx));
 }
 
 let timerSecs=14*60+32,timerIv=null;
@@ -3806,21 +3817,25 @@ function regSocial(type){
 function regSubmit(){
   const name=document.getElementById('reg-name').value.trim();
   const username=document.getElementById('reg-username')?.value.trim().toLowerCase()||'';
+  const cedula=document.getElementById('reg-cedula')?.value.trim()||'';
   const phone=document.getElementById('reg-phone').value.trim();
   const pass=document.getElementById('reg-pass').value.trim();
+  const pass2=document.getElementById('reg-pass2')?.value.trim()||'';
   const city=(document.getElementById('reg-city')?.value||'').trim();
   const shop=(document.getElementById('reg-shop')?.value||'').trim();
   if(!name){toast('⚠️ Escribe tu nombre completo');return;}
+  if(!cedula){toast('⚠️ Ingresa tu número de cédula');return;}
   if(!username){toast('⚠️ Elige un nombre de usuario');return;}
   if(!phone||!phone.includes('@')){toast('⚠️ Ingresa un correo válido');return;}
   if(!pass||pass.length<6){toast('⚠️ Contraseña mínimo 6 caracteres');return;}
+  if(pass!==pass2){toast('⚠️ Las contraseñas no coinciden');return;}
   const emailToUse=phone;
   const btn=document.querySelector('#auth-reg-form button');
   if(btn){btn.textContent='Creando cuenta…';btn.disabled=true;}
   fbSignUp(emailToUse,pass)
     .then(async d=>{
       window.fbToken=d.idToken;
-      const userData={name,username,phone,city,type:accType,shop,email:emailToUse,uid:d.localId};
+      const userData={name,username,cedula,phone,city,type:accType,shop,email:emailToUse,uid:d.localId};
       await fbSaveUser(d.localId,userData,d.idToken);
       window.fbUser={...userData};
       fbSaveSession(d.idToken,d.localId);
@@ -3844,6 +3859,94 @@ function regLogin(){authMode('login');}
 let cameraStream=null, facingMode='user', bcTimerIv=null, bcSecs=0;
 let bcProdIdx=0, bcSelectedProds=[], bcViewerIv=null, bcChatIv=null;
 let isMuted=false;
+
+// ═══ AGORA RTC ═══
+const AGORA_APP_ID='989149d167ca46ccbd90405fbd706abb';
+let agoraClient=null, agoraJoined=false;
+let agoraLocalVideo=null, agoraLocalAudio=null;
+
+function getChannelForSeller(idx){
+  return 'ic_'+idx;
+}
+function getMySellerIdx(){
+  if(!window.fbUser)return 0;
+  const u=(window.fbUser.username||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const idx=SELLERS.findIndex(s=>s.n.toLowerCase().replace(/[^a-z0-9]/g,'')===u);
+  return idx>=0?idx:0;
+}
+
+async function leaveAgoraChannel(){
+  try{
+    if(agoraLocalVideo){agoraLocalVideo.stop();agoraLocalVideo.close();agoraLocalVideo=null;}
+    if(agoraLocalAudio){agoraLocalAudio.stop();agoraLocalAudio.close();agoraLocalAudio=null;}
+    if(agoraClient&&agoraJoined){await agoraClient.leave();agoraJoined=false;}
+    agoraClient=null;
+  }catch(e){console.warn('Agora leave:',e);}
+  const sv=document.getElementById('sv-agora-video');
+  if(sv){sv.style.display='none';sv.innerHTML='';}
+  const bc=document.getElementById('bc-agora-video');
+  if(bc){bc.style.display='none';bc.innerHTML='';}
+}
+
+async function joinAsAudience(channelName){
+  try{
+    await leaveAgoraChannel();
+    agoraClient=AgoraRTC.createClient({mode:'live',codec:'h264'});
+    await agoraClient.setClientRole('audience');
+    await agoraClient.join(AGORA_APP_ID,channelName,null,null);
+    agoraJoined=true;
+    agoraClient.on('user-published',async(user,mediaType)=>{
+      await agoraClient.subscribe(user,mediaType);
+      if(mediaType==='video'){
+        const container=document.getElementById('sv-agora-video');
+        if(container){container.style.display='block';user.videoTrack.play(container);}
+        const img=document.getElementById('sv-img');
+        if(img)img.style.opacity='0';
+      }
+      if(mediaType==='audio'){user.audioTrack.play();}
+    });
+    agoraClient.on('user-unpublished',(user,mediaType)=>{
+      if(mediaType==='video'){
+        const container=document.getElementById('sv-agora-video');
+        if(container){container.style.display='none';container.innerHTML='';}
+        const img=document.getElementById('sv-img');
+        if(img)img.style.opacity='1';
+      }
+    });
+    toast('📡 Conectado al live');
+  }catch(e){
+    console.error('Agora audience:',e);
+    toast('⚠️ No se pudo conectar al stream en vivo');
+  }
+}
+
+async function joinAsHost(channelName){
+  try{
+    // Stop getUserMedia preview
+    if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}
+    await leaveAgoraChannel();
+    agoraClient=AgoraRTC.createClient({mode:'live',codec:'h264'});
+    await agoraClient.setClientRole('host');
+    await agoraClient.join(AGORA_APP_ID,channelName,null,null);
+    agoraJoined=true;
+    // Create tracks
+    [agoraLocalAudio,agoraLocalVideo]=await AgoraRTC.createMicrophoneAndCameraTracks(
+      {encoderConfig:'music_standard'},
+      {encoderConfig:'720p_1',facingMode}
+    );
+    // Show in broadcast screen
+    const bcHtml=document.getElementById('bc-video');
+    if(bcHtml)bcHtml.style.display='none';
+    const bcAgora=document.getElementById('bc-agora-video');
+    if(bcAgora){bcAgora.style.display='block';agoraLocalVideo.play(bcAgora);}
+    await agoraClient.publish([agoraLocalAudio,agoraLocalVideo]);
+    toast('📡 ¡Estás en vivo!');
+  }catch(e){
+    console.error('Agora host:',e);
+    toast('⚠️ Error al iniciar live: '+e.message);
+    if(btn){btn.textContent='Empezar en Vivo';btn.disabled=false;}
+  }
+}
 
 // Init go-live screen
 let glSaleType='sell';
@@ -3899,7 +4002,19 @@ async function startCamera(){
 
 function flipCamera(){
   facingMode=facingMode==='user'?'environment':'user';
-  startCamera();
+  // If broadcasting with Agora, recreate the video track
+  if(agoraJoined && agoraLocalVideo){
+    agoraLocalVideo.stop();agoraLocalVideo.close();
+    AgoraRTC.createCameraVideoTrack({encoderConfig:'720p_1',facingMode}).then(async track=>{
+      agoraLocalVideo=track;
+      const bc=document.getElementById('bc-agora-video');
+      if(bc)agoraLocalVideo.play(bc);
+      await agoraClient.unpublish();
+      await agoraClient.publish([agoraLocalAudio,agoraLocalVideo]);
+    }).catch(e=>toast('⚠️ Error al voltear cámara'));
+  } else {
+    startCamera();
+  }
 }
 
 function stopCamera(){
@@ -4035,12 +4150,8 @@ function bcEndAuction(){
 
 function startBroadcast(){
   const title=document.getElementById('gl-title').value.trim()||'Stream en vivo 🔴';
-  if(!cameraStream){toast('⚠️ Activa la cámara primero');return;}
   bcProdIdx=bcSelectedProds[0]||0;
   bcSecs=0;
-  // Update bc video stream
-  const bcVid=document.getElementById('bc-video');
-  if(bcVid)bcVid.srcObject=cameraStream;
   // Update featured product
   updateBcProd();
   // Timer
@@ -4081,6 +4192,9 @@ function startBroadcast(){
   // Push notif to "audience"
   pushNotif('🔴','live',`<strong>Tú</strong> estás en vivo ahora — ${title}`,()=>go('broadcast'));
   go('broadcast');
+  // Join Agora as host
+  const channelName=getChannelForSeller(getMySellerIdx());
+  joinAsHost(channelName);
   // If auction mode selected, auto-open auction panel
   if(glSaleType==='auction'){setTimeout(()=>bcShowAucPanel(),1000);}
 }
@@ -4104,6 +4218,9 @@ function cycleBcProd(){
 
 function toggleMute(){
   isMuted=!isMuted;
+  // Agora track mute
+  if(agoraLocalAudio){agoraLocalAudio.setEnabled(!isMuted);}
+  // Fallback: getUserMedia mute
   if(cameraStream){cameraStream.getAudioTracks().forEach(t=>t.enabled=!isMuted);}
   const btn=document.getElementById('bc-mute-btn');
   if(btn){
@@ -4135,6 +4252,7 @@ function bcSend(){
 function endBroadcast(){
   clearInterval(bcTimerIv);clearInterval(bcViewerIv);clearInterval(bcChatIv);
   stopCamera();
+  leaveAgoraChannel();
   const m=String(~~(bcSecs/60)).padStart(2,'0');
   const s=String(bcSecs%60).padStart(2,'0');
   toast(`✅ Stream terminado — Duración: ${m}:${s}`);
