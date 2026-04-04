@@ -467,7 +467,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .prof-btns{display:flex;justify-content:flex-end;padding-top:9px;margin-bottom:32px;gap:7px}
 .prof-btn{background:var(--dk3);border:1.5px solid rgba(255,255,255,.09);border-radius:18px;padding:6px 14px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;color:var(--tx);cursor:pointer;transition:all .15s}
 .prof-btn:hover{border-color:rgba(255,208,0,.4);color:var(--y)}
-.prof-name{font-family:'Bebas Neue',sans-serif;font-size:24px;margin-bottom:2px}
+.prof-name{font-family:'Bebas Neue',sans-serif;font-size:26px;margin-bottom:2px;letter-spacing:.3px}
 .prof-handle{font-size:12px;color:var(--mu);margin-bottom:13px}
 .prof-stats{display:flex;background:var(--dk3);border-radius:11px;overflow:hidden;border:1px solid rgba(255,255,255,.05);margin-bottom:14px}
 .pst{flex:1;padding:11px 8px;text-align:center;border-right:1px solid rgba(255,255,255,.05)}
@@ -1714,41 +1714,145 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 <!-- PROFILE -->
 <div id="s-prof" class="scr">
-  <!-- Input de archivo oculto para foto de perfil -->
   <input type="file" id="prof-av-input" accept="image/*" style="display:none" onchange="profUploadAv(this)">
-  <!-- Input de archivo oculto para portada -->
   <input type="file" id="prof-banner-input" accept="image/*" style="display:none" onchange="profUploadBanner(this)">
-  <div class="sb" style="padding-bottom:80px">
-    <div class="prof-banner" id="prof-banner-wrap" style="cursor:pointer" onclick="document.getElementById('prof-banner-input').click()">
-      <img id="prof-banner-img" src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80" style="width:100%;height:100%;object-fit:cover;opacity:.7;display:block">
-      <button class="prof-edit-banner" style="pointer-events:none">📷 Cambiar portada</button>
+
+  <div class="sb" style="padding-bottom:88px">
+
+    <!-- BANNER — SVG gradient default, no external URL -->
+    <div id="prof-banner-wrap" style="position:relative;height:160px;overflow:hidden;cursor:pointer" onclick="document.getElementById('prof-banner-input').click()">
+      <div id="prof-banner-bg" style="position:absolute;inset:0;background:linear-gradient(135deg,#0a0a0f 0%,#1a1200 30%,#2a1e00 60%,#0f0a00 100%)">
+        <!-- Decorative SVG pattern -->
+        <svg width="100%" height="100%" viewBox="0 0 430 160" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;opacity:.5">
+          <defs>
+            <radialGradient id="bg1" cx="80%" cy="30%"><stop offset="0%" stop-color="#FFD000" stop-opacity=".35"/><stop offset="100%" stop-color="#FFD000" stop-opacity="0"/></radialGradient>
+            <radialGradient id="bg2" cx="20%" cy="80%"><stop offset="0%" stop-color="#FF3B3B" stop-opacity=".2"/><stop offset="100%" stop-color="#FF3B3B" stop-opacity="0"/></radialGradient>
+          </defs>
+          <rect width="430" height="160" fill="url(#bg1)"/>
+          <rect width="430" height="160" fill="url(#bg2)"/>
+          <circle cx="340" cy="40" r="80" fill="none" stroke="rgba(255,208,0,.12)" stroke-width="1"/>
+          <circle cx="340" cy="40" r="120" fill="none" stroke="rgba(255,208,0,.07)" stroke-width="1"/>
+          <circle cx="80" cy="130" r="60" fill="none" stroke="rgba(255,59,59,.1)" stroke-width="1"/>
+          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="52" fill="rgba(255,208,0,.06)" letter-spacing="8">INSTACOMPRAS</text>
+        </svg>
+        <img id="prof-banner-img" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none">
+      </div>
+      <!-- Live badge top left -->
+      <div style="position:absolute;top:12px;left:14px;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);border-radius:20px;padding:4px 10px;border:1px solid rgba(255,255,255,.1)">
+        <div style="width:6px;height:6px;border-radius:50%;background:var(--rd);animation:pulse-live 2s infinite"></div>
+        <span style="font-size:10px;font-weight:900;color:#fff;letter-spacing:1px" id="prof-type-badge">COMPRADOR</span>
+      </div>
+      <!-- Edit banner hint -->
+      <div style="position:absolute;bottom:10px;right:12px;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border-radius:8px;padding:4px 9px;font-size:10px;font-weight:700;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:4px">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Cambiar portada
+      </div>
     </div>
-    <div class="prof-body">
-      <!-- Avatar con foto real + botón upload encima -->
-      <div class="prof-av" id="prof-av" onclick="document.getElementById('prof-av-input').click()">
-        <img id="prof-av-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80" alt="avatar">
+
+    <!-- AVATAR + ACTIONS ROW -->
+    <div style="padding:0 16px;position:relative;margin-top:-44px;margin-bottom:12px;display:flex;align-items:flex-end;justify-content:space-between">
+      <!-- Avatar -->
+      <div style="position:relative;cursor:pointer" onclick="document.getElementById('prof-av-input').click()">
+        <div id="prof-av" style="width:84px;height:84px;border-radius:50%;border:3px solid var(--dk);overflow:hidden;background:var(--dk3);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <div id="prof-av-initials" style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--y);letter-spacing:1px">?</div>
+          <img id="prof-av-img" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;display:none">
+        </div>
+        <div style="position:absolute;bottom:2px;right:2px;width:22px;height:22px;border-radius:50%;background:var(--y);border:2px solid var(--dk);display:flex;align-items:center;justify-content:center">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--dk)" stroke-width="3" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </div>
       </div>
-      <div class="prof-av-edit" onclick="document.getElementById('prof-av-input').click()">
-        <div class="prof-av-edit-btn">📷 Editar</div>
+      <!-- Action buttons -->
+      <div style="display:flex;gap:8px;padding-bottom:4px">
+        <button onclick="openProfEdit()" style="background:var(--dk3);border:1.5px solid rgba(255,255,255,.12);border-radius:10px;padding:8px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Editar
+        </button>
+        <button onclick="fbLogout()" style="background:rgba(255,59,59,.1);border:1.5px solid rgba(255,59,59,.25);border-radius:10px;padding:8px 14px;color:var(--rd);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          Salir
+        </button>
       </div>
-      <div class="prof-btns">
-        <button class="prof-btn" onclick="openProfEdit()">✏️ Editar perfil</button>
-        <button class="prof-btn" style="border-color:rgba(255,59,59,.3);color:var(--rd)" onclick="openDash()">📊 Mi Dashboard</button>
-      </div>
+    </div>
+
+    <!-- NAME + HANDLE -->
+    <div style="padding:0 16px 14px">
       <div class="prof-name" id="prof-name-display">—</div>
-      <div class="prof-handle" id="prof-handle-display">@— · —</div>
-      <div id="prof-bio-display" style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.55;margin-bottom:14px;padding:10px 12px;background:var(--dk3);border-radius:10px;border:1px solid rgba(255,255,255,.05)"></div>
-      <div class="prof-stats">
-        <div class="pst"><div class="pstn" id="st-buy">0</div><div class="pstl">Compras</div></div>
-        <div class="pst"><div class="pstn" id="st-fol">0</div><div class="pstl">Siguiendo</div></div>
-        <div class="pst"><div class="pstn">$<span id="st-spent">0</span></div><div class="pstl">Gastado</div></div>
+      <div style="font-size:13px;color:var(--mu);font-weight:700;margin-bottom:8px" id="prof-handle-display">@—</div>
+      <div id="prof-bio-display" style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.55"></div>
+    </div>
+
+    <!-- STATS -->
+    <div style="display:flex;margin:0 16px 16px;background:var(--dk3);border-radius:14px;border:1px solid rgba(255,255,255,.06);overflow:hidden">
+      <div style="flex:1;padding:14px 0;text-align:center;border-right:1px solid rgba(255,255,255,.06)">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y)" id="st-buy">0</div>
+        <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Compras</div>
       </div>
-      <div class="pmenu">
-        <div class="pmi" onclick="openWallet()"><div class="pmic">💰</div><div class="pmil">Mi Wallet</div><div class="pmib" id="wallet-prof-badge">250 IC</div><div class="pmia">›</div></div>
-        <div class="pmi" onclick="nav('cart')"><div class="pmic">🛒</div><div class="pmil">Mi Carrito</div><div class="pmib" id="cart-prof-badge">0</div><div class="pmia">›</div></div>
-        <div class="pmi" onclick="openDash()"><div class="pmic">📊</div><div class="pmil">Dashboard Vendedor</div><div class="pmia">›</div></div>
-        <div class="pmi" onclick="openTrack(0)"><div class="pmic">🚚</div><div class="pmil">Seguimiento de Pedido</div><div class="pmia">›</div></div>
+      <div style="flex:1;padding:14px 0;text-align:center;border-right:1px solid rgba(255,255,255,.06)">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y)" id="st-fol">0</div>
+        <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Siguiendo</div>
       </div>
+      <div style="flex:1;padding:14px 0;text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y)">$<span id="st-spent">0</span></div>
+        <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Gastado</div>
+      </div>
+    </div>
+
+    <!-- MENU -->
+    <div style="padding:0 16px;display:flex;flex-direction:column;gap:8px">
+
+      <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px">Mi cuenta</div>
+
+      <div class="pmi" onclick="openWallet()" style="border-radius:13px">
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,208,0,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--y)" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+        </div>
+        <div class="pmil">Mi Wallet</div>
+        <div class="pmib" id="wallet-prof-badge" style="background:rgba(255,208,0,.1);color:var(--y);border-radius:8px;padding:3px 8px;font-size:11px">250 IC</div>
+        <div class="pmia">›</div>
+      </div>
+
+      <div class="pmi" onclick="nav('cart')" style="border-radius:13px">
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--tx)" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+        </div>
+        <div class="pmil">Mi Carrito</div>
+        <div class="pmib" id="cart-prof-badge" style="background:rgba(255,255,255,.07);border-radius:8px;padding:3px 8px;font-size:11px">0</div>
+        <div class="pmia">›</div>
+      </div>
+
+      <div class="pmi" onclick="openTrack(0)" style="border-radius:13px">
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--tx)" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        </div>
+        <div class="pmil">Mis Pedidos</div>
+        <div class="pmia">›</div>
+      </div>
+
+      <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-top:6px;margin-bottom:2px">Vendedor</div>
+
+      <div class="pmi" onclick="openDash()" style="border-radius:13px">
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,208,0,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--y)" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        <div class="pmil">Dashboard Vendedor</div>
+        <div class="pmia">›</div>
+      </div>
+
+      <div class="pmi" onclick="initGoLive()" style="border-radius:13px">
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,59,59,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--rd);animation:pulse-live 2s infinite"></div>
+        </div>
+        <div class="pmil">Iniciar Stream</div>
+        <div class="pmia">›</div>
+      </div>
+
+      <!-- Sign out -->
+      <div style="margin-top:10px;padding:14px 16px;background:rgba(255,59,59,.06);border:1px solid rgba(255,59,59,.15);border-radius:13px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="fbLogout()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--rd)" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        <div style="flex:1;font-size:14px;font-weight:800;color:var(--rd)">Cerrar sesión</div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,59,59,.5)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+
     </div>
   </div>
 
@@ -1759,15 +1863,12 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px">Editar Perfil</div>
         <button onclick="closeProfEdit()" style="background:var(--dk3);border:1px solid rgba(255,255,255,.08);border-radius:50%;width:32px;height:32px;color:var(--mu);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
       </div>
-      <!-- Nombre -->
       <div style="font-size:10px;font-weight:800;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px">Nombre</div>
       <input id="prof-edit-name" type="text" maxlength="40" placeholder="Tu nombre" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 16px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;transition:border-color .15s" onfocus="this.style.borderColor='rgba(255,208,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
-      <!-- Bio -->
       <div style="font-size:10px;font-weight:800;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px">Bio</div>
       <textarea id="prof-edit-bio" maxlength="120" rows="3" placeholder="Cuéntanos algo sobre ti…" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 16px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;resize:none;box-sizing:border-box;margin-bottom:6px;line-height:1.5;transition:border-color .15s" onfocus="this.style.borderColor='rgba(255,208,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'"></textarea>
       <div style="text-align:right;font-size:10px;color:var(--mu);margin-bottom:18px"><span id="prof-bio-count">0</span>/120</div>
-      <!-- Guardar -->
-      <button onclick="saveProfEdit()" style="width:100%;background:var(--y);color:var(--dk);border:none;border-radius:13px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .15s">✅ Guardar cambios</button>
+      <button onclick="saveProfEdit()" style="width:100%;background:var(--y);color:var(--dk);border:none;border-radius:13px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .15s">Guardar cambios</button>
     </div>
   </div>
 </div>
@@ -3665,14 +3766,31 @@ function loadProfData(){
   const handleEl=document.getElementById('prof-handle-display');
   if(handleEl){
     const handle=u.username?('@'+u.username):(u.email?u.email.split('@')[0]:'');
-    const city=u.city||'Venezuela';
-    handleEl.textContent=handle+' · '+city+' 🇻🇪';
+    const city=u.city?(' · '+u.city+' 🇻🇪'):'';
+    handleEl.textContent=handle+city;
   }
   // Bio
   const bioEl=document.getElementById('prof-bio-display');
   if(bioEl){
     const type=u.type==='seller'?'Vendedor 📡':'Comprador 🛍️';
-    bioEl.textContent=u.bio||(type+' · '+(u.city||'Venezuela')+' 🇻🇪');
+    bioEl.textContent=u.bio||(type+(u.city?' · '+u.city:''));
+  }
+  // Type badge
+  const badge=document.getElementById('prof-type-badge');
+  if(badge) badge.textContent=u.type==='seller'?'VENDEDOR':'COMPRADOR';
+  // Avatar initials
+  const initEl=document.getElementById('prof-av-initials');
+  if(initEl){
+    const name=u.name||u.email||'?';
+    const parts=name.trim().split(' ');
+    const initials=parts.length>=2?(parts[0][0]+parts[1][0]).toUpperCase():name[0].toUpperCase();
+    initEl.textContent=initials;
+  }
+  // If Google avatar exists
+  if(u.avatar){
+    const img=document.getElementById('prof-av-img');
+    const ini=document.getElementById('prof-av-initials');
+    if(img&&ini){img.src=u.avatar;img.style.display='block';ini.style.display='none';}
   }
   // Checkout name
   const coName=document.getElementById('co-name-display');
