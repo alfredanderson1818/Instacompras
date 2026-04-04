@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>InstaCompras Live</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 // ═══ FIREBASE REST API — sin SDK externo ═══
 const FB={
@@ -15,6 +16,7 @@ const FB={
 };
 window.fbUser=null;
 window.fbToken=null;
+const GOOGLE_CLIENT_ID='770638350247-ev139tnoi9peqmmtjtaejfic2hqqbicv.apps.googleusercontent.com';
 
 // Guardar/recuperar sesión en localStorage
 function fbSaveSession(token,uid){
@@ -88,6 +90,37 @@ async function fbGetUser(uid,token){
   if(!r.ok)return null;
   const d=await r.json();
   return fromFS(d);
+}
+
+// Google Sign-In con Firebase REST
+async function fbGoogleSignIn(){
+  return new Promise((resolve,reject)=>{
+    if(typeof google==='undefined'){
+      reject({message:'Google Sign-In no disponible. Intenta de nuevo.'});return;
+    }
+    const client=google.accounts.oauth2.initTokenClient({
+      client_id:GOOGLE_CLIENT_ID,
+      scope:'email profile openid',
+      callback:async(resp)=>{
+        if(resp.error){reject({message:resp.error});return;}
+        try{
+          // Exchange Google access token with Firebase
+          const r=await fetch(`${FB.authUrl}:signInWithIdp?key=${FB.apiKey}`,{
+            method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+              postBody:`access_token=${resp.access_token}&providerId=google.com`,
+              requestUri:'https://alfredanderson1818.github.io/Instacompras',
+              returnSecureToken:true,returnIdpCredential:true
+            })
+          });
+          const d=await r.json();
+          if(!r.ok)throw{message:d.error?.message||'Error Google'};
+          resolve(d);
+        }catch(e){reject(e);}
+      }
+    });
+    client.requestAccessToken({prompt:'select_account'});
+  });
 }
 
 // Verificar token guardado al cargar
@@ -1182,7 +1215,15 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none"
         onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
 
-      <input id="reg-phone" type="text" placeholder="Teléfono o correo" autocomplete="username"
+      <div style="position:relative">
+        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--mu);font-weight:700;pointer-events:none">@</span>
+        <input id="reg-username" type="text" placeholder="nombre_de_usuario" autocomplete="off"
+          style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px 13px 28px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none"
+          onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'"
+          oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_.]/g,'')">
+      </div>
+
+      <input id="reg-phone" type="email" placeholder="Correo electrónico" autocomplete="email"
         style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none"
         onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
 
@@ -1694,9 +1735,9 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         <button class="prof-btn" onclick="openProfEdit()">✏️ Editar perfil</button>
         <button class="prof-btn" style="border-color:rgba(255,59,59,.3);color:var(--rd)" onclick="openDash()">📊 Mi Dashboard</button>
       </div>
-      <div class="prof-name" id="prof-name-display">Juan Pérez</div>
-      <div class="prof-handle" id="prof-handle-display">@juanperez.ve · Caracas 🇻🇪</div>
-      <div id="prof-bio-display" style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.55;margin-bottom:14px;padding:10px 12px;background:var(--dk3);border-radius:10px;border:1px solid rgba(255,255,255,.05)">Comprador apasionado 🛍️ · Caracas, Venezuela 🇻🇪</div>
+      <div class="prof-name" id="prof-name-display">—</div>
+      <div class="prof-handle" id="prof-handle-display">@— · —</div>
+      <div id="prof-bio-display" style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.55;margin-bottom:14px;padding:10px 12px;background:var(--dk3);border-radius:10px;border:1px solid rgba(255,255,255,.05)"></div>
       <div class="prof-stats">
         <div class="pst"><div class="pstn" id="st-buy">0</div><div class="pstl">Compras</div></div>
         <div class="pst"><div class="pstn" id="st-fol">0</div><div class="pstl">Siguiendo</div></div>
@@ -1893,7 +1934,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <div class="co-sec">
       <div class="co-sec-t">📦 Entrega</div>
       <div class="co-card">
-        <div class="co-row"><span class="co-l">Nombre</span><span class="co-v">Juan Pérez</span></div>
+        <div class="co-row"><span class="co-l">Nombre</span><span class="co-v" id="co-name-display">—</span></div>
         <div class="co-row"><span class="co-l">Ciudad</span><span class="co-v">Caracas, VE</span></div>
         <div class="co-row"><span class="co-l">Método</span><span class="co-v">🏍️ Moto · $3 USD</span></div>
       </div>
@@ -2433,6 +2474,7 @@ function go(id,push=true){
 function nav(id){
   hist=[id];stopChat();
   addNavRipple(id);
+  if(id==='prof') loadProfData();
   go(id,false);
 }
 
@@ -3232,7 +3274,7 @@ function doLogin(){
       const userData=await fbGetUser(d.localId,d.idToken);
       window.fbUser={uid:d.localId,...(userData||{email})};
       fbSaveSession(d.idToken,d.localId);
-      toast('✅ ¡Bienvenido de vuelta!');
+      toast('✅ ¡Bienvenido de vuelta!');setTimeout(loadProfData,500);
       const reg=document.getElementById('s-register');
       if(reg)reg.classList.remove('on');
       const ob=document.getElementById('s-onboard');
@@ -3246,28 +3288,59 @@ function doLogin(){
     });
 }
 function regSocial(type){
-  const msg=type==='Google'?'🌐 Conectando con Google…':'🌐 Conectando...';
-  toast(msg);
-  setTimeout(()=>{
-    toast(`✅ Sesión iniciada con ${type}`);
-    setTimeout(()=>goHome(),600);
-  },1500);
+  if(type==='Google'){
+    toast('🌐 Conectando con Google…');
+    fbGoogleSignIn()
+      .then(async d=>{
+        window.fbToken=d.idToken;
+        // Check if user already has a profile
+        let userData=await fbGetUser(d.localId,d.idToken).catch(()=>null);
+        if(!userData){
+          // New user — create profile from Google data
+          userData={
+            name:d.displayName||d.email.split('@')[0],
+            username:d.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_.]/g,''),
+            email:d.email,
+            phone:'',city:'',type:'buyer',shop:'',
+            uid:d.localId,
+            avatar:d.photoUrl||''
+          };
+          await fbSaveUser(d.localId,userData,d.idToken).catch(()=>{});
+        }
+        window.fbUser={uid:d.localId,...userData};
+        fbSaveSession(d.idToken,d.localId);
+        toast('✅ Sesión iniciada con Google');
+        const reg=document.getElementById('s-register');
+        if(reg)reg.classList.remove('on');
+        const ob=document.getElementById('s-onboard');
+        if(ob){ob.classList.remove('on');ob.style.display='none';}
+        setTimeout(()=>{loadProfData();buildGrid();go('home',false);},400);
+      })
+      .catch(e=>{
+        toast('❌ '+(e.message||'Error al conectar con Google'));
+      });
+  } else {
+    toast('🌐 Próximamente: '+type);
+  }
 }
 function regSubmit(){
   const name=document.getElementById('reg-name').value.trim();
+  const username=document.getElementById('reg-username')?.value.trim().toLowerCase()||'';
   const phone=document.getElementById('reg-phone').value.trim();
   const pass=document.getElementById('reg-pass').value.trim();
   const city=(document.getElementById('reg-city')?.value||'').trim();
   const shop=(document.getElementById('reg-shop')?.value||'').trim();
-  if(!name||!phone){toast('⚠️ Completa tu nombre y teléfono/correo');return;}
+  if(!name){toast('⚠️ Escribe tu nombre completo');return;}
+  if(!username){toast('⚠️ Elige un nombre de usuario');return;}
+  if(!phone||!phone.includes('@')){toast('⚠️ Ingresa un correo válido');return;}
   if(!pass||pass.length<6){toast('⚠️ Contraseña mínimo 6 caracteres');return;}
-  const emailToUse=phone.includes('@')?phone:phone.replace(/\D/g,'')+'@instacompras.app';
+  const emailToUse=phone;
   const btn=document.querySelector('#auth-reg-form button');
   if(btn){btn.textContent='Creando cuenta…';btn.disabled=true;}
   fbSignUp(emailToUse,pass)
     .then(async d=>{
       window.fbToken=d.idToken;
-      const userData={name,phone,city,type:accType,shop,email:emailToUse,uid:d.localId};
+      const userData={name,username,phone,city,type:accType,shop,email:emailToUse,uid:d.localId};
       await fbSaveUser(d.localId,userData,d.idToken);
       window.fbUser={...userData};
       fbSaveSession(d.idToken,d.localId);
@@ -3582,6 +3655,30 @@ setTimeout(()=>{
 
 
 // ═══ PROFILE EDIT ═══
+function loadProfData(){
+  const u=window.fbUser;
+  if(!u)return;
+  // Name
+  const nameEl=document.getElementById('prof-name-display');
+  if(nameEl) nameEl.textContent=u.name||u.email||'Usuario';
+  // Handle
+  const handleEl=document.getElementById('prof-handle-display');
+  if(handleEl){
+    const handle=u.username?('@'+u.username):(u.email?u.email.split('@')[0]:'');
+    const city=u.city||'Venezuela';
+    handleEl.textContent=handle+' · '+city+' 🇻🇪';
+  }
+  // Bio
+  const bioEl=document.getElementById('prof-bio-display');
+  if(bioEl){
+    const type=u.type==='seller'?'Vendedor 📡':'Comprador 🛍️';
+    bioEl.textContent=u.bio||(type+' · '+(u.city||'Venezuela')+' 🇻🇪');
+  }
+  // Checkout name
+  const coName=document.getElementById('co-name-display');
+  if(coName) coName.textContent=u.name||'—';
+}
+
 function openProfEdit(){
   const modal=document.getElementById('prof-edit-modal');
   if(!modal)return;
