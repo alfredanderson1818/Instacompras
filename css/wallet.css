@@ -1,0 +1,108 @@
+/* ═══ WALLET ═══ */
+#s-wallet{background:var(--dk)}
+.wallet-hdr{padding:14px 16px 6px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.wallet-title{font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1}
+/* Balance hero card */
+.wallet-hero{margin:0 16px 16px;border-radius:20px;overflow:hidden;position:relative;padding:24px 20px;background:linear-gradient(135deg,#1a1a0a 0%,#2a2200 50%,#1a1500 100%);border:1px solid rgba(255,208,0,.2)}
+.wallet-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,208,0,.06)}
+.wallet-hero-label{font-size:11px;font-weight:800;color:rgba(255,208,0,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.wallet-balance{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--y);line-height:1;letter-spacing:1px}
+.wallet-balance-usd{font-size:13px;color:rgba(255,208,0,.5);font-weight:700;margin-top:4px}
+.wallet-hero-actions{display:flex;gap:10px;margin-top:20px}
+.wallet-action-btn{flex:1;padding:11px;border:none;border-radius:11px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer;transition:all .18s cubic-bezier(.34,1.3,.64,1);display:flex;align-items:center;justify-content:center;gap:6px}
+.wallet-action-btn:active{transform:scale(.95)}
+.wallet-action-btn.primary{background:var(--y);color:var(--dk)}
+.wallet-action-btn.secondary{background:rgba(255,255,255,.08);color:var(--tx);border:1px solid rgba(255,255,255,.1)}
+/* Secured notice */
+.wallet-secured{display:flex;align-items:center;gap:6px;margin:0 16px 16px;padding:10px 14px;background:rgba(255,59,59,.07);border:1px solid rgba(255,59,59,.15);border-radius:10px;font-size:11px;color:rgba(255,255,255,.6)}
+.wallet-secured span{color:var(--rd);font-weight:800}
+/* Deposit options */
+.wallet-methods{display:flex;flex-direction:column;gap:8px;padding:0 16px 16px}
+.wallet-method{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--dk3);border-radius:12px;border:1px solid rgba(255,255,255,.05);cursor:pointer;transition:all .18s}
+.wallet-method:active{transform:scale(.98)}
+.wallet-method.sel{border-color:rgba(255,208,0,.45);background:rgba(255,208,0,.05)}
+.wm-icon{width:40px;height:40px;border-radius:10px;background:var(--dk4);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.wm-info{flex:1}
+.wm-name{font-size:13px;font-weight:800;margin-bottom:2px}
+.wm-detail{font-size:11px;color:var(--mu)}
+.wm-radio{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.wm-radio.on{border-color:var(--y)}
+.wm-radio.on::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--y)}
+/* Amount input */
+.wallet-amount-wrap{padding:0 16px 16px}
+.wallet-amount-label{font-size:11px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px}
+.wallet-amount-row{display:flex;align-items:center;gap:10px;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:13px;padding:12px 16px;transition:border-color .15s}
+.wallet-amount-row:focus-within{border-color:rgba(255,208,0,.45)}
+.wallet-amount-prefix{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--y)}
+.wallet-amount-input{background:none;border:none;outline:none;font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--tx);width:100%;min-width:0}
+.wallet-amount-suffix{font-size:12px;font-weight:700;color:var(--mu);flex-shrink:0}
+.wallet-presets{display:flex;gap:7px;margin-top:10px}
+.wallet-preset{flex:1;padding:7px 4px;background:var(--dk3);border:1px solid rgba(255,255,255,.07);border-radius:8px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:var(--mu);cursor:pointer;text-align:center;transition:all .15s}
+.wallet-preset:hover{border-color:rgba(255,208,0,.3);color:var(--y)}
+/* Tx history */
+.wallet-tx{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04)}
+.wallet-tx-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.wallet-tx-icon.in{background:rgba(76,175,80,.15)}
+.wallet-tx-icon.out{background:rgba(255,59,59,.12)}
+.wallet-tx-icon.lock{background:rgba(255,208,0,.1)}
+.wallet-tx-info{flex:1}
+.wallet-tx-name{font-size:13px;font-weight:800;margin-bottom:1px}
+.wallet-tx-date{font-size:10px;color:var(--mu)}
+.wallet-tx-amount{font-family:'Bebas Neue',sans-serif;font-size:18px;text-align:right}
+.wallet-tx-amount.in{color:#4CAF50}
+.wallet-tx-amount.out{color:var(--rd)}
+.wallet-tx-amount.lock{color:var(--y)}
+
+/* ═══ AUCTION ═══ */
+#s-auction{background:var(--dk)}
+.auc-hdr{padding:14px 16px 0;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.auc-title{font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1}
+/* Product image */
+.auc-img{width:100%;height:220px;overflow:hidden;position:relative;flex-shrink:0}
+.auc-img img{width:100%;height:100%;object-fit:cover;opacity:.85}
+.auc-img-bg{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,var(--dk) 100%)}
+.auc-live-badge{position:absolute;top:14px;left:14px}
+/* Countdown timer */
+.auc-timer-wrap{display:flex;justify-content:center;gap:10px;margin:16px 16px 0;padding:16px;background:var(--dk3);border-radius:14px;border:1px solid rgba(255,59,59,.15)}
+.auc-timer-block{text-align:center;flex:1}
+.auc-timer-num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--rd);line-height:1}
+.auc-timer-label{font-size:9px;font-weight:800;color:var(--mu);letter-spacing:.5px;margin-top:2px}
+.auc-timer-sep{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--rd);padding-top:2px}
+/* Current bid */
+.auc-bid-card{margin:12px 16px 0;padding:16px;background:var(--dk3);border-radius:14px;border:1px solid rgba(255,255,255,.06)}
+.auc-bid-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.auc-bid-label{font-size:11px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.5px}
+.auc-bid-value{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--y);line-height:1}
+.auc-bid-sub{font-size:11px;color:var(--mu)}
+.auc-bids-list{display:flex;flex-direction:column;gap:6px;margin-top:10px;max-height:120px;overflow-y:auto;scrollbar-width:none}
+.auc-bids-list::-webkit-scrollbar{display:none}
+.auc-bid-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--dk4);border-radius:8px;font-size:12px}
+.auc-bid-item.winning{background:rgba(255,208,0,.1);border:1px solid rgba(255,208,0,.2)}
+.auc-bid-rank{font-size:14px;flex-shrink:0}
+.auc-bid-user{font-weight:800;flex:1}
+.auc-bid-amt{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--y)}
+/* Wallet balance inside auction */
+.auc-wallet-row{margin:12px 16px 0;display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(255,208,0,.07);border:1px solid rgba(255,208,0,.18);border-radius:11px}
+.auc-wallet-ico{font-size:20px}
+.auc-wallet-info{flex:1}
+.auc-wallet-label{font-size:10px;font-weight:800;color:rgba(255,208,0,.6);letter-spacing:1px;text-transform:uppercase}
+.auc-wallet-bal{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--y);line-height:1}
+.auc-wallet-top{font-size:11px;font-weight:700;color:var(--y);cursor:pointer;text-decoration:underline;text-underline-offset:2px;flex-shrink:0}
+/* Bid input */
+.auc-input-wrap{margin:12px 16px 0}
+.auc-input-row{display:flex;align-items:center;gap:10px;background:var(--dk3);border:2px solid rgba(255,208,0,.3);border-radius:13px;padding:12px 16px;transition:border-color .15s}
+.auc-input-row:focus-within{border-color:rgba(255,208,0,.7)}
+.auc-input-prefix{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--y)}
+.auc-input{background:none;border:none;outline:none;font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--tx);width:100%;min-width:0}
+.auc-input-suffix{font-size:12px;font-weight:700;color:var(--mu);flex-shrink:0}
+.auc-bid-presets{display:flex;gap:7px;margin:8px 16px 0}
+.auc-preset{flex:1;padding:8px 4px;background:var(--dk3);border:1px solid rgba(255,255,255,.07);border-radius:8px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;color:var(--mu);cursor:pointer;text-align:center;transition:all .15s}
+.auc-preset:hover,.auc-preset:active{border-color:rgba(255,208,0,.4);color:var(--y)}
+/* Bid button */
+.auc-bid-btn{display:block;width:calc(100% - 32px);margin:14px 16px;background:var(--y);color:var(--dk);border:none;border-radius:13px;padding:16px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;cursor:pointer;transition:all .2s cubic-bezier(.34,1.3,.64,1);display:flex;align-items:center;justify-content:center;gap:8px}
+.auc-bid-btn:active{transform:scale(.97)}
+.auc-bid-btn:disabled{background:var(--dk4);color:var(--mu);cursor:not-allowed}
+/* Legal notice */
+.auc-legal{margin:0 16px 24px;padding:12px 14px;background:rgba(255,59,59,.06);border:1px solid rgba(255,59,59,.12);border-radius:10px;font-size:11px;color:rgba(255,255,255,.55);line-height:1.6}
+.auc-legal strong{color:var(--rd)}
+
