@@ -33,30 +33,79 @@ function fbGetCachedUser(){
   try{const d=localStorage.getItem('fb_user');return d?JSON.parse(d):null;}catch(e){return null;}
 }
 
-// Convertir objeto JS → Firestore fields format
+// ═══ FIRESTORE HELPERS — CRUD genérico ═══
+function toFSVal(v){
+  if(v===null||v===undefined)return{nullValue:null};
+  if(typeof v==='boolean')return{booleanValue:v};
+  if(typeof v==='number')return Number.isInteger(v)?{integerValue:String(v)}:{doubleValue:v};
+  if(typeof v==='string')return{stringValue:v};
+  if(Array.isArray(v))return{arrayValue:{values:v.map(toFSVal)}};
+  if(typeof v==='object')return{mapValue:{fields:Object.fromEntries(Object.entries(v).map(([k,val])=>[k,toFSVal(val)]))}};
+  return{stringValue:String(v)};
+}
 function toFS(obj){
   const fields={};
-  for(const[k,v]of Object.entries(obj)){
-    if(typeof v==='string') fields[k]={stringValue:v};
-    else if(typeof v==='number') fields[k]={integerValue:v};
-    else if(typeof v==='boolean') fields[k]={booleanValue:v};
-    else if(v===null) fields[k]={nullValue:null};
-    else fields[k]={stringValue:String(v)};
-  }
+  for(const[k,v]of Object.entries(obj))fields[k]=toFSVal(v);
   return{fields};
 }
-// Convertir Firestore fields → objeto JS
+function fromFSVal(v){
+  if(!v)return null;
+  if('stringValue'in v)return v.stringValue;
+  if('integerValue'in v)return parseInt(v.integerValue);
+  if('doubleValue'in v)return v.doubleValue;
+  if('booleanValue'in v)return v.booleanValue;
+  if('nullValue'in v)return null;
+  if('arrayValue'in v)return(v.arrayValue.values||[]).map(fromFSVal);
+  if('mapValue'in v)return Object.fromEntries(Object.entries(v.mapValue.fields||{}).map(([k,val])=>[k,fromFSVal(val)]));
+  return null;
+}
 function fromFS(doc){
   if(!doc||!doc.fields)return{};
-  const obj={};
-  for(const[k,v]of Object.entries(doc.fields)){
-    if(v.stringValue!==undefined) obj[k]=v.stringValue;
-    else if(v.integerValue!==undefined) obj[k]=Number(v.integerValue);
-    else if(v.booleanValue!==undefined) obj[k]=v.booleanValue;
-    else obj[k]=null;
-  }
+  const obj=Object.fromEntries(Object.entries(doc.fields).map(([k,v])=>[k,fromFSVal(v)]));
+  if(doc.name)obj._id=doc.name.split('/').pop();
   return obj;
 }
+function fsHeaders(){
+  const h={'Content-Type':'application/json'};
+  if(window.fbToken)h['Authorization']='Bearer '+window.fbToken;
+  return h;
+}
+async function fsSet(col,docId,data){
+  try{
+    const keys=Object.keys(data);
+    const mask=keys.map(k=>'updateMask.fieldPaths='+encodeURIComponent(k)).join('&');
+    const r=await fetch(`${FB.dbUrl}/${col}/${docId}?${mask}`,{method:'PATCH',headers:fsHeaders(),body:JSON.stringify(toFS(data))});
+    if(!r.ok)return null;
+    return fromFS(await r.json());
+  }catch(e){console.warn('fsSet:',e);return null;}
+}
+async function fsGet(col,docId){
+  try{
+    const r=await fetch(`${FB.dbUrl}/${col}/${docId}`,{headers:fsHeaders()});
+    if(!r.ok)return null;
+    return fromFS(await r.json());
+  }catch(e){return null;}
+}
+async function fsAdd(col,data){
+  try{
+    const r=await fetch(`${FB.dbUrl}/${col}`,{method:'POST',headers:fsHeaders(),body:JSON.stringify(toFS(data))});
+    if(!r.ok)return null;
+    return fromFS(await r.json());
+  }catch(e){return null;}
+}
+async function fsQuery(col,filters=[]){
+  try{
+    const url='https://firestore.googleapis.com/v1/projects/'+FB.projectId+'/databases/(default)/documents:runQuery';
+    const makeFilter=f=>({fieldFilter:{field:{fieldPath:f.field},op:f.op||'EQUAL',value:toFSVal(f.value)}});
+    const where=filters.length===0?undefined:filters.length===1?makeFilter(filters[0]):{compositeFilter:{op:'AND',filters:filters.map(makeFilter)}};
+    const q={structuredQuery:{from:[{collectionId:col}],...(where?{where}:{}),limit:100}};
+    const r=await fetch(url,{method:'POST',headers:fsHeaders(),body:JSON.stringify(q)});
+    if(!r.ok)return[];
+    const res=await r.json();
+    return res.filter(x=>x.document).map(x=>fromFS(x.document));
+  }catch(e){return[];}
+}
+function fsId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
 
 // Auth: Registrar usuario
 async function fbSignUp(email,password){
@@ -3351,17 +3400,28 @@ function placeOrder(){
   const buyerName=window.fbUser?.name||window.fbUser?.username||'Comprador';
   const buyerPhone=window.fbUser?.phone||window.fbUser?.email||'';
   const buyerCity=window.fbUser?.city||'';
-  // Push each cart item to seller dashboard
+  const buyerId=window.fbUser?.uid||'guest';
+  // Push each cart item to seller dashboard + Firestore
   cart.forEach(item=>{
     const p=PRODS[item.pi];
+    const s=SELLERS[p.s];
     const unitPrice=item.overridePrice||p.p;
-    DASH_ORDERS.unshift({
-      prod:p.n, img:p.img, e:p.e,
-      buyer:buyerName, buyerPhone, buyerCity,
-      amt:unitPrice*item.q, qty:item.q, sz:item.sz,
-      status:'pending', date:'Ahora',
-      num, fromAuction:!!item.fromAuction
-    });
+    const orderId=fsId();
+    const orderData={
+      orderId, num,
+      buyerId, buyerName, buyerPhone, buyerCity,
+      sellerId:String(p.s), sellerName:s.n,
+      prod:p.n, img:p.img||'', e:p.e||'📦',
+      sz:item.sz||'', qty:item.q,
+      amt:unitPrice*item.q,
+      status:'pending',
+      fromAuction:!!item.fromAuction,
+      createdAt:Date.now(),
+      date:'Ahora'
+    };
+    DASH_ORDERS.unshift({...orderData, _id:orderId});
+    // Save to Firestore in background
+    fsSet('orders',orderId,orderData).catch(()=>{});
   });
   document.getElementById('ok-order').innerHTML=`
     <div class="ok-row"><span class="ok-row-l">N° Pedido</span><span style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px">${num}</span></div>
@@ -3660,18 +3720,22 @@ function aucTick(){
       const buyerName=window.fbUser?.name||window.fbUser?.username||'Tú';
       const buyerPhone=window.fbUser?.phone||window.fbUser?.email||'';
       const buyerCity=window.fbUser?.city||'';
-      // Add to buyer cart with auction price
-      cart.push({pi:aucProdIdx, sz, q:1, overridePrice:aucCurrentBid, fromAuction:true});
+      const buyerId=window.fbUser?.uid||'guest';
+      const orderId=fsId();
+      const orderData={
+        orderId,num,buyerId,buyerName,buyerPhone,buyerCity,
+        sellerId:String(p.s),sellerName:SELLERS[p.s].n,
+        prod:p.n,img:p.img||'',e:p.e||'📦',
+        sz,qty:1,amt:aucCurrentBid,
+        status:'pending',fromAuction:true,
+        createdAt:Date.now(),date:'Ahora'
+      };
+      cart.push({pi:aucProdIdx,sz,q:1,overridePrice:aucCurrentBid,fromAuction:true});
       updateCart();
-      // Add to seller dashboard
-      DASH_ORDERS.unshift({
-        prod:p.n, img:p.img, e:p.e,
-        buyer:buyerName, buyerPhone, buyerCity,
-        amt:aucCurrentBid, qty:1, sz,
-        status:'pending', date:'Ahora', num, fromAuction:true
-      });
+      DASH_ORDERS.unshift({...orderData,buyer:buyerName,_id:orderId});
+      fsSet('orders',orderId,orderData).catch(()=>{});
       pushNotif('🏆','auction',`¡Ganaste la subasta! ${p.n} por $${aucCurrentBid} — revisa tu carrito`,()=>nav('cart'),true);
-      setTimeout(()=>showWinCelebration(p.n, aucCurrentBid),600);
+      setTimeout(()=>showWinCelebration(p.n,aucCurrentBid),600);
     }
   }
 }
@@ -3780,7 +3844,25 @@ let DASH_ORDERS=[
 const DAYS=["L","M","M","J","V","S","D"];
 const WEEK_DATA=[42,78,55,91,63,120,88];
 
-function openDash(){
+async function openDash(){
+  go('dash');
+  dashTab('orders');
+  // Load real orders from Firestore for this seller
+  const uid=window.fbUser?.uid;
+  if(uid){
+    fsQuery('orders',[{field:'sellerId',value:uid}]).then(fsOrders=>{
+      if(fsOrders.length){
+        // Merge FS orders with local, dedup by orderId
+        const existingIds=new Set(DASH_ORDERS.map(o=>o._id||o.orderId));
+        fsOrders.forEach(o=>{if(!existingIds.has(o._id))DASH_ORDERS.unshift({...o,buyer:o.buyerName,buyerPhone:o.buyerPhone,buyerCity:o.buyerCity,num:o.num||o.orderId,date:o.date||'Guardado'});});
+      }
+      renderDash();
+    }).catch(()=>renderDash());
+  } else {
+    renderDash();
+  }
+}
+function renderDash(){
   const revenue=DASH_ORDERS.reduce((s,o)=>s+o.amt,0);
   const todayRev=DASH_ORDERS.slice(0,3).reduce((s,o)=>s+o.amt,0);
   const pending=DASH_ORDERS.filter(o=>o.status==='pending').reduce((s,o)=>s+o.amt,0);
@@ -3841,12 +3923,12 @@ function openDash(){
     {icon:'🏆',label:'Subastas cerradas',val:String(DASH_ORDERS.filter(o=>o.fromAuction).length||23),sub:'Este mes'},
   ];
   document.getElementById('dash-stats-grid').innerHTML=statsData.map(s=>`<div style="background:var(--dk3);border-radius:13px;padding:14px;border:1px solid rgba(255,255,255,.05)"><div style="font-size:22px;margin-bottom:6px">${s.icon}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--y);line-height:1">${s.val}</div><div style="font-size:11px;font-weight:800;color:var(--tx);margin-top:3px">${s.label}</div><div style="font-size:10px;color:var(--mu);margin-top:2px">${s.sub}</div></div>`).join('');
-  dashTab('orders');
-  go('dash');
 }
 
 function markOrderStatus(i,status){
   DASH_ORDERS[i].status=status;
+  const id=DASH_ORDERS[i]._id||DASH_ORDERS[i].orderId;
+  if(id)fsSet('orders',id,{status}).catch(()=>{});
   toast(status==='processing'?'🚀 Pedido despachado':'✅ Marcado como entregado');
   openDash();
 }
@@ -3997,6 +4079,16 @@ function regSubmit(){
       await fbSaveUser(d.localId,userData,d.idToken);
       window.fbUser={...userData};
       fbSaveSession(d.idToken,d.localId);fbCacheUser({uid:d.localId,...(window.fbUser||{})});
+      // Si es vendedor, crear tienda en Firestore
+      if(accType==='seller'&&shop){
+        fsSet('stores',d.localId,{
+          uid:d.localId, shopName:shop, ownerName:name,
+          email:emailToUse, phone, city, cedula,
+          followers:0, totalSales:0, rating:5.0,
+          isLive:false, isVerified:false,
+          createdAt:Date.now(), category:'', description:''
+        });
+      }
       const msg=accType==='seller'?`📡 ¡Cuenta vendedor creada, ${name.split(' ')[0]}!`:`🎉 ¡Bienvenido, ${name.split(' ')[0]}!`;
       toast(msg);
       const reg=document.getElementById('s-register');
@@ -4356,6 +4448,16 @@ function startBroadcast(){
   // Join Agora as host
   const channelName=getChannelForSeller(getMySellerIdx());
   joinAsHost(channelName);
+  // Save stream to Firestore
+  const uid=window.fbUser?.uid;
+  if(uid){
+    fsSet('streams',channelName,{
+      sellerId:uid, sellerName:window.fbUser?.name||window.fbUser?.username||'Vendedor',
+      shopName:window.fbUser?.shop||'', channelName, title,
+      isLive:true, viewerCount:1, startedAt:Date.now()
+    });
+    fsSet('stores',uid,{isLive:true,channelName});
+  }
   // If auction mode selected, auto-open auction panel
   if(glSaleType==='auction'){setTimeout(()=>bcShowAucPanel(),1000);}
 }
@@ -4414,6 +4516,13 @@ function endBroadcast(){
   clearInterval(bcTimerIv);clearInterval(bcViewerIv);clearInterval(bcChatIv);
   stopCamera();
   leaveAgoraChannel();
+  // Mark stream offline in Firestore
+  const uid=window.fbUser?.uid;
+  const channelName=getChannelForSeller(getMySellerIdx());
+  if(uid){
+    fsSet('streams',channelName,{isLive:false,endedAt:Date.now()});
+    fsSet('stores',uid,{isLive:false});
+  }
   const m=String(~~(bcSecs/60)).padStart(2,'0');
   const s=String(bcSecs%60).padStart(2,'0');
   toast(`✅ Stream terminado — Duración: ${m}:${s}`);
