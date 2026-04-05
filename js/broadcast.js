@@ -497,7 +497,4 @@ function stopPdLiveSim(){
   const hearts=document.getElementById('pd-hearts');
   if(hearts)hearts.innerHTML='';
 }
-buildLiveStrip();buildCats();buildGrid();buildSellers();buildCoPays();updateCart();
-// Show initial unread count
-(()=>{const count=notifData.filter(n=>n.unread).length;const b=document.getElementById('notif-badge');if(b&&count){b.style.display='flex';b.textContent=count;}})();
-// notif-btn onclick set inline
+// Init code in init.js

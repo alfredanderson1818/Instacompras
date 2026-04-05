@@ -1,5 +1,22 @@
-// ═══ INIT — Auto-login & Bootstrap ═══
-// Dependencies: All other JS files loaded before this
+// ═══ INIT — Bootstrap & Auto-login ═══
+// This file loads LAST — all dependencies are available
+
+// 1. Build initial UI
+buildLiveStrip();
+buildCats();
+buildGrid();
+buildSellers();
+buildCoPays();
+updateCart();
+
+// 2. Show initial notification badge
+(()=>{
+  const count = notifData.filter(n => n.unread).length;
+  const b = document.getElementById('notif-badge');
+  if (b && count) { b.style.display = 'flex'; b.textContent = count; }
+})();
+
+// 3. Auto-login from saved session
 
 (async () => {
   const ok = await fbRestoreSession();
