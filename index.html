@@ -1207,6 +1207,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
             <div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot on"></div>
           </div>
           <button class="ob-btn" onclick="goRegister()">Crear cuenta gratis 🔥</button>
+          <div onclick="enterAsGuest()" style="margin-top:14px;font-size:12px;color:rgba(255,255,255,.4);font-weight:700;cursor:pointer;padding:6px;text-align:center">Explorar sin cuenta →</div>
         </div>
       </div>
     </div>
@@ -2303,7 +2304,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     </div>
   </div>
   <!-- Carrito -->
-  <div class="ni" id="ni-cart" onclick="nav('cart')">
+  <div class="ni" id="ni-cart" onclick="if(requireAccount('🛒','Para ver tu carrito necesitas cuenta','Regístrate gratis y empieza a comprar.'))return;nav('cart')">
     <div class="ni-ico-wrap">
       <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
       <span class="nb" id="cart-nb" style="display:none">0</span>
@@ -2578,14 +2579,26 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 <div class="toast" id="toast-el"></div>
 
 <!-- Auction Win Celebration -->
-<div id="win-overlay" style="position:fixed;inset:0;z-index:9999;pointer-events:none;display:none">
+<div id="win-overlay" style="position:fixed;inset:0;z-index:9999;pointer-events:none;display:none;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)">
   <canvas id="win-canvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
-  <div id="win-card" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%) scale(0);transition:transform .45s cubic-bezier(.34,1.56,.64,1);background:linear-gradient(135deg,#1a1a25,#22222f);border:2px solid rgba(255,208,0,.5);border-radius:24px;padding:32px 28px;text-align:center;width:280px;box-shadow:0 0 60px rgba(255,208,0,.25)">
+  <div id="win-card" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);transition:transform .45s cubic-bezier(.34,1.56,.64,1);background:linear-gradient(135deg,#1a1a25,#22222f);border:2px solid rgba(255,208,0,.5);border-radius:24px;padding:32px 28px;text-align:center;width:280px;box-shadow:0 0 60px rgba(255,208,0,.25)">
     <div id="win-emoji" style="font-size:64px;line-height:1;margin-bottom:12px">🏆</div>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--y);letter-spacing:1px;margin-bottom:6px">¡GANASTE!</div>
     <div id="win-item" style="font-size:14px;font-weight:800;color:#fff;margin-bottom:4px"></div>
     <div id="win-price" style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--y);line-height:1;margin-bottom:20px"></div>
-    <button onclick="closeWinOverlay()" style="background:var(--y);color:var(--dk);border:none;border-radius:14px;padding:13px 32px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;width:100%;pointer-events:all">Ver mi pedido 📦</button>
+    <button onclick="closeWinOverlay()" style="background:var(--y);color:var(--dk);border:none;border-radius:14px;padding:13px 32px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;width:100%;pointer-events:all">Ver en mi carrito 🛒</button>
+  </div>
+</div>
+
+<!-- Guest Wall Modal -->
+<div id="guest-wall" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center">
+  <div style="background:var(--dk2);border-radius:24px 24px 0 0;padding:32px 24px 40px;width:100%;max-width:430px;text-align:center;border-top:1px solid rgba(255,255,255,.08)">
+    <div style="width:40px;height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin:0 auto 24px"></div>
+    <div style="font-size:48px;margin-bottom:12px" id="guest-wall-emoji">🛒</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.5px;margin-bottom:8px" id="guest-wall-title">Para comprar necesitas cuenta</div>
+    <div style="font-size:13px;color:var(--mu);line-height:1.6;margin-bottom:24px" id="guest-wall-desc">Crea tu cuenta gratis en 30 segundos y empieza a comprar en live.</div>
+    <button onclick="closeGuestWall(true)" style="width:100%;background:var(--y);color:var(--dk);border:none;border-radius:14px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;margin-bottom:10px">Crear cuenta gratis 🔥</button>
+    <div onclick="closeGuestWall(false)" style="font-size:13px;color:var(--mu);font-weight:700;cursor:pointer;padding:8px">Seguir explorando</div>
   </div>
 </div>
 
@@ -3164,7 +3177,10 @@ function likeStream(){
 }
 function shareStream(){toast('🔗 Link copiado al portapapeles');}
 function bcAddItem(){ bcShowItemPanel(); }
-function quickAdd(pi){addItem(pi,PRODS[pi].sz[0],1);animateCartBadge();toast(`✅ ${PRODS[pi].n} al carrito`);}
+function quickAdd(pi){
+  if(requireAccount('🛒','Para comprar necesitas cuenta','Crea tu cuenta gratis y compra en vivo al instante.'))return;
+  addItem(pi,PRODS[pi].sz[0],1);animateCartBadge();toast(`✅ ${PRODS[pi].n} al carrito`);
+}
 
 function animateCartBadge(){
   const badge=document.getElementById('cart-nb');
@@ -3282,17 +3298,18 @@ function updateCart(){
   }
   body.innerHTML=cart.map((item,i)=>{
     const p=PRODS[item.pi];const s=SELLERS[p.s];
+    const unitPrice=item.overridePrice||p.p;
+    const auctionBadge=item.fromAuction?`<span style="background:rgba(255,59,59,.15);color:var(--rd);font-size:9px;font-weight:900;border-radius:6px;padding:2px 7px;margin-left:4px">🔨 SUBASTA</span>`:'';
     return `<div class="citem">
       <div class="cimg">${p.img?`<img src="${p.img}" onerror="this.style.display='none'">`:`<span>${p.e}</span>`}</div>
-      <div class="cinfo"><div class="cname">${p.n}</div><div class="csub">${s.n} · ${item.sz}</div><div class="cprice">$${p.p*item.q} USD</div></div>
+      <div class="cinfo"><div class="cname">${p.n}${auctionBadge}</div><div class="csub">${s.n} · ${item.sz}</div><div class="cprice">$${unitPrice*item.q} USD</div></div>
       <div class="cacts">
-        <button class="cqb" onclick="cq(${i},-1)">−</button>
-        <div class="cq">${item.q}</div>
-        <button class="cqb" onclick="cq(${i},1)">+</button>
+        ${item.fromAuction?`<div style="font-size:10px;color:var(--mu);font-weight:700">x${item.q}</div>`:`<button class="cqb" onclick="cq(${i},-1)">−</button><div class="cq">${item.q}</div><button class="cqb" onclick="cq(${i},1)">+</button>`}
         <div class="crm" onclick="cr(${i})">🗑️</div>
       </div>
-    </div>`;}).join('');
-  const sub=cart.reduce((s,i)=>s+PRODS[i.pi].p*i.q,0);
+    </div>`;}
+  ).join('');
+  const sub=cart.reduce((s,i)=>s+(i.overridePrice||PRODS[i.pi].p)*i.q,0);
   document.getElementById('cart-sub').textContent=`$${sub} USD`;
   ft.style.display='';
   updateCo();
@@ -3303,20 +3320,19 @@ function clearCart(){if(!cart.length)return;cart=[];updateCart();toast('🗑️ 
 
 // ═══ CHECKOUT ═══
 function updateCo(){
-  const sub=cart.reduce((s,i)=>s+PRODS[i.pi].p*i.q,0);
+  const sub=cart.reduce((s,i)=>s+(i.overridePrice||PRODS[i.pi].p)*i.q,0);
   const tot=sub+(sub>0?3:0);
   document.getElementById('co-tot').textContent=`$${tot} USD`;
-  // product thumbs
   const th=document.getElementById('co-thumbs');
   if(th)th.innerHTML=cart.map(item=>{
     const p=PRODS[item.pi];
     return `<div class="co-item-thumb">${p.img?`<img src="${p.img}" onerror="this.style.display='none'">`:`<span>${p.e}</span>`}<div class="co-item-qty">${item.q}</div></div>`;
   }).join('');
-  // summary
   const sm=document.getElementById('co-sum');
   if(sm)sm.innerHTML=cart.map(item=>{
     const p=PRODS[item.pi];
-    return `<div class="co-summary-item"><span class="co-summary-name">${p.n} × ${item.q}</span><span class="co-summary-val">$${p.p*item.q}</span></div>`;
+    const unitPrice=item.overridePrice||p.p;
+    return `<div class="co-summary-item"><span class="co-summary-name">${p.n}${item.fromAuction?' 🔨':''} × ${item.q}</span><span class="co-summary-val">$${unitPrice*item.q}</span></div>`;
   }).join('')+`<div class="co-summary-item"><span class="co-summary-name">Delivery 🏍️</span><span class="co-summary-val">$3</span></div><div class="co-summary-item"><span class="co-summary-name">Total</span><span class="co-summary-val" style="color:var(--y)">$${tot}</span></div>`;
 }
 function setSPay(i){
@@ -3327,11 +3343,26 @@ function setSPay(i){
   });
 }
 function placeOrder(){
-  const sub=cart.reduce((s,i)=>s+PRODS[i.pi].p*i.q,0);
+  const sub=cart.reduce((s,i)=>s+(i.overridePrice||PRODS[i.pi].p)*i.q,0);
   const tot=sub+3;
   const num='IC-'+~~(Math.random()*90000+10000);
   const now=new Date();
   const dateStr=now.toLocaleDateString('es-VE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+  const buyerName=window.fbUser?.name||window.fbUser?.username||'Comprador';
+  const buyerPhone=window.fbUser?.phone||window.fbUser?.email||'';
+  const buyerCity=window.fbUser?.city||'';
+  // Push each cart item to seller dashboard
+  cart.forEach(item=>{
+    const p=PRODS[item.pi];
+    const unitPrice=item.overridePrice||p.p;
+    DASH_ORDERS.unshift({
+      prod:p.n, img:p.img, e:p.e,
+      buyer:buyerName, buyerPhone, buyerCity,
+      amt:unitPrice*item.q, qty:item.q, sz:item.sz,
+      status:'pending', date:'Ahora',
+      num, fromAuction:!!item.fromAuction
+    });
+  });
   document.getElementById('ok-order').innerHTML=`
     <div class="ok-row"><span class="ok-row-l">N° Pedido</span><span style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px">${num}</span></div>
     <div class="ok-row"><span class="ok-row-l">Fecha</span><span>${dateStr}</span></div>
@@ -3370,6 +3401,7 @@ function addMsg(name,text,av){
   while(el.children.length>6)el.removeChild(el.firstChild);
 }
 function sendChat(){
+  if(requireAccount('💬','Para chatear necesitas cuenta','Únete y participa en los lives.'))return;
   const inp=document.getElementById('chat-in');const v=inp.value.trim();if(!v)return;
   addMsg('Tú ✅',v,'🙋');inp.value='';
   setTimeout(()=>addMsg(NAMES[~~(Math.random()*NAMES.length)],MSGS[~~(Math.random()*MSGS.length)],AVTS[~~(Math.random()*AVTS.length)]),600+~~(Math.random()*1200));
@@ -3622,9 +3654,24 @@ function aucTick(){
     const iWon=aucBids.length>0&&aucBids[0].me;
     toast(`🔨 ¡Subasta cerrada! Ganador: ${winner} con $${aucCurrentBid}`);
     if(iWon){
-      const wonItem=aucBids.length>0?aucBids[0].item||'Subasta':'Subasta';
-      pushNotif('🏆','auction',`¡Ganaste la subasta! Ítem por $${aucCurrentBid} — revisa tu pedido`,()=>openTrack(0),true);
-      setTimeout(()=>showWinCelebration(wonItem,aucCurrentBid),600);
+      const p=PRODS[aucProdIdx];
+      const sz=p.sz[0]||'Único';
+      const num='IC-'+~~(Math.random()*90000+10000);
+      const buyerName=window.fbUser?.name||window.fbUser?.username||'Tú';
+      const buyerPhone=window.fbUser?.phone||window.fbUser?.email||'';
+      const buyerCity=window.fbUser?.city||'';
+      // Add to buyer cart with auction price
+      cart.push({pi:aucProdIdx, sz, q:1, overridePrice:aucCurrentBid, fromAuction:true});
+      updateCart();
+      // Add to seller dashboard
+      DASH_ORDERS.unshift({
+        prod:p.n, img:p.img, e:p.e,
+        buyer:buyerName, buyerPhone, buyerCity,
+        amt:aucCurrentBid, qty:1, sz,
+        status:'pending', date:'Ahora', num, fromAuction:true
+      });
+      pushNotif('🏆','auction',`¡Ganaste la subasta! ${p.n} por $${aucCurrentBid} — revisa tu carrito`,()=>nav('cart'),true);
+      setTimeout(()=>showWinCelebration(p.n, aucCurrentBid),600);
     }
   }
 }
@@ -3694,6 +3741,7 @@ function aucUpdateBtn(){
   else btn.innerHTML=`🔨 Ofertar $${v||0} USD`;
 }
 function placeBid(){
+  if(requireAccount('🔨','Para ofertar necesitas cuenta','Crea tu cuenta y participa en subastas en vivo.'))return;
   const v=parseFloat(document.getElementById('auc-bid-input').value)||0;
   if(v<=aucCurrentBid){toast(`⚠️ Mínimo $${aucCurrentBid+1}`);return;}
   if(walletBalance<v){toast('⚠️ Recarga tu wallet primero');return;}
@@ -3706,7 +3754,7 @@ function placeBid(){
   toast(`🔒 Oferta $${v} reservada. ¡Vas ganando!`);
 }
 function aucAutoBot(){
-  if(aucSecs<=0)return;
+  if(aucSecs<=8)return; // no bots in last 8s — user can win
   const bots=['marisolita22','pedro_mcs','yoli_shop','cristi_vzla','el_pana99'];
   const bot=bots[~~(Math.random()*bots.length)];const nb=aucCurrentBid+~~(Math.random()*8+1);
   aucCurrentBid=nb;aucBids.unshift({user:bot,amt:nb,me:false});aucBids=aucBids.slice(0,5);
@@ -3714,14 +3762,13 @@ function aucAutoBot(){
   const acb=document.getElementById('auc-current-bid');if(acb)acb.textContent=`$${nb}`;
   const amb=document.getElementById('auc-min-bid');if(amb)amb.textContent=`$${nb+1}`;
   aucUpdateBtn();
-  // Si el usuario estaba ganando, notificar que lo superaron
   const wasWinning=aucBids.length>1&&aucBids[1]?.me;
   if(wasWinning)toast(`⚠️ ${bot} te superó con $${nb} — ¡oferta más!`);
   setTimeout(aucAutoBot,10000+Math.random()*20000);
 }
 
 // ═══ DASHBOARD ═══
-const DASH_ORDERS=[
+let DASH_ORDERS=[
   {prod:'Nike Air Jordan 1',img:IMGS.jordan,e:'👟',buyer:'carlos.VE',amt:120,status:'pending',date:'Hace 5 min'},
   {prod:'Sony WH-1000XM5',img:IMGS.headphones,e:'🎧',buyer:'luisa_mpn',amt:110,status:'processing',date:'Hace 22 min'},
   {prod:'Casio G-Shock',img:IMGS.watch,e:'⌚',buyer:'pedro_mcs',amt:75,status:'delivered',date:'Hace 1h'},
@@ -3736,32 +3783,74 @@ const WEEK_DATA=[42,78,55,91,63,120,88];
 function openDash(){
   const revenue=DASH_ORDERS.reduce((s,o)=>s+o.amt,0);
   const todayRev=DASH_ORDERS.slice(0,3).reduce((s,o)=>s+o.amt,0);
-  const pending=DASH_ORDERS.filter(o=>o.status==="pending").reduce((s,o)=>s+o.amt,0);
-  document.getElementById("dash-revenue").textContent="$"+revenue;
-  document.getElementById("dash-rev-sub").textContent="+23% vs mes anterior";
-  document.getElementById("dash-today").textContent="$"+todayRev;
-  document.getElementById("dash-pending").textContent="$"+pending;
-  document.getElementById("dash-orders").textContent=DASH_ORDERS.length;
-  document.getElementById("dash-views").textContent="389";
-  document.getElementById("dash-followers").textContent="12.4k";
-  document.getElementById("dash-products").textContent=PRODS.filter(p=>p.s===0).length||6;
+  const pending=DASH_ORDERS.filter(o=>o.status==='pending').reduce((s,o)=>s+o.amt,0);
+  document.getElementById('dash-revenue').textContent='$'+revenue;
+  document.getElementById('dash-rev-sub').textContent='+23% vs mes anterior';
+  document.getElementById('dash-today').textContent='$'+todayRev;
+  document.getElementById('dash-pending').textContent='$'+pending;
+  document.getElementById('dash-orders').textContent=DASH_ORDERS.length;
+  document.getElementById('dash-views').textContent='389';
+  document.getElementById('dash-followers').textContent='12.4k';
+  document.getElementById('dash-products').textContent=PRODS.filter(p=>p.s===0).length||6;
   const maxVal=Math.max(...WEEK_DATA);
-  document.getElementById("dash-bars").innerHTML=WEEK_DATA.map((v,i)=>`<div class="dash-bar-wrap"><div class="dash-bar-val">${v>0?"$"+v:""}</div><div class="dash-bar ${i===6?"today":""}" style="height:${Math.round((v/maxVal)*72)+4}px"></div><div class="dash-bar-lbl">${DAYS[i]}</div></div>`).join("");
-  document.getElementById("dash-orders-list").innerHTML=DASH_ORDERS.map((o,i)=>`<div class="dash-order" onclick="toast('📦 Pedido #IC-${10000+i}')"><div class="dash-order-thumb">${o.img?`<img src="${o.img}" onerror="this.style.display=\'none\'">`:""}${o.e}</div><div class="dash-order-info"><div class="dash-order-name">${o.prod}</div><div class="dash-order-meta">👤 ${o.buyer} · ${o.date}</div></div><div class="dash-order-right"><div class="dash-order-amt">$${o.amt}</div><div class="dash-order-status ${o.status}">${o.status==="pending"?"⏳ Pendiente":o.status==="processing"?"🔄 En camino":"✅ Entregado"}</div></div></div>`).join("");
+  document.getElementById('dash-bars').innerHTML=WEEK_DATA.map((v,i)=>`<div class="dash-bar-wrap"><div class="dash-bar-val">${v>0?'$'+v:''}</div><div class="dash-bar ${i===6?'today':''}" style="height:${Math.round((v/maxVal)*72)+4}px"></div><div class="dash-bar-lbl">${DAYS[i]}</div></div>`).join('');
+  document.getElementById('dash-orders-list').innerHTML=DASH_ORDERS.map((o,i)=>{
+    const statusLabel=o.status==='pending'?'⏳ Pendiente':o.status==='processing'?'🔄 En camino':'✅ Entregado';
+    const auctionTag=o.fromAuction?`<span style="font-size:8px;font-weight:900;color:var(--rd);background:rgba(255,59,59,.12);border-radius:4px;padding:1px 5px;margin-left:4px">🔨 SUBASTA</span>`:'';
+    const buyerDetails=[o.buyerPhone,o.buyerCity].filter(Boolean).join(' · ');
+    const orderNum=o.num||('IC-'+(10000+i));
+    return `<div class="dash-order" style="flex-direction:column;align-items:stretch;gap:0;padding:14px 16px">
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:10px">
+        <div class="dash-order-thumb">${o.img?`<img src="${o.img}" onerror="this.style.display='none'">`:''}${o.e||''}</div>
+        <div style="flex:1">
+          <div class="dash-order-name">${o.prod}${auctionTag}</div>
+          <div class="dash-order-meta">${o.sz?`${o.sz} · `:''}x${o.qty||1} · ${o.date}</div>
+        </div>
+        <div class="dash-order-right">
+          <div class="dash-order-amt">$${o.amt}</div>
+          <div class="dash-order-status ${o.status}">${statusLabel}</div>
+        </div>
+      </div>
+      <div style="background:var(--dk4);border-radius:10px;padding:10px 12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span style="font-size:10px;font-weight:900;color:var(--mu);text-transform:uppercase;letter-spacing:.4px">Comprador</span>
+          <span style="font-size:10px;color:var(--mu)">#${orderNum}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--dk3);display:flex;align-items:center;justify-content:center;font-size:14px">👤</div>
+          <div>
+            <div style="font-size:13px;font-weight:900;color:#fff">${o.buyer}</div>
+            ${buyerDetails?`<div style="font-size:10px;color:var(--mu)">${buyerDetails}</div>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="event.stopPropagation();markOrderStatus(${i},'processing')" style="flex:1;padding:7px;background:rgba(33,150,243,.15);border:1px solid rgba(33,150,243,.3);border-radius:9px;color:#2196F3;font-size:10px;font-weight:900;cursor:pointer">🚀 Despachar</button>
+          <button onclick="event.stopPropagation();markOrderStatus(${i},'delivered')" style="flex:1;padding:7px;background:rgba(76,175,80,.12);border:1px solid rgba(76,175,80,.3);border-radius:9px;color:#4CAF50;font-size:10px;font-weight:900;cursor:pointer">✅ Entregado</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
   const topProds=PRODS.slice(0,5);
-  document.getElementById("dash-prods-list").innerHTML=topProds.map((p,i)=>`<div class="dash-top-prod"><div class="dash-tp-rank">${i+1}</div><div class="dash-tp-img">${p.img?`<img src="${p.img}" onerror="this.style.display=\'none\'">`:""}${p.e}</div><div class="dash-tp-info"><div class="dash-tp-name">${p.n}</div><div class="dash-tp-sold">${~~(Math.random()*40+5)} vendidos</div></div><div class="dash-tp-rev">$${p.p*~~(Math.random()*40+5)}</div></div>`).join("");
+  document.getElementById('dash-prods-list').innerHTML=topProds.map((p,i)=>`<div class="dash-top-prod"><div class="dash-tp-rank">${i+1}</div><div class="dash-tp-img">${p.img?`<img src="${p.img}" onerror="this.style.display='none'">`:''}${p.e}</div><div class="dash-tp-info"><div class="dash-tp-name">${p.n}</div><div class="dash-tp-sold">${~~(Math.random()*40+5)} vendidos</div></div><div class="dash-tp-rev">$${p.p*~~(Math.random()*40+5)}</div></div>`).join('');
   const statsData=[
-    {icon:"👁",label:"Vistas al perfil",val:"2.4k",sub:"Esta semana"},
-    {icon:"🛒",label:"Tasa conversión",val:"8.2%",sub:"Vistas → compras"},
-    {icon:"⭐",label:"Rating promedio",val:"4.9",sub:"128 reseñas"},
-    {icon:"⏱",label:"Resp. promedio",val:"12 min",sub:"Tiempo respuesta"},
-    {icon:"🔴",label:"Streams este mes",val:"8",sub:"Total lives"},
-    {icon:"🏆",label:"Subastas ganadas",val:"23",sub:"Este mes"},
+    {icon:'👁',label:'Vistas al perfil',val:'2.4k',sub:'Esta semana'},
+    {icon:'🛒',label:'Tasa conversión',val:'8.2%',sub:'Vistas → compras'},
+    {icon:'⭐',label:'Rating promedio',val:'4.9',sub:'128 reseñas'},
+    {icon:'⏱',label:'Resp. promedio',val:'12 min',sub:'Tiempo respuesta'},
+    {icon:'🔴',label:'Streams este mes',val:'8',sub:'Total lives'},
+    {icon:'🏆',label:'Subastas cerradas',val:String(DASH_ORDERS.filter(o=>o.fromAuction).length||23),sub:'Este mes'},
   ];
-  document.getElementById("dash-stats-grid").innerHTML=statsData.map(s=>`<div style="background:var(--dk3);border-radius:13px;padding:14px;border:1px solid rgba(255,255,255,.05)"><div style="font-size:22px;margin-bottom:6px">${s.icon}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--y);line-height:1">${s.val}</div><div style="font-size:11px;font-weight:800;color:var(--tx);margin-top:3px">${s.label}</div><div style="font-size:10px;color:var(--mu);margin-top:2px">${s.sub}</div></div>`).join("");
-  dashTab("orders");
-  go("dash");
+  document.getElementById('dash-stats-grid').innerHTML=statsData.map(s=>`<div style="background:var(--dk3);border-radius:13px;padding:14px;border:1px solid rgba(255,255,255,.05)"><div style="font-size:22px;margin-bottom:6px">${s.icon}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--y);line-height:1">${s.val}</div><div style="font-size:11px;font-weight:800;color:var(--tx);margin-top:3px">${s.label}</div><div style="font-size:10px;color:var(--mu);margin-top:2px">${s.sub}</div></div>`).join('');
+  dashTab('orders');
+  go('dash');
 }
+
+function markOrderStatus(i,status){
+  DASH_ORDERS[i].status=status;
+  toast(status==='processing'?'🚀 Pedido despachado':'✅ Marcado como entregado');
+  openDash();
+}
+
 function dashTab(tab){
   ["orders","prods","stats"].forEach(t=>{
     document.getElementById("dtab-"+t).classList.toggle("on",t===tab);
@@ -4335,11 +4424,34 @@ function endBroadcast(){
 function openModal(){initGoLive();}
 function closeModal(e,force){if(force||e?.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('on');}
 
-// ═══ WIN CELEBRATION ═══
+// ═══ GUEST MODE ═══
+window.isGuest=false;
+
+function enterAsGuest(){
+  window.isGuest=true;
+  const ob=document.getElementById('s-onboard');
+  if(ob){ob.classList.remove('on');ob.style.display='none';}
+  buildLiveStrip();buildGrid();go('home',false);
+}
+
+function requireAccount(emoji,title,desc){
+  if(!window.isGuest)return false; // logged in, allow
+  const wall=document.getElementById('guest-wall');
+  document.getElementById('guest-wall-emoji').textContent=emoji||'🔐';
+  document.getElementById('guest-wall-title').textContent=title||'Necesitas una cuenta';
+  document.getElementById('guest-wall-desc').textContent=desc||'Crea tu cuenta gratis y accede a todo.';
+  wall.style.display='flex';
+  return true; // blocked
+}
+
+function closeGuestWall(goRegister){
+  document.getElementById('guest-wall').style.display='none';
+  if(goRegister){window.isGuest=false;go('register');}
+}
 function closeWinOverlay(){
   const ov=document.getElementById('win-overlay');
   const card=document.getElementById('win-card');
-  card.style.transform='translate(-50%,-60%) scale(0)';
+  card.style.transform='translate(-50%,-50%) scale(0)';
   setTimeout(()=>{ov.style.display='none';},350);
   openTrack(0);
 }
@@ -4351,8 +4463,9 @@ function showWinCelebration(itemName,price){
   document.getElementById('win-item').textContent=itemName;
   document.getElementById('win-price').textContent='$'+price;
   ov.style.display='block';
+  ov.style.pointerEvents='all';
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    card.style.transform='translate(-50%,-60%) scale(1)';
+    card.style.transform='translate(-50%,-50%) scale(1)';
   }));
   // Confetti burst
   const ctx=canvas.getContext('2d');
