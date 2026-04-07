@@ -2265,7 +2265,19 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
       <!-- Seed button — solo para desarrollo -->
       <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)">
         <div style="font-size:10px;color:var(--mu);margin-bottom:8px;text-align:center;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Herramientas de desarrollo</div>
-        <button onclick="seedFirestore()" style="width:100%;padding:12px;background:rgba(255,208,0,.08);border:1.5px dashed rgba(255,208,0,.3);border-radius:12px;color:var(--y);font-size:12px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif">🌱 Cargar data de prueba en Firestore</button>
+        <button onclick="seedFirestore()" style="width:100%;padding:12px;background:rgba(255,208,0,.08);border:1.5px dashed rgba(255,208,0,.3);border-radius:12px;color:var(--y);font-size:12px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;margin-bottom:10px">🌱 Cargar data de prueba en Firestore</button>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:8px;text-align:center;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:14px">📣 Enviar notificación</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <input id="admin-notif-title" type="text" placeholder="Título" style="width:100%;background:var(--dk4);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:13px;outline:none;box-sizing:border-box">
+          <input id="admin-notif-body" type="text" placeholder="Mensaje" style="width:100%;background:var(--dk4);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:13px;outline:none;box-sizing:border-box">
+          <select id="admin-notif-target" style="width:100%;background:var(--dk4);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:13px;outline:none">
+            <option value="all">📢 Todos los usuarios</option>
+            <option value="buyers">🛍️ Solo compradores</option>
+            <option value="sellers">📡 Solo sellers</option>
+          </select>
+          <button onclick="adminSendNotif()" style="width:100%;padding:12px;background:rgba(255,59,59,.15);border:1.5px solid rgba(255,59,59,.3);border-radius:12px;color:var(--rd);font-size:13px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif">📣 Generar script de envío</button>
+          <div id="admin-notif-script" style="display:none;background:var(--dk4);border-radius:10px;padding:12px;font-size:10px;color:rgba(255,255,255,.6);word-break:break-all;font-family:monospace;max-height:120px;overflow-y:auto"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -3101,9 +3113,9 @@ function expGetBestImg(si,skip=0){
 
 function _expOpenSeller(item){
   if(item.fs&&item._id){
-    // Real FS store — open stream if live, else show profile toast
-    if(item.s.channelName)openStreamFS(item.s.channelName);
-    else toast(`🛍️ ${item.s.n} — próximamente`);
+    // Real FS store — open full profile
+    const storeData={...(item.s),_id:item._id,uid:item._id};
+    openSellerFS(storeData);
   } else {
     openSeller(item.i);
   }
@@ -3807,6 +3819,107 @@ const BIOS=[
   'Gaming y electrónica. Control, consolas, accesorios. Todo original con garantía. 🎮',
   'Belleza y cuidado personal. Productos importados certificados. Asesoría personalizada incluida. 💄',
 ];
+
+
+async function openSellerFS(storeData){
+  // storeData comes from Firestore stores collection
+  const uid=storeData._id||storeData.uid||'';
+  const isLive=storeData.isLive||false;
+  const channelName=storeData.channelName||'';
+
+  // Hero image — use stream thumb if live, else first product image
+  let heroImg='';
+  let prods=[];
+  try{
+    prods=await fsQuery('products',[{field:'sellerId',value:uid}]);
+    if(prods.length)heroImg=prods[0].img||'';
+  }catch(e){}
+  if(isLive&&channelName){
+    try{const s=await fsGet('streams',channelName);if(s?.thumb)heroImg=s.thumb;}catch(e){}
+  }
+
+  const heroEl=document.getElementById('sp-hero-img');
+  if(heroEl){heroEl.src=heroImg;heroEl.style.display=heroImg?'block':'none';}
+
+  // Avatar
+  const avEl=document.getElementById('sp-av-emoji');
+  if(avEl){
+    if(storeData.avatar){
+      avEl.innerHTML=`<img src="${storeData.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      avEl.style.background='#000';avEl.style.overflow='hidden';
+    } else {
+      avEl.textContent='📡';avEl.style.background='';avEl.style.overflow='';
+    }
+  }
+
+  // Live ring
+  document.getElementById('sp-live-ring').style.display=isLive?'block':'none';
+
+  // Info
+  document.getElementById('sp-name').textContent=storeData.shopName||storeData.ownerName||'Vendedor';
+  document.getElementById('sp-handle').textContent='@'+(storeData.shopName||'tienda').toLowerCase().replace(/\s/g,'');
+  document.getElementById('sp-location').innerHTML=`📍 ${storeData.city||'Venezuela'} 🇻🇪`;
+
+  // Follow btn — can't follow FS sellers yet (no index), show as available
+  const fb=document.getElementById('sp-fol-btn');
+  if(fb){fb.textContent='+ Seguir';fb.className='sp-follow-btn';fb.onclick=()=>toast('💛 ¡Siguiendo!');}
+
+  // Live btn
+  const liveBtn=document.getElementById('sp-live-btn');
+  if(liveBtn){
+    if(isLive&&channelName){
+      liveBtn.style.display='flex';
+      liveBtn.onclick=()=>openStreamFS(channelName);
+    } else {
+      liveBtn.style.display='none';
+    }
+  }
+
+  // Stats from Firestore
+  const viewerCount=isLive?(await fsGet('streams',channelName).catch(()=>null))?.viewerCount||0:0;
+  const totalSales=storeData.totalSales||prods.reduce((_,p)=>_+(p.sales||0),0);
+  const followers=storeData.followers||0;
+  const rating=storeData.rating||'—';
+  document.getElementById('sp-stat-v').textContent=viewerCount||'0';
+  document.getElementById('sp-stat-s').textContent=totalSales||'0';
+  document.getElementById('sp-stat-f').textContent=followers>999?(followers/1000).toFixed(1)+'k':followers;
+  document.getElementById('sp-stat-r').textContent=rating;
+  document.getElementById('sp-rating').textContent=rating;
+  document.getElementById('sp-reviews-count').textContent='Sin reseñas aún';
+
+  // Bio
+  document.getElementById('sp-bio').textContent=storeData.description||storeData.bio||`Vendedor verificado en InstaCompras. ${storeData.category||''}`;
+
+  // Rating bars — empty for new sellers
+  document.getElementById('sp-bars').innerHTML='<div style="font-size:12px;color:var(--mu);padding:8px 0">Sin calificaciones aún</div>';
+
+  // Products grid — real from Firestore
+  if(prods.length){
+    document.getElementById('sp-pgrid').innerHTML=prods.map((p,i)=>`
+      <div class="sp-pcard" onclick="openProdFS('${p._id}')">
+        ${p.img?`<img src="${p.img}" onerror="this.style.display='none'">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px">${p.emoji||'📦'}</div>`}
+        ${p.live?`<div class="sp-pcard-live"><div class="lbadge" style="font-size:7px;padding:2px 5px">LIVE</div></div>`:''}
+        <div class="sp-pcard-price">$${p.price||p.p||0}</div>
+      </div>`).join('');
+  } else {
+    document.getElementById('sp-pgrid').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--mu);font-size:12px">Sin productos aún</div>';
+  }
+
+  // Reviews — empty for now
+  document.getElementById('sp-revs-list').innerHTML='<div style="text-align:center;padding:32px;color:var(--mu);font-size:12px">Sin reseñas aún</div>';
+
+  // WhatsApp contact if available
+  const waBtn=document.querySelector('.sp-chat-btn');
+  if(waBtn&&storeData.whatsapp){
+    const msg=encodeURIComponent('Hola, te vi en InstaCompras y quiero saber más sobre tus productos 🛍️');
+    waBtn.onclick=()=>window.open(`https://wa.me/${storeData.whatsapp}?text=${msg}`,'_blank');
+    waBtn.textContent='💬 WhatsApp';
+  }
+
+  curSeller=-1; // mark as FS seller
+  spTab('prods');
+  go('seller');
+}
 
 function openSeller(idx){
   curSeller=idx;
@@ -6004,6 +6117,34 @@ async function openAdmin(){
   await _adminLoadDeps();
 }
 
+
+async function adminSendNotif(){
+  if(!_isAdmin())return;
+  const title=document.getElementById('admin-notif-title').value.trim();
+  const body=document.getElementById('admin-notif-body').value.trim();
+  const target=document.getElementById('admin-notif-target').value;
+  if(!title||!body){toast('⚠️ Escribe título y mensaje');return;}
+  toast('⏳ Obteniendo suscriptores...');
+  const users=await fsQuery('users');
+  const subs=users
+    .filter(u=>u.pushSub&&(target==='all'||(target==='buyers'&&u.type!=='seller')||(target==='sellers'&&u.type==='seller')))
+    .map(u=>({uid:u.uid||u._id,sub:u.pushSub}));
+  if(!subs.length){toast('⚠️ Sin suscriptores activos');return;}
+  await fsAdd('push_jobs',{
+    title,body,target,
+    subscriptions:subs.map(s=>s.sub),
+    createdAt:Date.now(),
+    status:'pending',
+    createdBy:window.fbUser?.uid
+  }).catch(()=>{});
+  const scriptEl=document.getElementById('admin-notif-script');
+  if(scriptEl){
+    scriptEl.style.display='block';
+    scriptEl.textContent='✅ '+subs.length+' destinatario'+(subs.length!==1?'s':'')+' — corre: node send-push.js';
+  }
+  toast('✅ Job guardado — '+subs.length+' destinatario'+(subs.length!==1?'s':'')+'. Corre send-push.js');
+}
+
 async function _adminLoadDeps(){
   const listEl=document.getElementById('admin-dep-list');
   listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu);font-size:12px">⏳ Cargando depósitos...</div>';
@@ -6218,6 +6359,17 @@ window.addEventListener('appinstalled',()=>{
 });
 
 // ── Notification Permission ───────────────────────────────────────────────────
+const VAPID_PUBLIC_KEY='BEJcz6fiT5LSTCMH_XpOuHcggaxoAWc6cichU3cp82VpcPceQZTokgCSKrEuh8WBhuJ3c5Oh4wd_KNIiLcszrek';
+
+function _urlBase64ToUint8Array(base64String){
+  const padding='='.repeat((4-base64String.length%4)%4);
+  const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+  const rawData=window.atob(base64);
+  const outputArray=new Uint8Array(rawData.length);
+  for(let i=0;i<rawData.length;++i)outputArray[i]=rawData.charCodeAt(i);
+  return outputArray;
+}
+
 async function requestNotifPermission(){
   document.getElementById('notif-prompt').style.display='none';
   if(!('Notification' in window)){toast('⚠️ Tu navegador no soporta notificaciones');return;}
@@ -6225,16 +6377,22 @@ async function requestNotifPermission(){
   if(perm==='granted'){
     toast('🔔 ¡Notificaciones activadas!');
     localStorage.setItem('notif-granted','1');
-    // Subscribe to push if SW is available
     if('serviceWorker' in navigator){
       try{
         const reg=await navigator.serviceWorker.ready;
-        // Save subscription to Firestore for future push
-        const sub=await reg.pushManager.getSubscription();
-        if(sub&&window.fbUser?.uid){
-          fsSet('users',window.fbUser.uid,{pushSub:JSON.stringify(sub)}).catch(()=>{});
+        // Unsubscribe old and resubscribe with VAPID
+        const oldSub=await reg.pushManager.getSubscription();
+        if(oldSub)await oldSub.unsubscribe();
+        const sub=await reg.pushManager.subscribe({
+          userVisibleOnly:true,
+          applicationServerKey:_urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
+        const uid=window.fbUser?.uid;
+        if(uid){
+          await fsSet('users',uid,{pushSub:JSON.stringify(sub)});
+          console.log('Push subscription saved');
         }
-      }catch(e){}
+      }catch(e){console.warn('Push subscribe error:',e);}
     }
   } else {
     toast('Notificaciones desactivadas');
