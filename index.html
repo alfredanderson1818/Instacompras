@@ -243,8 +243,8 @@ async function fbRestoreSession(){
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{height:100%;height:-webkit-fill-available}
-body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;background:var(--dk);color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px}
-#app{max-width:430px;margin:0 auto;height:var(--app-h);height:100dvh;position:relative;overflow:hidden;background:var(--dk)}
+body{height:100%;height:-webkit-fill-available;overflow:hidden;background:var(--dk);color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px}
+#app{max-width:430px;margin:0 auto;height:100vh;height:100dvh;height:-webkit-fill-available;position:relative;overflow:hidden;background:var(--dk)}
 .scr{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateX(44px) scale(.98);transition:opacity .32s cubic-bezier(.4,0,.2,1),transform .36s cubic-bezier(.34,1.10,.64,1);overflow:hidden;will-change:transform,opacity}
 .scr.on{opacity:1;pointer-events:all;transform:translateX(0) scale(1)}
 .scr.out{opacity:0;transform:translateX(-28px) scale(.98);transition:opacity .2s ease,transform .2s ease}
@@ -1957,7 +1957,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         <img id="prof-banner-img" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none">
       </div>
       <!-- Live badge top left -->
-      <div style="position:absolute;top:12px;left:14px;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);border-radius:20px;padding:4px 10px;border:1px solid rgba(255,255,255,.1)">
+      <div style="position:absolute;top:max(var(--sat),12px);left:14px;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);border-radius:20px;padding:4px 10px;border:1px solid rgba(255,255,255,.1)">
         <div style="width:6px;height:6px;border-radius:50%;background:var(--rd);animation:pulse-live 2s infinite"></div>
         <span style="font-size:10px;font-weight:900;color:#fff;letter-spacing:1px" id="prof-type-badge">COMPRADOR</span>
       </div>
@@ -5465,7 +5465,15 @@ function fmt(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n);}
 
 // ═══ MOBILE VIEWPORT FIX ═══
 function setAppHeight(){
-  // Use visualViewport when available (more accurate on mobile)
+  // In standalone PWA, rely on CSS 100dvh which is more accurate
+  const isStandalone=window.navigator.standalone||window.matchMedia('(display-mode:standalone)').matches;
+  if(isStandalone){
+    document.documentElement.style.removeProperty('--app-h');
+    const app=document.getElementById('app');
+    if(app)app.style.height='';
+    return;
+  }
+  // In browser, use visualViewport for keyboard handling
   const h=(window.visualViewport?.height)||window.innerHeight;
   document.documentElement.style.setProperty('--app-h',h+'px');
   const app=document.getElementById('app');
