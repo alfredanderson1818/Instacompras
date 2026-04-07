@@ -1558,6 +1558,9 @@ body{height:100%;height:-webkit-fill-available;overflow:hidden;background:var(--
     <!-- Categories -->
     <div class="cat-strip" id="cat-strip"></div>
 
+    <!-- Live Strip -->
+    <div class="live-strip" id="live-strip"></div>
+
     <!-- Products -->
     <div class="sh">
       <div class="sh-title">Populares</div>
@@ -2099,6 +2102,8 @@ body{height:100%;height:-webkit-fill-available;overflow:hidden;background:var(--
       </div>
       <div style="font-size:10px;font-weight:800;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px">Nombre</div>
       <input id="prof-edit-name" type="text" maxlength="40" placeholder="Tu nombre" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 16px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;transition:border-color .15s" onfocus="this.style.borderColor='rgba(255,208,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+      <div style="font-size:10px;font-weight:800;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px">@Username</div>
+      <input id="prof-edit-handle" type="text" maxlength="30" placeholder="@tu_usuario" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 16px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;transition:border-color .15s" onfocus="this.style.borderColor='rgba(255,208,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
       <div style="display:flex;align-items:center;gap:10px;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 16px;margin-bottom:14px;transition:border-color .15s" id="prof-edit-wa-wrap">
         <span style="font-size:16px;flex-shrink:0">💬</span>
         <input id="prof-edit-whatsapp" type="tel" placeholder="WhatsApp: 04120000000" style="background:none;border:none;outline:none;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;width:100%" onfocus="document.getElementById('prof-edit-wa-wrap').style.borderColor='rgba(255,208,0,.4)'" onblur="document.getElementById('prof-edit-wa-wrap').style.borderColor='rgba(255,255,255,.08)'">
@@ -3370,10 +3375,9 @@ function goHome(){
 
 // ═══ STREAM ═══
 function svTab(tab){
-  // sv-chat-panel removed — chat is overlay
-  document.getElementById('sv-prods-panel').style.display=tab==='prods'?'block':'none';
-  document.getElementById('sv-tab-chat').classList.toggle('on',tab==='chat');
-  document.getElementById('sv-tab-prods').classList.toggle('on',tab==='prods');
+  const pp=document.getElementById('sv-prods-panel');if(pp)pp.style.display=tab==='prods'?'block':'none';
+  const tc=document.getElementById('sv-tab-chat');if(tc)tc.classList.toggle('on',tab==='chat');
+  const tp=document.getElementById('sv-tab-prods');if(tp)tp.classList.toggle('on',tab==='prods');
 }
 
 let curStreamProd=0;
@@ -3409,7 +3413,8 @@ function openStream(idx){
   // populate products panel
   const sellerProds=PRODS.filter(p=>p.s===idx);
   const gridProds=sellerProds.length?sellerProds:PRODS.slice(0,6);
-  document.getElementById('sv-prods-grid').innerHTML=gridProds.map((p,i)=>`
+  const _spg=document.getElementById('sv-prods-grid');
+  if(_spg)_spg.innerHTML=gridProds.map((p,i)=>`
     <div class="sv-prod-card" onclick="openProd(${PRODS.indexOf(p)})">
       <div class="sv-prod-img ${BG[i%4]}">${p.img?`<img src="${p.img}" onerror="this.style.display='none'">`:`<span>${p.e}</span>`}</div>
       <div class="sv-prod-body">
