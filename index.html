@@ -4,34 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>InstaCompras Live</title>
-
-<!-- ═══ PWA ═══ -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#FFD000">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="InstaCompras">
-<meta name="application-name" content="InstaCompras">
-<meta name="description" content="Compra en vivo. Subastas en tiempo real. La mejor experiencia de live shopping de Venezuela.">
-<meta name="format-detection" content="telephone=no">
-
-<!-- Apple touch icons -->
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-192.png">
-<link rel="apple-touch-icon" sizes="167x167" href="icons/icon-192.png">
-
-<!-- Splash screens iOS (optional but nice) -->
-<meta name="apple-touch-fullscreen" content="yes">
-
-<!-- Open Graph -->
-<meta property="og:type" content="website">
-<meta property="og:title" content="InstaCompras Live">
-<meta property="og:description" content="Compra en vivo. Subastas en tiempo real.">
-<meta property="og:image" content="icons/icon-512.png">
-<meta property="og:url" content="https://alfredanderson1818.github.io/Instacompras">
-
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.0.js" defer></script>
@@ -207,67 +179,31 @@ async function fbGoogleSignIn(){
   });
 }
 
-// Password Reset
-async function fbPasswordReset(email){
-  const r=await fetch(`${FB.authUrl}:sendOobCode?key=${FB.apiKey}`,{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({requestType:'PASSWORD_RESET',email})
-  });
-  const d=await r.json();
-  if(!r.ok)throw{code:d.error?.message||'ERROR',message:d.error?.message||'Error'};
-  return d;
-}
-
-// Token Refresh — Firebase ID tokens expire after 1h
-async function fbRefreshToken(refreshToken){
-  try{
-    const r=await fetch(`https://securetoken.googleapis.com/v1/token?key=${FB.apiKey}`,{
-      method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
-      body:`grant_type=refresh_token&refresh_token=${encodeURIComponent(refreshToken)}`
-    });
-    const d=await r.json();
-    if(!r.ok)return null;
-    return{idToken:d.id_token,refreshToken:d.refresh_token,uid:d.user_id};
-  }catch(e){return null;}
-}
-
 // Verificar token guardado al cargar
 async function fbRestoreSession(){
   try{
     const token=localStorage.getItem('fb_token');
     const uid=localStorage.getItem('fb_uid');
     if(!token||!uid)return false;
+    // Use cached user data for instant load
     const cached=fbGetCachedUser();
     if(cached&&cached.uid===uid){
       window.fbUser={...cached};
       window.fbToken=token;
-      // Silently refresh token in background
-      const refresh=localStorage.getItem('fb_refresh');
-      if(refresh){
-        fbRefreshToken(refresh).then(r=>{
-          if(!r)return;
-          window.fbToken=r.idToken;
-          try{localStorage.setItem('fb_token',r.idToken);localStorage.setItem('fb_refresh',r.refreshToken);}catch(e){}
-          fbGetUser(r.uid,r.idToken).then(d=>{if(d){window.fbUser={uid:r.uid,...d};fbCacheUser({uid:r.uid,...d});}}).catch(()=>{});
-        }).catch(()=>{});
-      }
+      // Refresh silently in background
+      fbGetUser(uid,token).then(d=>{
+        if(d){window.fbUser={uid,...d};fbCacheUser({uid,...d});}
+      }).catch(()=>{});
       return true;
     }
-    // No cache — fetch with timeout, fallback to refresh
-    let userData=await Promise.race([
+    // No cache: fetch with 5s timeout
+    const userData=await Promise.race([
       fbGetUser(uid,token),
-      new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),4000))
-    ]).catch(async()=>{
-      const refresh=localStorage.getItem('fb_refresh');
-      if(!refresh)return null;
-      const r=await fbRefreshToken(refresh);
-      if(!r)return null;
-      window.fbToken=r.idToken;
-      try{localStorage.setItem('fb_token',r.idToken);localStorage.setItem('fb_refresh',r.refreshToken);}catch(e){}
-      return fbGetUser(r.uid,r.idToken).catch(()=>null);
-    });
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),5000))
+    ]);
     if(userData){
       window.fbUser={uid,...userData};
+      window.fbToken=token;
       fbCacheUser({uid,...userData});
       return true;
     }
@@ -426,11 +362,11 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .pcard-old{font-size:10px;color:var(--mu);text-decoration:line-through}
 
 /* ═══ STREAM — FULL IMMERSIVE ═══ */
-#s-stream{background:var(--dk);position:relative}
+#s-stream{background:#000;position:relative}
 /* Stream page */
-.sv{position:relative;width:100%;height:300px;overflow:hidden;background:#000;flex-shrink:0}
+.sv{position:relative;width:100%;height:62vh;min-height:320px;overflow:hidden;background:#000;flex-shrink:0}
 .sv img{width:100%;height:100%;object-fit:cover;opacity:.9;display:block}
-.sv-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.6) 0%,transparent 35%,transparent 48%,var(--dk) 100%);pointer-events:none}
+.sv-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.55) 0%,transparent 28%,transparent 42%,rgba(0,0,0,.85) 100%);pointer-events:none}
 /* Top bar inside stream */
 .sv-topbar{position:absolute;top:0;left:0;right:0;padding:14px 14px 0;display:flex;align-items:center;justify-content:space-between;z-index:5}
 .sv-top-left{display:flex;align-items:center;gap:8px}
@@ -469,29 +405,22 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .sp-discount{background:var(--rd);color:#fff;font-size:9px;font-weight:900;padding:2px 5px;border-radius:4px;margin-left:3px}
 .spbuy{background:var(--y);color:var(--dk);border:none;border-radius:9px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;cursor:pointer;flex-shrink:0;transition:all .18s cubic-bezier(.34,1.3,.64,1);white-space:nowrap}
 .spbuy:active{transform:scale(.93)}
-/* chat */
-.chat-wrap{background:var(--dk);display:flex;flex-direction:column;flex-shrink:0}
-.chat-msgs{height:130px;overflow:hidden;padding:10px 16px 4px;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;scrollbar-width:none}
-.chat-msgs::-webkit-scrollbar{display:none}
-.cmsg{display:flex;gap:7px;align-items:flex-start;animation:fi .22s cubic-bezier(.34,1.2,.64,1)}
-@keyframes fi{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
-.cav{width:26px;height:26px;border-radius:50%;background:var(--dk3);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;border:1px solid rgba(255,255,255,.06)}
-.ccon{flex:1}
-.cu{font-size:10px;font-weight:800;color:var(--y);margin-bottom:1px}
-.ct{font-size:12px;color:rgba(255,255,255,.82);line-height:1.4}
-.chat-inp{display:flex;gap:8px;padding:8px 14px;border-top:1px solid rgba(255,255,255,.05);flex-shrink:0;background:var(--dk2)}
-.ci{flex:1;background:var(--dk3);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:9px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:13px;outline:none;transition:border-color .15s}
-.ci:focus{border-color:rgba(255,208,0,.35)}
-.ci::placeholder{color:var(--mu)}
-.sendbtn{width:34px;height:34px;background:var(--y);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .15s cubic-bezier(.34,1.56,.64,1)}
+/* chat overlay — TikTok style */
+.chat-overlay{position:absolute;bottom:72px;left:0;right:80px;padding:0 14px 10px;pointer-events:none;z-index:6;display:flex;flex-direction:column;justify-content:flex-end;gap:5px;max-height:45%;overflow:hidden}
+.cmsg{display:flex;gap:7px;align-items:flex-end;animation:fi .25s cubic-bezier(.34,1.2,.64,1);pointer-events:auto}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.cmsg-bubble{background:rgba(0,0,0,.52);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:18px;padding:6px 11px;max-width:100%;border:1px solid rgba(255,255,255,.08)}
+.cu{font-size:10px;font-weight:900;color:var(--y);margin-bottom:1px;display:inline}
+.ct{font-size:12px;color:rgba(255,255,255,.9);line-height:1.4;display:inline;margin-left:4px}
+/* chat input bar */
+.chat-bar{display:flex;align-items:center;gap:8px;padding:10px 14px 10px;background:rgba(10,10,15,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.ci{flex:1;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.12);border-radius:22px;padding:9px 16px;color:#fff;font-family:'Nunito',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+.ci:focus{border-color:rgba(255,208,0,.5);background:rgba(255,255,255,.13)}
+.ci::placeholder{color:rgba(255,255,255,.4)}
+.sendbtn{width:36px;height:36px;background:var(--y);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;transition:all .15s cubic-bezier(.34,1.56,.64,1)}
 .sendbtn:active{transform:scale(.88)}
-.giftbtn{width:34px;height:34px;background:var(--dk3);border:1px solid rgba(255,255,255,.07);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;transition:transform .15s}
+.giftbtn{width:36px;height:36px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.12);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:transform .15s}
 .giftbtn:active{transform:scale(.88)}
-
-.sv-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;background:var(--dk)}
-.sv-tab{flex:1;padding:11px 0;text-align:center;font-size:12px;font-weight:800;color:var(--mu);cursor:pointer;position:relative;transition:color .15s}
-.sv-tab.on{color:var(--y)}
-.sv-tab.on::after{content:"";position:absolute;bottom:-1px;left:25%;right:25%;height:2px;background:var(--y);border-radius:2px}
 .sv-prods{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 80px}
 .sv-prod-card{background:var(--dk3);border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid rgba(255,255,255,.05);transition:transform .18s}
 .sv-prod-card:active{transform:scale(.96)}
@@ -829,7 +758,6 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 /* Floating in-app notification banner */
 #notif-banner{position:fixed;top:0;left:0;right:0;z-index:500;padding:max(env(safe-area-inset-top),12px) 14px 12px;background:rgba(26,26,37,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:11px;cursor:pointer;transform:translateY(-100%);transition:transform .36s cubic-bezier(.34,1.2,.64,1)}
 #notif-banner.on{transform:none}
-#pwa-banner.on{transform:none}
 .nb-icon{width:36px;height:36px;border-radius:10px;background:rgba(255,59,59,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .nb-text{font-size:12px;font-weight:700;color:var(--tx);flex:1;line-height:1.4}
 .nb-close{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--mu);flex-shrink:0;cursor:pointer}
@@ -1371,7 +1299,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         </div>
       </div>
       <div style="text-align:right;margin-bottom:22px">
-        <span style="font-size:12px;color:var(--y);font-weight:700;cursor:pointer" onclick="doPasswordReset()">¿Olvidaste tu contraseña?</span>
+        <span style="font-size:12px;color:var(--y);font-weight:700;cursor:pointer" onclick="doForgotPass()">¿Olvidaste tu contraseña?</span>
       </div>
       <button onclick="doLogin()" style="width:100%;background:var(--y);color:var(--dk);border:none;border-radius:13px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;margin-bottom:16px;transition:all .2s">Entrar</button>
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
@@ -1448,8 +1376,15 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         <input id="reg-shop" type="text" placeholder="Nombre de tu tienda"
           style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none"
           onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+        <div style="display:flex;align-items:center;gap:10px;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;transition:border-color .15s" id="reg-wa-wrap">
+          <span style="font-size:16px;flex-shrink:0">💬</span>
+          <input id="reg-whatsapp" type="tel" placeholder="WhatsApp: 04120000000"
+            style="background:none;border:none;outline:none;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;width:100%"
+            onfocus="document.getElementById('reg-wa-wrap').style.borderColor='rgba(255,208,0,.5)'"
+            onblur="document.getElementById('reg-wa-wrap').style.borderColor='rgba(255,255,255,.08)'">
+        </div>
         <div style="background:rgba(255,208,0,.07);border:1px solid rgba(255,208,0,.2);border-radius:10px;padding:11px 13px;font-size:11px;color:rgba(255,255,255,.6);line-height:1.6">
-          ✅ Revisión en <strong style="color:var(--y)">24h</strong>. Ten lista tu cédula de identidad.
+          ✅ Revisión en <strong style="color:var(--y)">24h</strong>. Tu WhatsApp será visible para compradores.
         </div>
       </div>
 
@@ -1606,7 +1541,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         <div class="sv-title-pill">
           <div class="sv-avsmall" id="sv-av-small">🛍️</div>
           <span class="sv-seller-mini" id="sv-name-mini">MarisolShop</span>
-          <div class="lbadge" id="sv-live-status" style="font-size:8px;padding:2px 6px">EN VIVO</div>
+          <div class="lbadge" style="font-size:8px;padding:2px 6px">EN VIVO</div>
         </div>
       </div>
       <div class="sv-top-right">
@@ -1632,7 +1567,11 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     </div>
   </div>
 
-  <!-- Featured product bar -->
+  <!-- Chat overlay sobre el video -->
+  <div class="chat-overlay" id="chat-msgs"></div>
+</div>
+
+  <!-- Product bar -->
   <div class="spbar" id="spbar">
     <div class="spthumb" id="spthumb"><span>👟</span></div>
     <div class="spinfo">
@@ -1646,25 +1585,13 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <button class="spbuy" id="spbuy">🛒 Comprar</button>
   </div>
 
-  <!-- Tabs: Chat / Productos -->
-  <div class="sv-tabs">
-    <div class="sv-tab on" id="sv-tab-chat" onclick="svTab('chat')">💬 Chat</div>
-    <div class="sv-tab" id="sv-tab-prods" onclick="svTab('prods')">🛍️ Productos</div>
-  </div>
-
-  <!-- Chat panel -->
-  <div id="sv-chat-panel" class="chat-wrap">
-    <div class="chat-msgs" id="chat-msgs"></div>
-    <div class="chat-inp">
-      <input class="ci" type="text" placeholder="Enviar mensaje…" id="chat-in" onkeydown="if(event.key==='Enter')sendChat()">
-      <button class="giftbtn" onclick="spawnGift()">🎁</button>
-      <button class="sendbtn" onclick="sendChat()">➤</button>
-    </div>
-  </div>
-
-  <!-- Products panel -->
-  <div id="sv-prods-panel" style="display:none;overflow-y:auto;flex:1;padding-bottom:72px">
-    <div class="sv-prods" id="sv-prods-grid"></div>
+  <!-- Chat input -->
+  <div class="chat-bar">
+    <input class="ci" type="text" placeholder="Comenta algo…" id="chat-in" onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="giftbtn" onclick="spawnGift()">🎁</button>
+    <button class="sendbtn" onclick="sendChat()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--dk)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
   </div>
 </div>
 
@@ -1802,7 +1729,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
   <div class="cart-ft" id="cart-ft" style="display:none">
     <div class="cart-sub"><div class="cart-sub-l">Subtotal</div><div class="cart-sub-v" id="cart-sub">$0</div></div>
     <div class="cart-hint">Delivery +$3 USD</div>
-    <button class="cko-btn" onclick="go('co')">✅ Finalizar Compra</button>
+    <button class="cko-btn" onclick="go('co');updateCo()">✅ Finalizar Compra</button>
   </div>
 </div>
 
@@ -2058,11 +1985,12 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         <div class="pmia">›</div>
       </div>
 
-      <div class="pmi" onclick="openTrack(0)" style="border-radius:13px">
+      <div class="pmi" onclick="openMyOrders()" style="border-radius:13px">
         <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;flex-shrink:0">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--tx)" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
         </div>
         <div class="pmil">Mis Pedidos</div>
+        <div class="pmib" id="my-orders-badge" style="background:rgba(255,255,255,.07);border-radius:8px;padding:3px 8px;font-size:11px;display:none"></div>
         <div class="pmia">›</div>
       </div>
 
@@ -2103,10 +2031,30 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
       </div>
       <div style="font-size:10px;font-weight:800;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px">Nombre</div>
       <input id="prof-edit-name" type="text" maxlength="40" placeholder="Tu nombre" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 16px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;transition:border-color .15s" onfocus="this.style.borderColor='rgba(255,208,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+      <div style="display:flex;align-items:center;gap:10px;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 16px;margin-bottom:14px;transition:border-color .15s" id="prof-edit-wa-wrap">
+        <span style="font-size:16px;flex-shrink:0">💬</span>
+        <input id="prof-edit-whatsapp" type="tel" placeholder="WhatsApp: 04120000000" style="background:none;border:none;outline:none;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;width:100%" onfocus="document.getElementById('prof-edit-wa-wrap').style.borderColor='rgba(255,208,0,.4)'" onblur="document.getElementById('prof-edit-wa-wrap').style.borderColor='rgba(255,255,255,.08)'">
+      </div>
       <div style="font-size:10px;font-weight:800;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px">Bio</div>
       <textarea id="prof-edit-bio" maxlength="120" rows="3" placeholder="Cuéntanos algo sobre ti…" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 16px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;resize:none;box-sizing:border-box;margin-bottom:6px;line-height:1.5;transition:border-color .15s" onfocus="this.style.borderColor='rgba(255,208,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'"></textarea>
       <div style="text-align:right;font-size:10px;color:var(--mu);margin-bottom:18px"><span id="prof-bio-count">0</span>/120</div>
       <button onclick="saveProfEdit()" style="width:100%;background:var(--y);color:var(--dk);border:none;border-radius:13px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .15s">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- MIS PEDIDOS -->
+<div id="s-my-orders" class="scr">
+  <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06)">
+    <button class="bk" style="position:static;background:var(--dk3);border:1px solid rgba(255,255,255,.07)" onclick="goBack()">←</button>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1">Mis Pedidos</div>
+    <div id="my-orders-count" style="font-size:11px;color:var(--mu);font-weight:700"></div>
+  </div>
+  <div class="sb" style="padding-bottom:88px" id="my-orders-list">
+    <div style="text-align:center;padding:48px 24px;color:var(--mu)">
+      <div style="font-size:40px;margin-bottom:12px">📦</div>
+      <div style="font-size:14px;font-weight:800;color:var(--tx);margin-bottom:6px">Sin pedidos aún</div>
+      <div style="font-size:12px">Tus compras aparecerán aquí</div>
     </div>
   </div>
 </div>
@@ -2252,6 +2200,11 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <!-- Stats panel -->
     <div id="dpanel-stats" style="display:none;padding:14px 16px;display:none">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="dash-stats-grid"></div>
+      <!-- Seed button — solo para desarrollo -->
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)">
+        <div style="font-size:10px;color:var(--mu);margin-bottom:8px;text-align:center;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Herramientas de desarrollo</div>
+        <button onclick="seedFirestore()" style="width:100%;padding:12px;background:rgba(255,208,0,.08);border:1.5px dashed rgba(255,208,0,.3);border-radius:12px;color:var(--y);font-size:12px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif">🌱 Cargar data de prueba en Firestore</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2274,7 +2227,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
       <div class="co-sec-t">📦 Entrega</div>
       <div class="co-card">
         <div class="co-row"><span class="co-l">Nombre</span><span class="co-v" id="co-name-display">—</span></div>
-        <div class="co-row"><span class="co-l">Ciudad</span><span class="co-v" id="co-city-display">Venezuela</span></div>
+        <div class="co-row"><span class="co-l">Ciudad</span><span class="co-v" id="co-city-display">Venezuela 🇻🇪</span></div>
         <div class="co-row"><span class="co-l">Método</span><span class="co-v">🏍️ Moto · $3 USD</span></div>
       </div>
       <div class="co-sec-t">⚡ Pagar con InstaCreditos</div>
@@ -2290,7 +2243,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
             </div>
             <div style="text-align:right">
               <div style="font-size:11px;color:var(--mu);margin-bottom:2px">Tu saldo</div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y);line-height:1" id="co-ic-balance">250 IC</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y);line-height:1" id="co-wallet-balance">0 IC</div>
             </div>
           </div>
           <div style="background:rgba(255,208,0,.08);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:6px">
@@ -2322,7 +2275,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
       <div class="ok-order-title">Detalles del pedido</div>
       <div id="ok-order"></div>
     </div>
-    <button class="ok-whatsapp-btn" onclick="toast('📱 Contactando al vendedor...')"><span style="font-size:18px">💬</span> Contactar al Vendedor</button>
+    <button class="ok-whatsapp-btn" onclick="window.open('https://wa.me/584242244622?text=Hola%2C+acabo+de+hacer+un+pedido+en+InstaCompras+y+quiero+coordinar+la+entrega+%F0%9F%93%A6','_blank')"><span style="font-size:18px">💬</span> Contactar al Vendedor</button>
     <button class="ok-back" onclick="goHome()">← Seguir Comprando</button>
   </div>
 </div>
@@ -2535,7 +2488,6 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
       <span id="bc-viewers">1</span>
     </div>
     <div class="bc-timer" id="bc-timer">00:00</div>
-    <div class="lbadge" id="bc-live-indicator" style="font-size:8px;padding:2px 8px;margin-left:6px">EN VIVO</div>
     <button class="bc-end" onclick="endBroadcast()">Terminar</button>
   </div>
 
@@ -2722,19 +2674,6 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
   <div class="nb-icon">🔔</div>
   <div class="nb-text">Notificación</div>
   <div class="nb-close" onclick="event.stopPropagation();this.closest('#notif-banner').classList.remove('on')">✕</div>
-</div>
-
-<!-- PWA Install Banner -->
-<div id="pwa-banner" style="position:fixed;bottom:0;left:0;right:0;z-index:490;transform:translateY(100%);transition:transform .4s cubic-bezier(.34,1.1,.64,1);background:rgba(17,17,24,.98);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid rgba(255,208,0,.2);padding:16px 16px max(env(safe-area-inset-bottom),20px);display:flex;align-items:center;gap:13px;max-width:430px;margin:0 auto">
-  <div style="width:48px;height:48px;border-radius:14px;background:var(--y);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:26px">🛍️</div>
-  <div style="flex:1;min-width:0">
-    <div style="font-size:13px;font-weight:900;color:#fff;margin-bottom:2px">Instala InstaCompras</div>
-    <div style="font-size:11px;color:var(--mu);line-height:1.4">Acceso directo desde tu pantalla de inicio — sin App Store</div>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
-    <button onclick="installApp()" style="background:var(--y);color:var(--dk);border:none;border-radius:10px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap">Instalar</button>
-    <button onclick="dismissInstallBanner()" style="background:none;border:none;color:var(--mu);font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;cursor:pointer;text-align:center">Ahora no</button>
-  </div>
 </div>
 </div>
 
@@ -2927,9 +2866,6 @@ const PAYOPTS=[{i:'💜',n:'Zelle'},{i:'🏦',n:'Pago Móvil'},{i:'₿',n:'Binan
 
 // ═══ STATE ═══
 let cart=[],curProd=null,curStream=null,hist=['home'],selPay=0,qty=1,curSz='',wish=new Set(),following=new Set(),likes=0,chatIv=null,viewIv=null;
-let FS_LIVE_SELLERS=[]; // sellers from Firestore with isLive:true
-let FS_USER_ORDERS=[]; // buyer's real orders from Firestore
-let homePollIv=null;   // polling interval for home screen
 
 // ═══ BUILD ═══
 function buildLiveStrip(){
@@ -3016,75 +2952,6 @@ function prodCard(p,i,list){
     </div>
   </div>`;
 }
-// ═══ FIRESTORE HOME SYNC ═══
-async function syncLiveSellers(){
-  if(!window.fbToken)return;
-  try{
-    // Fetch stores marked as live
-    const stores=await fsQuery('stores',[{field:'isLive',value:true}]);
-    FS_LIVE_SELLERS=stores;
-    // Patch SELLERS array with real viewer counts + live status + channelName
-    stores.forEach(store=>{
-      const match=SELLERS.findIndex(s=>s.n===store.shopName||s.uid===store.uid);
-      if(match>=0){
-        SELLERS[match].isLive=true;
-        if(store.viewers)SELLERS[match].v=store.viewers;
-        if(store.channelName)SELLERS[match].channelName=store.channelName;
-        if(store.uid)SELLERS[match].uid=store.uid;
-      }
-    });
-    // Re-render live strip with updated data
-    buildLiveStrip();
-    // Show/hide "no lives" empty state
-    const emptyEl=document.getElementById('home-no-lives');
-    if(emptyEl)emptyEl.style.display=stores.length?'none':'flex';
-  }catch(e){console.warn('syncLiveSellers:',e);}
-}
-
-async function loadUserOrders(){
-  const uid=window.fbUser?.uid;
-  if(!uid||!window.fbToken)return;
-  try{
-    const orders=await fsQuery('orders',[{field:'buyerId',value:uid}]);
-    if(!orders.length)return;
-    // Sort newest first
-    orders.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-    FS_USER_ORDERS=orders;
-    // Refresh track screen if open
-    _renderTrackIfNeeded();
-  }catch(e){console.warn('loadUserOrders:',e);}
-}
-
-function _renderTrackIfNeeded(){
-  const trackScr=document.getElementById('s-track');
-  if(!trackScr||!trackScr.classList.contains('on'))return;
-  if(!FS_USER_ORDERS.length)return;
-  const latest=FS_USER_ORDERS[0];
-  const numEl=document.getElementById('track-order-num');
-  const num2El=document.getElementById('track-num2');
-  if(numEl)numEl.textContent='#'+(latest.num||latest.orderId||'--');
-  if(num2El)num2El.textContent='#'+(latest.num||latest.orderId||'--');
-  // Update status
-  const status=latest.status||'pending';
-  document.querySelectorAll('.track-step').forEach((el,i)=>{
-    const states=['pending','processing','delivered'];
-    const stepStatus=i<=states.indexOf(status)?'done':(i===states.indexOf(status)+1?'active':'');
-    el.className='track-step'+(stepStatus?' '+stepStatus:'');
-  });
-}
-
-function startHomePolling(){
-  syncLiveSellers();
-  loadUserOrders();
-  if(homePollIv)clearInterval(homePollIv);
-  homePollIv=setInterval(()=>{
-    if(hist[hist.length-1]==='home')syncLiveSellers();
-  },30000);
-}
-function stopHomePolling(){
-  if(homePollIv){clearInterval(homePollIv);homePollIv=null;}
-}
-
 function buildExpScreen(){
   const EXP_CATS=['🔥 Todo','👟 Calzado','📱 Tech','👗 Ropa','💄 Belleza','🏠 Hogar','⚽ Deportes','💍 Joyería','🎮 Gaming','☕ Comida','🎸 Música'];
   const catBar=document.getElementById('exp-cats');
@@ -3236,12 +3103,9 @@ function go(id,push=true){
   const next=document.getElementById('s-'+id);
   if(next){next.classList.add('on');}
   if(push&&hist[hist.length-1]!==id)hist.push(id);
-  const hide=['stream','co','ok','onboard','register','seller','wallet','deposit','dash','notif','track'].includes(id);
+  const hide=['stream','co','ok','onboard','register','seller','wallet','deposit','dash','notif','track','my-orders'].includes(id);
   document.getElementById('nav').className='nav'+(hide?' hide':'');
   ['home','exp','cart','prof'].forEach(n=>document.getElementById('ni-'+n)?.classList.toggle('on',n===id));
-  // Polling: start on home, stop when leaving
-  if(id==='home')startHomePolling();
-  else stopHomePolling();
 }
 function nav(id){
   hist=[id];stopChat();
@@ -3259,7 +3123,7 @@ function addNavRipple(id){
   el.appendChild(r);
   setTimeout(()=>r.remove(),520);
 }
-function goBack(){
+function goBack(){if(typeof stopAuction==="function")stopAuction();
   if(hist.length>1){
     const leaving=hist[hist.length-1];
     hist.pop();stopChat();
@@ -3285,7 +3149,7 @@ function goHome(){
 
 // ═══ STREAM ═══
 function svTab(tab){
-  document.getElementById('sv-chat-panel').style.display=tab==='chat'?'flex':'none';
+  // sv-chat-panel removed — chat is overlay
   document.getElementById('sv-prods-panel').style.display=tab==='prods'?'block':'none';
   document.getElementById('sv-tab-chat').classList.toggle('on',tab==='chat');
   document.getElementById('sv-tab-prods').classList.toggle('on',tab==='prods');
@@ -3334,10 +3198,8 @@ function openStream(idx){
     </div>`).join('');
   svTab('chat');
   go('stream');
-  // Join Agora — resolve real channel first (may be from Firestore)
-  resolveSellerChannel(idx).then(channelName=>{
-    joinAsAudience(channelName);
-  });
+  // Join Agora channel as viewer
+  joinAsAudience(getChannelForSeller(idx));
 }
 
 let timerSecs=14*60+32,timerIv=null;
@@ -3464,8 +3326,20 @@ function openProd(idx){
   document.getElementById('pd-sfoll').textContent=`${s.f} seguidores`;
   document.getElementById('pd-seller').onclick=()=>openStream(p.s);
   document.getElementById('pd-wish').textContent=wish.has(idx)?'❤️':'🤍';
-  // Inicializar subasta inline
-  openAuction(idx);
+  // Subasta solo si producto live, precio fijo si no
+  const aucCard=document.getElementById('auc-inline-card');
+  const priceRow=document.querySelector('#s-prod .pd-prow');
+  const tagsRow=document.querySelector('#s-prod .pd-tags');
+  if(p.live){
+    if(aucCard)aucCard.style.display='block';
+    if(priceRow)priceRow.style.display='none';
+    if(tagsRow)tagsRow.style.display='none';
+    openAuction(idx);
+  }else{
+    if(aucCard)aucCard.style.display='none';
+    if(priceRow)priceRow.style.display='flex';
+    if(tagsRow)tagsRow.style.display='flex';
+  }
   go('prod');
 }
 function selSz(btn,v){curSz=v;}
@@ -3525,17 +3399,17 @@ function clearCart(){if(!cart.length)return;cart=[];updateCart();toast('🗑️ 
 
 // ═══ CHECKOUT ═══
 function updateCo(){
+  // Datos reales del usuario
+  const u=window.fbUser;
+  const nameEl=document.getElementById('co-name-display');
+  if(nameEl) nameEl.textContent=u?.name||u?.displayName||'—';
+  const cityEl=document.getElementById('co-city-display');
+  if(cityEl) cityEl.textContent=(u?.city?u.city+' 🇻🇪':'Venezuela 🇻🇪');
+  const walEl=document.getElementById('co-wallet-balance');
+  if(walEl) walEl.textContent=(u?.wallet||u?.credits||0)+' IC';
   const sub=cart.reduce((s,i)=>s+(i.overridePrice||PRODS[i.pi].p)*i.q,0);
   const tot=sub+(sub>0?3:0);
   document.getElementById('co-tot').textContent=`$${tot} USD`;
-  // Show real user name
-  const nameEl=document.getElementById('co-name-display');
-  if(nameEl)nameEl.textContent=window.fbUser?.name||window.fbUser?.username||'—';
-  const cityEl=document.getElementById('co-city-display');
-  if(cityEl)cityEl.textContent=(window.fbUser?.city||'Venezuela')+', VE';
-  // Update wallet balance shown in checkout
-  const icEl=document.getElementById('co-ic-balance');
-  if(icEl)icEl.textContent=walletBalance+' IC';
   const th=document.getElementById('co-thumbs');
   if(th)th.innerHTML=cart.map(item=>{
     const p=PRODS[item.pi];
@@ -3555,81 +3429,93 @@ function setSPay(i){
     e.querySelector('.prad').className='prad'+(j===i?' on':'');
   });
 }
-async function placeOrder(){
-  // 1. Require login
-  if(!window.fbUser||!window.fbToken){
-    requireAccount('🛒','Inicia sesión para comprar','Crea tu cuenta gratis y compra en segundos.');
-    return;
+async function _updateWAButton(cartSnap, orderNum){
+  const btn=document.querySelector('.ok-whatsapp-btn');
+  if(!btn)return;
+  // Tomar seller del primer item
+  const firstItem=cartSnap[0];
+  if(!firstItem){btn.style.display='none';return;}
+  const p=PRODS[firstItem.pi];
+  const s=SELLERS[p.s];
+  const sellerName=s.n||'Vendedor';
+
+  // Intentar obtener teléfono del seller desde Firestore
+  let phone=s.whatsapp||s.phone||'';
+  if(!phone){
+    try{
+      const fsUser=await fsGet('users', String(p.s));
+      phone=fsUser?.whatsapp||fsUser?.phone||'';
+    }catch(e){}
   }
-  if(!cart.length){toast('⚠️ Tu carrito está vacío');return;}
+
+  const msg=encodeURIComponent(
+    `Hola @${sellerName}, acabo de hacer un pedido en InstaCompras #${orderNum} y quiero coordinar la entrega 📦`
+  );
+  const url=phone
+    ? `https://wa.me/${phone.replace(/[^0-9]/g,'')}?text=${msg}`
+    : `https://wa.me/?text=${msg}`;
+
+  btn.onclick=()=>window.open(url,'_blank');
+  btn.innerHTML=`<span style="font-size:18px">💬</span> Contactar a ${sellerName}`;
+}
+
+async function placeOrder(){
+  const btn=document.querySelector('.place-btn');
+  if(btn){btn.disabled=true;btn.textContent='⏳ Guardando...';}
   const sub=cart.reduce((s,i)=>s+(i.overridePrice||PRODS[i.pi].p)*i.q,0);
   const tot=sub+3;
-  // 2. Check wallet balance
-  if(walletBalance<tot){
-    const needed=tot-walletBalance;
-    toast(`⚡ Saldo insuficiente — te faltan $${needed} USD`);
-    setTimeout(()=>go('deposit'),1200);
-    return;
-  }
-  // 3. Loading state
-  const btn=document.querySelector('.place-btn');
-  if(btn){btn.disabled=true;btn.textContent='⏳ Procesando...';}
-  const num='IC-'+Date.now().toString(36).toUpperCase().slice(-5);
+  const num='IC-'+~~(Math.random()*90000+10000);
   const now=new Date();
   const dateStr=now.toLocaleDateString('es-VE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-  const buyerName=window.fbUser.name||window.fbUser.username||'Comprador';
-  const buyerPhone=window.fbUser.phone||window.fbUser.email||'';
-  const buyerCity=window.fbUser.city||'';
-  const buyerId=window.fbUser.uid;
+  const buyerName=window.fbUser?.displayName||window.fbUser?.name||window.fbUser?.username||'Comprador';
+  const buyerPhone=window.fbUser?.phone||window.fbUser?.email||'';
+  const buyerCity=window.fbUser?.city||window.fbUser?.cedula?'Venezuela':'';
+  const buyerId=window.fbUser?.uid||'guest';
+  const saves=cart.map(item=>{
+    const p=PRODS[item.pi];
+    const s=SELLERS[p.s];
+    const unitPrice=item.overridePrice||p.p;
+    const orderId=fsId();
+    const orderData={
+      orderId, num,
+      buyerId, buyerName, buyerPhone, buyerCity,
+      sellerId:String(p.s), sellerName:s.n,
+      prod:p.n, img:p.img||'', e:p.e||'📦',
+      sz:item.sz||'', qty:item.q,
+      amt:unitPrice*item.q,
+      status:'pending',
+      fromAuction:!!item.fromAuction,
+      createdAt:Date.now(),
+      date:dateStr
+    };
+    DASH_ORDERS.unshift({...orderData, _id:orderId});
+    return fsSet('orders',orderId,orderData);
+  });
   try{
-    // 4. Save each order item to Firestore
-    const savePromises=cart.map(item=>{
-      const p=PRODS[item.pi];
-      const s=SELLERS[p.s];
-      const unitPrice=item.overridePrice||p.p;
-      const orderId=fsId();
-      const orderData={
-        orderId, num, buyerId, buyerName, buyerPhone, buyerCity,
-        sellerId:String(p.s), sellerName:s.n,
-        prod:p.n, img:p.img||'', e:p.e||'📦',
-        sz:item.sz||'', qty:item.q,
-        amt:unitPrice*item.q, total:tot,
-        status:'pending',
-        fromAuction:!!item.fromAuction,
-        createdAt:Date.now(), date:'Ahora'
-      };
-      DASH_ORDERS.unshift({...orderData,_id:orderId});
-      return fsSet('orders',orderId,orderData);
-    });
-    await Promise.allSettled(savePromises);
-    // 5. Deduct wallet balance + save to Firestore
-    walletBalance-=tot;
-    updateWalletDisplay();
-    const icEl=document.getElementById('co-ic-balance');
-    if(icEl)icEl.textContent=walletBalance+' IC';
-    fsSet('users',buyerId,{walletBalance}).catch(()=>{});
-    // 6. Add wallet transaction
-    WALLET_TXS.unshift({type:'out',icon:'✅',name:`Compra — ${num}`,date:'Ahora',amt:'-'+tot,cls:'out'});
-    // 7. Show confirmation
-    document.getElementById('ok-order').innerHTML=`
-      <div class="ok-row"><span class="ok-row-l">N° Pedido</span><span style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px">${num}</span></div>
-      <div class="ok-row"><span class="ok-row-l">Fecha</span><span>${dateStr}</span></div>
-      <div class="ok-row"><span class="ok-row-l">Productos</span><span>${cart.length} ítem(s)</span></div>
-      <div class="ok-row"><span class="ok-row-l">Pago</span><span>⚡ ${tot} InstaCreditos</span></div>
-      <div class="ok-row"><span class="ok-row-l">Saldo restante</span><span style="color:var(--y)">${walletBalance} IC</span></div>`;
-    const stSpent=document.getElementById('st-spent');
-    const stBuy=document.getElementById('st-buy');
-    if(stSpent)stSpent.textContent=parseInt(stSpent.textContent||0)+tot;
-    if(stBuy)stBuy.textContent=parseInt(stBuy.textContent||0)+1;
-    cart=[];updateCart();
-    pushNotif('📦','order','Tu pedido fue confirmado — en camino pronto 🚀',()=>openTrack(0),true);
-    go('ok');
-  }catch(err){
-    console.error('placeOrder error:',err);
-    toast('❌ Error al procesar el pedido. Intenta de nuevo.');
-  }finally{
+    await Promise.all(saves);
+  }catch(e){
     if(btn){btn.disabled=false;btn.textContent='✅ Confirmar Pedido';}
+    toast('❌ Error al guardar, intenta de nuevo');
+    return;
   }
+  document.getElementById('ok-order').innerHTML=`
+    <div class="ok-row"><span class="ok-row-l">N° Pedido</span><span style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px">${num}</span></div>
+    <div class="ok-row"><span class="ok-row-l">Fecha</span><span>${dateStr}</span></div>
+    <div class="ok-row"><span class="ok-row-l">Productos</span><span>${cart.length} ítem(s)</span></div>
+    <div class="ok-row"><span class="ok-row-l">Pago</span><span>⚡ InstaCreditos</span></div>
+    <div class="ok-row"><span class="ok-row-l">Total</span><span>$${tot} USD</span></div>`;
+  document.getElementById('st-spent').textContent=parseInt(document.getElementById('st-spent').textContent||'0')+tot;
+  document.getElementById('st-buy').textContent=parseInt(document.getElementById('st-buy').textContent||'0')+1;
+  const cart_snapshot=[...cart];
+  cart=[];updateCart();
+  if(btn){btn.disabled=false;btn.textContent='✅ Confirmar Pedido';}
+  window._buyerOrders=null; // invalidar cache de órdenes del comprador
+  const _lastOrder=DASH_ORDERS[0];
+  pushNotif('📦','order','Tu pedido fue confirmado — en camino pronto 🚀',()=>openTrack(_lastOrder),true);
+
+  // WhatsApp del seller del primer item
+  _updateWAButton(cart_snapshot, num);
+  go('ok');
 }
 
 // ═══ FILTERS ═══
@@ -3645,30 +3531,66 @@ function homeSearch(q){
   if(!q){buildGrid();return;}
   buildGrid(PRODS.filter(p=>p.n.toLowerCase().includes(q.toLowerCase())||SELLERS[p.s].n.toLowerCase().includes(q.toLowerCase())));
 }
-// ═══ CHAT ═══
+// ═══ CHAT REAL ═══
 const AVTS=['😊','🧑','👩','🧔','💁','😎','🤩','🥳','😄'];
 const NAMES=['carlos.VE','luisa_mpn','andres22','yoli_shop','el_pana99','cristi_vzla','pedro_mcs','marleny07','rosmary.ve'];
-const MSGS=['¡Qué precio! 🔥','¿Envían a Valencia?','A1 👌','¿Tienen más tallas?','¡Comprando ahora!','¡Chévere! 🇻🇪','¿Acepta Pago Móvil?','¡Los quiero! 😍','¿Cuánto stock?','¡Oferta increíble! 💯','¿Envían a Maracaibo?','¡Bien chulas! 🍊','¿Traen a Los Teques?','¡Dale que sí! ✅'];
-function addMsg(name,text,av){
+const MSGS=['¡Qué precio! 🔥','¿Envían a Valencia?','A1 👌','¿Tienen más tallas?','¡Comprando ahora!','¡Chévere! 🇻🇪','¿Acepta Pago Móvil?','¡Los quiero! 😍','¿Cuánto stock?','¡Oferta increíble! 💯','¿Envían a Maracaibo?','¡Bien chulas! 🍊','¡Dale que sí! ✅'];
+let _chatPollIv=null;
+let _chatLastTs=0;
+let _chatChannel='';
+
+function addMsg(name,text,isMine=false){
   const el=document.getElementById('chat-msgs');if(!el)return;
-  const d=document.createElement('div');d.className='cmsg';
-  d.innerHTML=`<div class="cav">${av}</div><div class="ccon"><div class="cu">${name}</div><div class="ct">${text}</div></div>`;
+  const d=document.createElement('div');
+  d.className='cmsg';
+  d.style.alignSelf=isMine?'flex-end':'flex-start';
+  d.innerHTML=`<div class="cmsg-bubble" style="${isMine?'background:rgba(255,208,0,.18);border-color:rgba(255,208,0,.3)':''}"><span class="cu" style="${isMine?'color:#fff':''}">@${name}</span><span class="ct">${text}</span></div>`;
   el.appendChild(d);
-  while(el.children.length>6)el.removeChild(el.firstChild);
+  while(el.children.length>8)el.removeChild(el.firstChild);
+  el.scrollTop=el.scrollHeight;
 }
-function sendChat(){
+
+async function sendChat(){
   if(requireAccount('💬','Para chatear necesitas cuenta','Únete y participa en los lives.'))return;
-  const inp=document.getElementById('chat-in');const v=inp.value.trim();if(!v)return;
-  addMsg('Tú ✅',v,'🙋');inp.value='';
-  setTimeout(()=>addMsg(NAMES[~~(Math.random()*NAMES.length)],MSGS[~~(Math.random()*MSGS.length)],AVTS[~~(Math.random()*AVTS.length)]),600+~~(Math.random()*1200));
+  const inp=document.getElementById('chat-in');
+  const v=inp.value.trim();if(!v)return;
+  inp.value='';
+  const name=window.fbUser?.username||window.fbUser?.name||'yo';
+  const msg={channel:_chatChannel,user:name,text:v,ts:Date.now()};
+  addMsg(name,v,true);
+  // Save to Firestore (no-wait)
+  fsAdd('messages',msg).catch(()=>{});
 }
+
+async function _pollChat(){
+  if(!_chatChannel)return;
+  try{
+    const msgs=await fsQuery('messages',[{field:'channel',value:_chatChannel}]);
+    // Only show messages newer than last seen
+    const fresh=msgs.filter(m=>m.ts>_chatLastTs).sort((a,b)=>a.ts-b.ts);
+    fresh.forEach(m=>{
+      const isMe=m.user===(window.fbUser?.username||window.fbUser?.name);
+      if(!isMe) addMsg(m.user,m.text,false);
+      if(m.ts>_chatLastTs)_chatLastTs=m.ts;
+    });
+  }catch(e){}
+}
+
 function startChat(idx){
   stopChat();
+  _chatChannel='ic_'+idx;
+  _chatLastTs=Date.now()-5000; // load last 5s of history
+  // Seed visual con msgs simulados para dar vida inmediata
   const s=SELLERS[idx];
-  setTimeout(()=>addMsg(`fan_${s.n.slice(0,5).toLowerCase()}`,'¡Entrando al stream! 🔥',AVTS[0]),500);
-  setTimeout(()=>addMsg(NAMES[1],'¿Cuánto cuesta el envío?',AVTS[1]),1200);
-  setTimeout(()=>addMsg(NAMES[2],`¡Me encanta ${s.n}! 💛`,AVTS[2]),2000);
-  chatIv=setInterval(()=>addMsg(NAMES[~~(Math.random()*NAMES.length)],MSGS[~~(Math.random()*MSGS.length)],AVTS[~~(Math.random()*AVTS.length)]),6000+~~(Math.random()*6000));
+  setTimeout(()=>addMsg(`fan_${s.n.slice(0,4).toLowerCase()}`,'¡Entrando al stream! 🔥'),400);
+  setTimeout(()=>addMsg(NAMES[1],'¿Cuánto cuesta el envío?'),1100);
+  setTimeout(()=>addMsg(NAMES[2],`¡Me encanta ${s.n}! 💛`),1900);
+  // Simulación de fondo cada 7-13s
+  chatIv=setInterval(()=>{
+    if(Math.random()<.4) addMsg(NAMES[~~(Math.random()*NAMES.length)],MSGS[~~(Math.random()*MSGS.length)]);
+  },7000+~~(Math.random()*6000));
+  // Poll Firestore cada 4s para mensajes reales
+  _chatPollIv=setInterval(_pollChat,4000);
 }
 function startViewers(idx){
   viewIv=setInterval(()=>{
@@ -3685,6 +3607,8 @@ function stopChat(){
   if(chatIv){clearInterval(chatIv);chatIv=null;}
   if(viewIv){clearInterval(viewIv);viewIv=null;}
   if(timerIv){clearInterval(timerIv);timerIv=null;}
+  if(_chatPollIv){clearInterval(_chatPollIv);_chatPollIv=null;}
+  _chatChannel='';
 }
 
 // ═══ SELLER PROFILE ═══
@@ -3853,13 +3777,10 @@ function depUpdatePreview(){
   document.getElementById('dep-credits-preview').innerHTML=`Recibirás <strong style="color:var(--y)">${v} créditos</strong>`;
 }
 function depConfirm(){
-  if(!window.fbUser||!window.fbToken){
-    requireAccount('⚡','Inicia sesión para recargar','Necesitas cuenta para agregar saldo a tu wallet.');
-    return;
-  }
   const v=parseFloat(document.getElementById('dep-amount').value)||0;
   if(v<1){toast('⚠️ Monto mínimo $1 USD');return;}
   const method=WALLET_METHODS[walletSelMethod];
+  // Show payment instructions
   const instructions={
     'Pago Móvil':'📱 Transfiere a: 0412-000-0000 · Banco Venezuela · J-12345678',
     'Zelle':'💜 Envía a: pagos@instacompras.ve · Nombre: InstaCompras',
@@ -3867,48 +3788,111 @@ function depConfirm(){
     'Reserve':'⬡ Número Reserve: +58 412 000 0001',
     'Efectivo USD':'💵 Coordina entrega con el soporte de InstaCompras'
   };
-  toast(`${method.i} ${instructions[method.n]||''}`);
-  // Simulate credit after 2s (in production: webhook confirms payment first)
-  setTimeout(async()=>{
+  const inst=instructions[method.n]||'';
+  toast(`${method.i} ${inst}`);
+  // Simulate credit after 2s
+  setTimeout(()=>{
     walletBalance+=v;
-    // Persist balance to Firestore
-    if(window.fbUser?.uid){
-      await fsSet('users',window.fbUser.uid,{walletBalance}).catch(()=>{});
-      if(window.fbUser)window.fbUser.walletBalance=walletBalance;
-      fbCacheUser({...window.fbUser});
-    }
-    // Update all wallet displays
     updateWalletDisplay();
-    const depBal=document.getElementById('dep-balance');if(depBal)depBal.textContent=walletBalance;
-    const depUsd=document.getElementById('dep-balance-usd');if(depUsd)depUsd.textContent=`≈ $${walletBalance.toFixed(2)} USD`;
-    const depTop=document.getElementById('dep-bal-top');if(depTop)depTop.textContent=`${walletBalance} cr`;
-    const awd=document.getElementById('auc-wallet-display');if(awd)awd.textContent=`${walletBalance} IC`;
-    const wpb=document.getElementById('wallet-prof-badge');if(wpb)wpb.textContent=`${walletBalance} IC`;
-    const icEl=document.getElementById('co-ic-balance');if(icEl)icEl.textContent=walletBalance+' IC';
-    WALLET_TXS.unshift({type:'in',icon:'💰',name:`Recarga vía ${method.n}`,date:'Ahora',amt:'+'+v,cls:'in'});
+    document.getElementById('dep-balance').textContent=walletBalance;
+    document.getElementById('dep-balance-usd').textContent=`≈ $${walletBalance.toFixed(2)} USD`;
+    document.getElementById('dep-bal-top').textContent=`${walletBalance} cr`;
+    const awd=document.getElementById('auc-wallet-display');if(awd)awd.textContent=`${walletBalance} créditos`;
+    const wpb=document.getElementById('wallet-prof-badge');if(wpb)wpb.textContent=`${walletBalance} cr`;
     toast(`✅ +${v} créditos acreditados a tu wallet`);
     setTimeout(()=>goBack(),1200);
   },2000);
 }
 // ═══ AUCTION ═══
-let aucBids=[],aucCurrentBid=0,aucTimerIv=null,aucSecs=0,aucProdIdx=0;
-function openAuction(prodIdx){
-  aucProdIdx=prodIdx!=null?prodIdx:0;const p=PRODS[aucProdIdx];const s=SELLERS[p.s];
-  aucCurrentBid=Math.floor(p.p*1.1);
+// ═══ SUBASTAS MULTI-USUARIO ═══
+let aucBids=[],aucCurrentBid=0,aucTimerIv=null,aucPollIv=null,aucSecs=0,aucProdIdx=0,aucEndsAt=0,aucId='',aucMyUser='';
+
+async function openAuction(prodIdx){
+  // Limpiar estado anterior
+  clearInterval(aucTimerIv);clearInterval(aucPollIv);
+  aucProdIdx=prodIdx!=null?prodIdx:0;
+  const p=PRODS[aucProdIdx];
+  aucId='auc_'+aucProdIdx;
+  aucMyUser=window.fbUser?.username||window.fbUser?.name||window.fbUser?.uid||'invitado';
+
+  // Precio base
+  const basePrice=Math.floor(p.p*1.1);
   const asp=document.getElementById('auc-start-price');if(asp)asp.textContent=`$${p.p}`;
-  aucBids=[{user:'carlos.VE',amt:aucCurrentBid,me:false},{user:'luisa_mpn',amt:aucCurrentBid-5,me:false},{user:'el_pana99',amt:aucCurrentBid-12,me:false}];
+  const awd=document.getElementById('auc-wallet-display');if(awd)awd.textContent=`${walletBalance} IC`;
+
+  // Intentar cargar subasta existente desde Firestore
+  let doc=await fsGet('auctions',aucId);
+  const now=Date.now();
+
+  if(doc&&doc.status==='active'&&doc.endsAt>now){
+    // Subasta activa en Firestore — sincronizar
+    aucCurrentBid=doc.currentBid||basePrice;
+    aucEndsAt=doc.endsAt;
+    aucBids=(doc.recentBids||'').split('|').filter(Boolean).map(b=>{
+      const [user,amt]=b.split(':');return{user,amt:Number(amt),me:user===aucMyUser};
+    });
+  } else {
+    // Crear nueva subasta
+    aucCurrentBid=basePrice;
+    aucEndsAt=now+120000; // 2 minutos
+    aucBids=[
+      {user:'carlos.VE',amt:basePrice,me:false},
+      {user:'luisa_mpn',amt:basePrice-5,me:false},
+      {user:'el_pana99',amt:basePrice-12,me:false}
+    ];
+    const aucData={
+      prodIdx:aucProdIdx,prodName:p.n,sellerIdx:p.s,
+      startPrice:p.p,currentBid:aucCurrentBid,
+      currentWinner:'carlos.VE',
+      recentBids:aucBids.map(b=>`${b.user}:${b.amt}`).join('|'),
+      endsAt:aucEndsAt,status:'active',createdAt:now
+    };
+    fsSet('auctions',aucId,aucData).catch(()=>{});
+    setTimeout(aucAutoBot,8000+Math.random()*12000);
+  }
+
   aucRenderBids();
   const acb=document.getElementById('auc-current-bid');if(acb)acb.textContent=`$${aucCurrentBid}`;
   const amb=document.getElementById('auc-min-bid');if(amb)amb.textContent=`$${aucCurrentBid+1}`;
   const abi=document.getElementById('auc-bid-input');if(abi)abi.value='';
-  const awd=document.getElementById('auc-wallet-display');if(awd)awd.textContent=`${walletBalance} IC`;
   aucRenderPresets();aucUpdateBtn();
-  if(aucTimerIv)clearInterval(aucTimerIv);
-  aucSecs=120;aucTick();aucTimerIv=setInterval(aucTick,1000);
-  setTimeout(aucAutoBot,8000+Math.random()*12000);
+
+  // Timer local sincronizado con endsAt
+  aucTimerIv=setInterval(aucTick,1000);aucTick();
+
+  // Polling Firestore cada 3s
+  aucPollIv=setInterval(aucPollFirestore,3000);
 }
+
+async function aucPollFirestore(){
+  if(!aucId)return;
+  try{
+    const doc=await fsGet('auctions',aucId);
+    if(!doc)return;
+    const prevBid=aucCurrentBid;
+    if(doc.currentBid>aucCurrentBid){
+      aucCurrentBid=doc.currentBid;
+      // Rebuild bids from stored string, mark mine
+      aucBids=(doc.recentBids||'').split('|').filter(Boolean).map(b=>{
+        const [user,amt]=b.split(':');return{user,amt:Number(amt),me:user===aucMyUser};
+      });
+      aucRenderBids();aucRenderPresets();
+      const acb=document.getElementById('auc-current-bid');if(acb)acb.textContent=`$${aucCurrentBid}`;
+      const amb=document.getElementById('auc-min-bid');if(amb)amb.textContent=`$${aucCurrentBid+1}`;
+      aucUpdateBtn();
+      // Notificar si me superaron
+      const iWasWinning=aucBids.length>1&&aucBids[1]?.me;
+      if(iWasWinning&&doc.currentWinner!==aucMyUser)
+        toast(`⚠️ ${doc.currentWinner} te superó con $${aucCurrentBid} — ¡oferta más!`);
+    }
+    if(doc.status==='ended'&&aucSecs>0){
+      aucSecs=0;aucTick(); // trigger close flow
+    }
+  }catch(e){}
+}
+
 function aucTick(){
-  aucSecs=Math.max(0,aucSecs-1);
+  aucSecs=Math.max(0,Math.floor((aucEndsAt-Date.now())/1000));
   const m=~~(aucSecs/60);const s=String(aucSecs%60).padStart(2,'0');
   const el=document.getElementById('pd-auction-timer');
   if(el){
@@ -3916,9 +3900,11 @@ function aucTick(){
     el.style.color=aucSecs<=10?'#ff3b3b':aucSecs<30?'#ff6b35':aucSecs<60?'#ffaa00':'var(--rd)';
   }
   if(aucSecs===0){
-    clearInterval(aucTimerIv);
-    const winner=aucBids.length>0?aucBids[0].user:'nadie';
+    clearInterval(aucTimerIv);clearInterval(aucPollIv);
+    // Marcar subasta como terminada en Firestore
+    fsSet('auctions',aucId,{status:'ended'}).catch(()=>{});
     const iWon=aucBids.length>0&&aucBids[0].me;
+    const winner=aucBids.length>0?aucBids[0].user:'nadie';
     toast(`🔨 ¡Subasta cerrada! Ganador: ${winner} con $${aucCurrentBid}`);
     if(iWon){
       const p=PRODS[aucProdIdx];
@@ -3941,6 +3927,7 @@ function aucTick(){
       updateCart();
       DASH_ORDERS.unshift({...orderData,buyer:buyerName,_id:orderId});
       fsSet('orders',orderId,orderData).catch(()=>{});
+      window._buyerOrders=null;
       pushNotif('🏆','auction',`¡Ganaste la subasta! ${p.n} por $${aucCurrentBid} — revisa tu carrito`,()=>nav('cart'),true);
       setTimeout(()=>showWinCelebration(p.n,aucCurrentBid),600);
     }
@@ -4011,63 +3998,112 @@ function aucUpdateBtn(){
   else if(!valid&&v>0)btn.innerHTML=`Mínimo $${aucCurrentBid+1}`;
   else btn.innerHTML=`🔨 Ofertar $${v||0} USD`;
 }
-function placeBid(){
+async function placeBid(){
   if(requireAccount('🔨','Para ofertar necesitas cuenta','Crea tu cuenta y participa en subastas en vivo.'))return;
   const v=parseFloat(document.getElementById('auc-bid-input').value)||0;
   if(v<=aucCurrentBid){toast(`⚠️ Mínimo $${aucCurrentBid+1}`);return;}
   if(walletBalance<v){toast('⚠️ Recarga tu wallet primero');return;}
-  aucCurrentBid=v;aucBids.unshift({user:'Tú',amt:v,me:true});aucBids=aucBids.slice(0,5);
+  if(aucSecs<=0){toast('⚠️ La subasta ya cerró');return;}
+
+  // Optimistic local update
+  aucCurrentBid=v;
+  aucBids.unshift({user:aucMyUser,amt:v,me:true});
+  aucBids=aucBids.slice(0,5);
   aucRenderBids();aucRenderPresets();
   const acb=document.getElementById('auc-current-bid');if(acb)acb.textContent=`$${v}`;
   const amb=document.getElementById('auc-min-bid');if(amb)amb.textContent=`$${v+1}`;
   const abi=document.getElementById('auc-bid-input');if(abi)abi.value='';
   aucUpdateBtn();spawnParticle(document.getElementById('auc-bid-btn'),'🔨');
   toast(`🔒 Oferta $${v} reservada. ¡Vas ganando!`);
+
+  // Persist to Firestore
+  const recentBids=aucBids.map(b=>`${b.user}:${b.amt}`).join('|');
+  fsSet('auctions',aucId,{
+    currentBid:v,
+    currentWinner:aucMyUser,
+    recentBids,
+    lastBidAt:Date.now()
+  }).catch(()=>{});
 }
 function aucAutoBot(){
-  if(aucSecs<=8)return; // no bots in last 8s — user can win
+  if(aucSecs<=8||aucSecs<=0)return;
   const bots=['marisolita22','pedro_mcs','yoli_shop','cristi_vzla','el_pana99'];
   const bot=bots[~~(Math.random()*bots.length)];const nb=aucCurrentBid+~~(Math.random()*8+1);
+  const wasWinning=aucBids.length>0&&aucBids[0]?.me;
   aucCurrentBid=nb;aucBids.unshift({user:bot,amt:nb,me:false});aucBids=aucBids.slice(0,5);
   aucRenderBids();aucRenderPresets();
   const acb=document.getElementById('auc-current-bid');if(acb)acb.textContent=`$${nb}`;
   const amb=document.getElementById('auc-min-bid');if(amb)amb.textContent=`$${nb+1}`;
   aucUpdateBtn();
-  const wasWinning=aucBids.length>1&&aucBids[1]?.me;
   if(wasWinning)toast(`⚠️ ${bot} te superó con $${nb} — ¡oferta más!`);
+  // Persist bot bid to Firestore so other users see it
+  const recentBids=aucBids.map(b=>`${b.user}:${b.amt}`).join('|');
+  fsSet('auctions',aucId,{currentBid:nb,currentWinner:bot,recentBids,lastBidAt:Date.now()}).catch(()=>{});
   setTimeout(aucAutoBot,10000+Math.random()*20000);
 }
 
 // ═══ DASHBOARD ═══
-let DASH_ORDERS=[
-  {prod:'Nike Air Jordan 1',img:IMGS.jordan,e:'👟',buyer:'carlos.VE',amt:120,status:'pending',date:'Hace 5 min'},
-  {prod:'Sony WH-1000XM5',img:IMGS.headphones,e:'🎧',buyer:'luisa_mpn',amt:110,status:'processing',date:'Hace 22 min'},
-  {prod:'Casio G-Shock',img:IMGS.watch,e:'⌚',buyer:'pedro_mcs',amt:75,status:'delivered',date:'Hace 1h'},
-  {prod:'Perfume Premium',img:IMGS.perfume,e:'🌸',buyer:'yoli_shop',amt:55,status:'delivered',date:'Hace 2h'},
-  {prod:'Control PS5',img:IMGS.gamepad,e:'🎮',buyer:'el_pana99',amt:65,status:'pending',date:'Hace 3h'},
-  {prod:'Tacones Stiletto',img:IMGS.heels,e:'👠',buyer:'cristi_vzla',amt:35,status:'delivered',date:'Ayer'},
-  {prod:'Anillo Oro 18K',img:IMGS.ring,e:'💍',buyer:'marleny07',amt:95,status:'delivered',date:'Ayer'},
-];
+let DASH_ORDERS=[];
 const DAYS=["L","M","M","J","V","S","D"];
 const WEEK_DATA=[42,78,55,91,63,120,88];
 
 async function openDash(){
   go('dash');
   dashTab('orders');
-  // Load real orders from Firestore for this seller
   const uid=window.fbUser?.uid;
-  if(uid){
-    fsQuery('orders',[{field:'sellerId',value:uid}]).then(fsOrders=>{
-      if(fsOrders.length){
-        // Merge FS orders with local, dedup by orderId
-        const existingIds=new Set(DASH_ORDERS.map(o=>o._id||o.orderId));
-        fsOrders.forEach(o=>{if(!existingIds.has(o._id))DASH_ORDERS.unshift({...o,buyer:o.buyerName,buyerPhone:o.buyerPhone,buyerCity:o.buyerCity,num:o.num||o.orderId,date:o.date||'Guardado'});});
-      }
-      renderDash();
-    }).catch(()=>renderDash());
-  } else {
-    renderDash();
-  }
+  if(!uid){renderDash();return;}
+  // Mostrar spinner mientras carga
+  const listEl=document.getElementById('dash-orders-list');
+  if(listEl)listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu);font-size:12px">⏳ Cargando órdenes...</div>';
+  try{
+    const fsOrders=await fsQuery('orders',[{field:'sellerId',value:uid}]);
+    // Reemplazar con data real (no mezclar con estáticos)
+    DASH_ORDERS=fsOrders.map(o=>({
+      ...o,
+      buyer:o.buyerName||o.buyer||'Comprador',
+      num:o.num||o.orderId||o._id,
+      date:o.date||new Date(o.createdAt||Date.now()).toLocaleDateString('es-VE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})
+    }));
+    // Calcular WEEK_DATA real por día de la semana
+    const wk=[0,0,0,0,0,0,0];
+    const now=Date.now();
+    DASH_ORDERS.forEach(o=>{
+      const d=new Date(o.createdAt||now);
+      const diff=Math.floor((now-d.getTime())/(86400000));
+      if(diff<7)wk[(d.getDay()+6)%7]+=o.amt||0;
+    });
+    if(wk.some(v=>v>0))WEEK_DATA.splice(0,7,...wk);
+  }catch(e){console.warn('openDash:',e);}
+  renderDash();
+}
+
+// ── B: SEED FIRESTORE ────────────────────────────────────────────────────────
+async function seedFirestore(){
+  toast('🌱 Cargando data de prueba...');
+  const sampleProds=[
+    {name:'Nike Air Jordan 1 Retro',price:120,origPrice:150,img:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400',sellerName:'SnkrsCulture',sellerEmoji:'👟',cat:'Calzado',live:true,emoji:'👟',desc:'Talla 42, edición limitada'},
+    {name:'Sony WH-1000XM5',price:199,origPrice:350,img:'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400',sellerName:'TechVentas',sellerEmoji:'💻',cat:'Tecnología',live:false,emoji:'🎧',desc:'Cancelación de ruido premium'},
+    {name:'Bolso Gucci GG Marmont',price:280,origPrice:420,img:'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400',sellerName:'FashionCCS',sellerEmoji:'👗',cat:'Accesorios',live:true,emoji:'👜',desc:'Cuero genuino, incluye caja'},
+    {name:'Casio G-Shock GA-2100',price:75,origPrice:95,img:'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400',sellerName:'RelojesVIP',sellerEmoji:'⌚',cat:'Accesorios',live:false,emoji:'⌚',desc:'Resistente al agua 200m'},
+    {name:'Perfume Dior Sauvage 100ml',price:89,origPrice:130,img:'https://images.unsplash.com/photo-1541643600914-78b084683702?w=400',sellerName:'PerfumesVIP',sellerEmoji:'🌸',cat:'Belleza',live:false,emoji:'🌸',desc:'Original sellado con factura'},
+    {name:'Control PS5 DualSense',price:65,origPrice:80,img:'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400',sellerName:'ElectroMDO',sellerEmoji:'🎮',cat:'Gaming',live:true,emoji:'🎮',desc:'Nuevo en caja, garantía'},
+    {name:'Anillo Oro 18K con Zircón',price:95,origPrice:140,img:'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400',sellerName:'JoyasFinas',sellerEmoji:'💍',cat:'Joyería',live:false,emoji:'💍',desc:'Certificado de autenticidad'},
+    {name:'Tacones Stiletto Punta Fina',price:35,origPrice:55,img:'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400',sellerName:'MarisolShop',sellerEmoji:'👠',cat:'Calzado',live:false,emoji:'👠',desc:'Talla 37-40 disponibles'},
+  ];
+  const sampleLive={
+    name:'MarisolShop',emoji:'👠',cat:'Calzado',
+    viewers:389,minPrice:35,live:true,
+    thumb:'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400',
+    followers:'12.4k',startedAt:Date.now()
+  };
+  try{
+    await Promise.all([
+      ...sampleProds.map(p=>fsAdd('products',p)),
+      fsAdd('lives',sampleLive)
+    ]);
+    toast('✅ Data cargada en Firestore');
+    loadHomeFeed();
+  }catch(e){toast('❌ Error al sembrar data');}
 }
 function renderDash(){
   const revenue=DASH_ORDERS.reduce((s,o)=>s+o.amt,0);
@@ -4135,12 +4171,8 @@ function renderDash(){
 function markOrderStatus(i,status){
   DASH_ORDERS[i].status=status;
   const id=DASH_ORDERS[i]._id||DASH_ORDERS[i].orderId;
-  if(id){
-    fsSet('orders',id,{status,updatedAt:Date.now()}).catch(()=>{});
-  }
-  const label=status==='processing'?'🚀 Pedido despachado':'✅ Marcado como entregado';
-  toast(label);
-  pushNotif('📦','order',label,()=>openDash());
+  if(id)fsSet('orders',id,{status}).catch(()=>{});
+  toast(status==='processing'?'🚀 Pedido despachado':'✅ Marcado como entregado');
   openDash();
 }
 
@@ -4178,18 +4210,6 @@ function goRegister(){go('register');}
 
 // ═══ AUTH ═══
 let accType='buyer';
-function doPasswordReset(){
-  const email=document.getElementById('login-email').value.trim();
-  if(!email){toast('⚠️ Ingresa tu correo primero');return;}
-  if(!email.includes('@')){toast('⚠️ Ingresa un correo válido');return;}
-  toast('📧 Enviando enlace…');
-  fbPasswordReset(email)
-    .then(()=>toast('✅ Revisa tu correo para restablecer tu contraseña'))
-    .catch(e=>{
-      const msgs={'EMAIL_NOT_FOUND':'❌ No existe cuenta con ese correo','INVALID_EMAIL':'❌ Correo inválido'};
-      toast(msgs[e.code]||'❌ '+(e.message||'Error al enviar'));
-    });
-}
 function authMode(mode){
   const isLogin=mode==='login';
   document.getElementById('auth-login-form').style.display=isLogin?'flex':'none';
@@ -4225,7 +4245,6 @@ function doLogin(){
   fbSignIn(email,pass)
     .then(async d=>{
       window.fbToken=d.idToken;
-      if(d.refreshToken)try{localStorage.setItem('fb_refresh',d.refreshToken);}catch(e){}
       const userData=await fbGetUser(d.localId,d.idToken);
       window.fbUser={uid:d.localId,...(userData||{email})};
       fbSaveSession(d.idToken,d.localId);fbCacheUser({uid:d.localId,...(window.fbUser||{})});
@@ -4234,7 +4253,7 @@ function doLogin(){
       if(reg)reg.classList.remove('on');
       const ob=document.getElementById('s-onboard');
       if(ob){ob.classList.remove('on');ob.style.display='none';}
-      setTimeout(()=>{buildLiveStrip();buildGrid();go('home',false);},400);
+      setTimeout(()=>{loadHomeFeed();go('home',false);},400);
     })
     .catch(e=>{
       if(btn){btn.textContent='Entrar';btn.disabled=false;}
@@ -4242,13 +4261,28 @@ function doLogin(){
       toast(msgs[e.code]||'❌ '+(e.message||'Error al iniciar sesión'));
     });
 }
+async function doForgotPass(){
+  const email=document.getElementById('login-email').value.trim();
+  if(!email){toast('⚠️ Ingresa tu correo primero');return;}
+  try{
+    const r=await fetch(`${FB.authUrl}:sendOobCode?key=${FB.apiKey}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({requestType:'PASSWORD_RESET',email})
+    });
+    const d=await r.json();
+    if(!r.ok)throw d.error;
+    toast('📧 Correo de recuperación enviado a '+email);
+  }catch(e){
+    const msgs={'EMAIL_NOT_FOUND':'❌ No existe una cuenta con ese correo','INVALID_EMAIL':'❌ Correo inválido'};
+    toast(msgs[e?.message]||'❌ Error al enviar correo');
+  }
+}
 function regSocial(type){
   if(type==='Google'){
     toast('🌐 Conectando con Google…');
     fbGoogleSignIn()
       .then(async d=>{
         window.fbToken=d.idToken;
-        if(d.refreshToken)try{localStorage.setItem('fb_refresh',d.refreshToken);}catch(e){}
         // Check if user already has a profile
         let userData=await fbGetUser(d.localId,d.idToken).catch(()=>null);
         if(!userData){
@@ -4270,7 +4304,7 @@ function regSocial(type){
         if(reg)reg.classList.remove('on');
         const ob=document.getElementById('s-onboard');
         if(ob){ob.classList.remove('on');ob.style.display='none';}
-        setTimeout(()=>{loadProfData();buildGrid();go('home',false);},400);
+        setTimeout(()=>{loadProfData();loadHomeFeed();go('home',false);},400);
       })
       .catch(e=>{
         toast('❌ '+(e.message||'Error al conectar con Google'));
@@ -4288,6 +4322,7 @@ function regSubmit(){
   const pass2=document.getElementById('reg-pass2')?.value.trim()||'';
   const city=(document.getElementById('reg-city')?.value||'').trim();
   const shop=(document.getElementById('reg-shop')?.value||'').trim();
+  const whatsapp=(document.getElementById('reg-whatsapp')?.value||'').trim().replace(/[^0-9]/g,'');
   if(!name){toast('⚠️ Escribe tu nombre completo');return;}
   if(!cedula){toast('⚠️ Ingresa tu número de cédula');return;}
   if(!username){toast('⚠️ Elige un nombre de usuario');return;}
@@ -4300,8 +4335,7 @@ function regSubmit(){
   fbSignUp(emailToUse,pass)
     .then(async d=>{
       window.fbToken=d.idToken;
-      if(d.refreshToken)try{localStorage.setItem('fb_refresh',d.refreshToken);}catch(e){}
-      const userData={name,username,cedula,phone,city,type:accType,shop,email:emailToUse,uid:d.localId};
+      const userData={name,username,cedula,phone,city,type:accType,shop,whatsapp,email:emailToUse,uid:d.localId};
       await fbSaveUser(d.localId,userData,d.idToken);
       window.fbUser={...userData};
       fbSaveSession(d.idToken,d.localId);fbCacheUser({uid:d.localId,...(window.fbUser||{})});
@@ -4309,7 +4343,7 @@ function regSubmit(){
       if(accType==='seller'&&shop){
         fsSet('stores',d.localId,{
           uid:d.localId, shopName:shop, ownerName:name,
-          email:emailToUse, phone, city, cedula,
+          email:emailToUse, phone, whatsapp, city, cedula,
           followers:0, totalSales:0, rating:5.0,
           isLive:false, isVerified:false,
           createdAt:Date.now(), category:'', description:''
@@ -4321,7 +4355,7 @@ function regSubmit(){
       if(reg)reg.classList.remove('on');
       const ob=document.getElementById('s-onboard');
       if(ob){ob.classList.remove('on');ob.style.display='none';}
-      setTimeout(()=>{buildLiveStrip();buildGrid();go('home',false);},400);
+      setTimeout(()=>{loadHomeFeed();go('home',false);},400);
     })
     .catch(e=>{
       if(btn){btn.textContent='Crear Cuenta';btn.disabled=false;}
@@ -4337,69 +4371,31 @@ let bcProdIdx=0, bcSelectedProds=[], bcViewerIv=null, bcChatIv=null;
 let isMuted=false;
 
 // ═══ AGORA RTC ═══
-const AGORA_APP_ID='7e70bcb4fbb54d458094376ebf3e2f4a';
-// Token: null = no-auth mode (disable App Certificate in Agora Console for testing)
-// To use token auth: set AGORA_TOKEN_URL to your token server endpoint
-// e.g. 'https://your-server.com/token?channel='
-const AGORA_TOKEN_URL=null; // null = no token server, uses null token
-let _agoraTokenCache={}; // cache tokens per channel
-
-async function getAgoraToken(channelName){
-  if(!AGORA_TOKEN_URL)return null; // no-auth mode
-  if(_agoraTokenCache[channelName])return _agoraTokenCache[channelName];
-  try{
-    const r=await fetch(AGORA_TOKEN_URL+encodeURIComponent(channelName));
-    const d=await r.json();
-    const token=d.token||d.rtcToken||null;
-    if(token)_agoraTokenCache[channelName]=token;
-    return token;
-  }catch(e){console.warn('Token fetch failed, using null:',e);return null;}
-}
+const AGORA_APP_ID='989149d167ca46ccbd90405fbd706abb';
+const AGORA_TEMP_TOKEN=null; // Token deshabilitado — usar Agora sin App Certificate
 let agoraClient=null, agoraJoined=false;
 let agoraLocalVideo=null, agoraLocalAudio=null;
 
-// Canal basado en UID del seller (único y estable)
-// Para sellers del demo, usamos el índice como fallback
 function getChannelForSeller(idx){
-  // Si el seller tiene UID en Firestore (seller real), usarlo
-  const s = SELLERS[idx];
-  if(s && s.uid) return 'ic_' + s.uid.slice(0,12);
-  return 'ic_seller_' + idx; // fallback demo
+  return 'ic_'+idx;
 }
-
-// El channel del usuario logueado como broadcaster
-function getMyChannel(){
-  if(window.fbUser?.uid) return 'ic_' + window.fbUser.uid.slice(0,12);
-  return 'ic_demo';
-}
-
-// Buscar el channel real de un seller desde Firestore
-async function resolveSellerChannel(sellerIdx){
-  const s = SELLERS[sellerIdx];
-  // Si ya tiene channelName cacheado (desde syncLiveSellers), usarlo
-  if(s && s.channelName) return s.channelName;
-  // Si tiene uid, construirlo
-  if(s && s.uid) return 'ic_' + s.uid.slice(0,12);
-  // Fallback: buscar en Firestore por shopName
-  try{
-    if(s && window.fbToken){
-      const stores = await fsQuery('stores',[{field:'shopName',value:s.n}]);
-      if(stores.length && stores[0].channelName){
-        s.channelName = stores[0].channelName; // cachear
-        if(stores[0].uid) s.uid = stores[0].uid;
-        return stores[0].channelName;
-      }
-    }
-  }catch(e){}
-  return getChannelForSeller(sellerIdx); // último fallback
+function getMySellerIdx(){
+  if(!window.fbUser)return 0;
+  const u=(window.fbUser.username||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const idx=SELLERS.findIndex(s=>s.n.toLowerCase().replace(/[^a-z0-9]/g,'')===u);
+  return idx>=0?idx:0;
 }
 
 async function leaveAgoraChannel(){
   try{
-    if(_bcViewerSyncIv){clearInterval(_bcViewerSyncIv);_bcViewerSyncIv=null;}
     if(agoraLocalVideo){agoraLocalVideo.stop();agoraLocalVideo.close();agoraLocalVideo=null;}
     if(agoraLocalAudio){agoraLocalAudio.stop();agoraLocalAudio.close();agoraLocalAudio=null;}
-    if(agoraClient&&agoraJoined){await agoraClient.leave();agoraJoined=false;}
+    if(agoraClient&&agoraJoined){
+      // Decrement viewer count
+      const ch=window._currentStreamChannel;
+      if(ch){fsGet('streams',ch).then(doc=>{const v=Math.max(0,(doc?.viewerCount||1)-1);fsSet('streams',ch,{viewerCount:v});}).catch(()=>{});}
+      await agoraClient.leave();agoraJoined=false;
+    }
     agoraClient=null;
   }catch(e){console.warn('Agora leave:',e);}
   const sv=document.getElementById('sv-agora-video');
@@ -4409,174 +4405,70 @@ async function leaveAgoraChannel(){
 }
 
 async function joinAsAudience(channelName){
-  if(typeof AgoraRTC==='undefined'){
-    // SDK not loaded — show fallback, keep simulation running
-    console.warn('Agora SDK not loaded, using simulated stream');
-    return;
-  }
-  // Show connecting state
-  const svImg=document.getElementById('sv-img');
-  const svAgora=document.getElementById('sv-agora-video');
-  const svStatus=document.getElementById('sv-live-status');
-  if(svStatus)svStatus.textContent='Conectando...';
-
+  window._currentStreamChannel=channelName;
+  if(typeof AgoraRTC==='undefined'){toast('⚠️ SDK de stream no disponible');return;}
   try{
     await leaveAgoraChannel();
     agoraClient=AgoraRTC.createClient({mode:'live',codec:'h264'});
     await agoraClient.setClientRole('audience');
-
-    // Get token (null = no-auth mode)
-    const token=await getAgoraToken(channelName);
-    await agoraClient.join(AGORA_APP_ID, channelName, token, null);
+    await agoraClient.join(AGORA_APP_ID, channelName, AGORA_TEMP_TOKEN, null);
     agoraJoined=true;
-
-    // Host is publishing video
-    agoraClient.on('user-published', async(user, mediaType)=>{
-      await agoraClient.subscribe(user, mediaType);
+    agoraClient.on('user-published', async(user,mediaType)=>{
+      await agoraClient.subscribe(user,mediaType);
       if(mediaType==='video'){
-        if(svAgora){svAgora.style.display='block';svAgora.innerHTML='';user.videoTrack.play(svAgora);}
-        if(svImg)svImg.style.opacity='0';
-        if(svStatus)svStatus.textContent='EN VIVO';
+        const container=document.getElementById('sv-agora-video');
+        if(container){container.style.display='block';user.videoTrack.play(container);}
+        const img=document.getElementById('sv-img');
+        if(img)img.style.opacity='0';
       }
-      if(mediaType==='audio')user.audioTrack.play();
+      if(mediaType==='audio'){user.audioTrack.play();}
     });
-
-    // Host stopped publishing
-    agoraClient.on('user-unpublished',(user, mediaType)=>{
+    agoraClient.on('user-unpublished',(user,mediaType)=>{
       if(mediaType==='video'){
-        if(svAgora){svAgora.style.display='none';svAgora.innerHTML='';}
-        if(svImg)svImg.style.opacity='1';
-        if(svStatus)svStatus.textContent='EN VIVO';
+        const container=document.getElementById('sv-agora-video');
+        if(container){container.style.display='none';container.innerHTML='';}
+        const img=document.getElementById('sv-img');
+        if(img)img.style.opacity='1';
       }
     });
-
-    // Host left entirely
-    agoraClient.on('user-left',(user)=>{
-      if(svAgora){svAgora.style.display='none';svAgora.innerHTML='';}
-      if(svImg)svImg.style.opacity='1';
-      if(svStatus)svStatus.textContent='Stream finalizado';
-      toast('📴 El vendedor terminó el live');
-    });
-
-    // Connection state — handle drops
-    agoraClient.on('connection-state-change',(curState, prevState)=>{
-      if(curState==='DISCONNECTED'){
-        if(svStatus)svStatus.textContent='Reconectando...';
-      } else if(curState==='CONNECTED'){
-        if(svStatus)svStatus.textContent='EN VIVO';
-      } else if(curState==='DISCONNECTING'){
-        if(svStatus)svStatus.textContent='Desconectando...';
-      }
-    });
-
-    // If host is already publishing (late join)
-    const remoteUsers=agoraClient.remoteUsers;
-    for(const user of remoteUsers){
-      if(user.hasVideo){
-        await agoraClient.subscribe(user,'video');
-        if(svAgora){svAgora.style.display='block';svAgora.innerHTML='';user.videoTrack.play(svAgora);}
-        if(svImg)svImg.style.opacity='0';
-      }
-      if(user.hasAudio){
-        await agoraClient.subscribe(user,'audio');
-        user.audioTrack.play();
-      }
-    }
-    if(svStatus)svStatus.textContent='EN VIVO';
-
+    toast('📡 Conectado al live');
+    // Increment viewer count in Firestore
+    fsGet('streams',channelName).then(doc=>{
+      const v=(doc?.viewerCount||0)+1;
+      fsSet('streams',channelName,{viewerCount:v});
+    }).catch(()=>{});
   }catch(e){
-    console.warn('Agora audience join failed:',e);
-    // Graceful fallback — keep simulation, don't crash
-    if(svStatus)svStatus.textContent='EN VIVO';
-    if(e.code==='OPERATION_ABORTED')return;
-    // Only show error for non-trivial failures
-    if(e.message&&!e.message.includes('abort')){
-      console.info('Stream simulado activo (Agora:', e.code||e.message,')');
-    }
+    console.error('Agora audience:',e);
+    toast('⚠️ No se pudo conectar al stream en vivo');
   }
 }
 
-let _bcViewerSyncIv=null;
-
 async function joinAsHost(channelName){
-  if(typeof AgoraRTC==='undefined'){
-    toast('⚠️ SDK de stream no disponible. Activa el live desde Chrome/Firefox.');
-    return;
-  }
-  const btn=document.getElementById('gl-go-btn');
-  if(btn){btn.textContent='Iniciando...';btn.disabled=true;}
+  if(typeof AgoraRTC==='undefined'){toast('⚠️ SDK de stream no disponible');return;}
   try{
-    // Stop camera preview (we'll recreate tracks via Agora)
+    // Stop getUserMedia preview
     if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}
     await leaveAgoraChannel();
-
     agoraClient=AgoraRTC.createClient({mode:'live',codec:'h264'});
     await agoraClient.setClientRole('host');
-
-    // Get token
-    const token=await getAgoraToken(channelName);
-    const uid=window.fbUser?.uid||null;
-    await agoraClient.join(AGORA_APP_ID, channelName, token, null);
+    await agoraClient.join(AGORA_APP_ID, channelName, AGORA_TEMP_TOKEN, null);
     agoraJoined=true;
-
-    // Create mic + camera tracks
-    [agoraLocalAudio, agoraLocalVideo]=await AgoraRTC.createMicrophoneAndCameraTracks(
+    // Create tracks
+    [agoraLocalAudio,agoraLocalVideo]=await AgoraRTC.createMicrophoneAndCameraTracks(
       {encoderConfig:'music_standard'},
-      {encoderConfig:{width:720,height:1280,frameRate:24,bitrateMin:400,bitrateMax:1200}, facingMode}
+      {encoderConfig:'720p_1',facingMode}
     );
-
     // Show in broadcast screen
     const bcHtml=document.getElementById('bc-video');
     if(bcHtml)bcHtml.style.display='none';
     const bcAgora=document.getElementById('bc-agora-video');
     if(bcAgora){bcAgora.style.display='block';agoraLocalVideo.play(bcAgora);}
-
-    await agoraClient.publish([agoraLocalAudio, agoraLocalVideo]);
-
-    // Handle network drops
-    agoraClient.on('connection-state-change',(curState)=>{
-      const el=document.getElementById('bc-live-indicator');
-      if(curState==='CONNECTED'){
-        if(el){el.style.background='var(--rd)';el.textContent='EN VIVO';}
-      } else if(curState==='RECONNECTING'){
-        if(el){el.style.background='#ff8c00';el.textContent='RECONECTANDO';}
-        toast('⚠️ Reconectando al stream...');
-      } else if(curState==='DISCONNECTED'){
-        if(el){el.style.background='#555';el.textContent='DESCONECTADO';}
-        toast('❌ Live desconectado. Verifica tu conexión.');
-      }
-    });
-
-    // Sync real viewer count to Firestore + UI every 10s
-    if(_bcViewerSyncIv)clearInterval(_bcViewerSyncIv);
-    _bcViewerSyncIv=setInterval(()=>{
-      if(!agoraClient||!agoraJoined)return;
-      const realViewers=agoraClient.remoteUsers.length+1;
-      const el=document.getElementById('bc-viewers');
-      if(el)el.textContent=realViewers;
-      // Sync to Firestore so home feed shows real count
-      if(window.fbUser?.uid){
-        fsSet('stores',window.fbUser.uid,{viewers:realViewers}).catch(()=>{});
-        fsSet('streams',channelName,{viewerCount:realViewers,updatedAt:Date.now()}).catch(()=>{});
-      }
-    },10000);
-
-    toast('🔴 ¡Estás en vivo!');
+    await agoraClient.publish([agoraLocalAudio,agoraLocalVideo]);
+    toast('📡 ¡Estás en vivo!');
   }catch(e){
-    console.error('Agora host error:',e);
-    // User-friendly error messages
-    const msgs={
-      'NotAllowedError':'❌ Permiso de cámara/micrófono denegado. Actívalos en Ajustes.',
-      'NotFoundError':'❌ No se encontró cámara o micrófono.',
-      'INVALID_VENDOR_KEY':'❌ App ID de Agora inválido.',
-      'UID_CONFLICT':'⚠️ Ya hay un host activo en este canal.',
-    };
-    const key=e.name||e.code||'';
-    toast(msgs[key]||'❌ Error al iniciar live: '+(e.message||key));
+    console.error('Agora host:',e);
+    toast('⚠️ Error al iniciar live: '+e.message);
     if(btn){btn.textContent='Empezar en Vivo';btn.disabled=false;}
-    // Fallback: reopen camera preview
-    startCamera();
-    go('golive',false);
   }
 }
 
@@ -4702,29 +4594,40 @@ function bcStartAuction(){
   if(!name){toast('⚠️ Escribe qué vas a subastar');return;}
   bcAucName=name; bcAucTopBid=startBid; bcAucSecs=bcSelDurSecs;
   bcHideAucPanel();
-  // Show overlay
   const overlay=document.getElementById('bc-auc-overlay');
   if(overlay) overlay.style.display='block';
   const nameEl=document.getElementById('bc-auc-item-name');
   if(nameEl) nameEl.textContent=name;
   const topBidEl=document.getElementById('bc-auc-top-bid');
   if(topBidEl) topBidEl.textContent=startBid?'$'+startBid:'Sin oferta';
-  // Glow the auction button
   const aucBtn=document.getElementById('bc-auc-btn');
   if(aucBtn){aucBtn.style.background='rgba(255,59,59,.4)';aucBtn.style.borderColor='var(--rd)';}
-  // Update item bar
   const pn=document.getElementById('bc-pn');
   if(pn) pn.textContent='🔨 '+name;
   const pp=document.getElementById('bc-pp');
   if(pp) pp.textContent=startBid?'$'+startBid:'Abierta';
+  // ── Write to Firestore so buyers can bid ──────────────────────────────────
+  const ch=window._bcChannelName||'ic_0';
+  const bcAucId='auc_bc_'+ch+'_'+Date.now();
+  const endsAt=Date.now()+bcSelDurSecs*1000;
+  fsSet('auctions',bcAucId,{
+    prodIdx:-1, prodName:name, sellerChannel:ch,
+    startPrice:startBid, currentBid:startBid,
+    currentWinner:'', recentBids:'',
+    endsAt, status:'active', createdAt:Date.now()
+  }).catch(()=>{});
+  // Register aucId with the polling loop
+  if(window._bcSetAucId) window._bcSetAucId(bcAucId);
+  // Announce in chat + write to messages
+  const announceMsg={channel:ch,user:'Sistema',text:`🔨 SUBASTA: "${name}" — ${bcSelDurSecs<60?bcSelDurSecs+'s':bcSelDurSecs/60+'min'} — Mínimo: $${startBid}`,ts:Date.now()};
+  fsAdd('messages',announceMsg).catch(()=>{});
+  addBcMsg('🔨','Sistema',announceMsg.text);
   // Start countdown
   bcAucIv=setInterval(bcAucTick,1000);
   bcAucTick();
-  // Announce in chat
-  addBcMsg('🔨','Sistema',`🔨 ¡SUBASTA INICIADA! "${name}" — ${bcSelDurSecs<60?bcSelDurSecs+'seg':bcSelDurSecs/60+'min'} — Oferta mínima: $${startBid}`);
-  // Simulate bids
-  setTimeout(()=>bcSimBid(),3000+Math.random()*4000);
-  toast('🔨 ¡Subasta iniciada!');
+  // Bot bids for warmup
+  setTimeout(()=>bcSimBid(),4000+Math.random()*5000);
+  toast('🔨 ¡Subasta iniciada! Compradores pueden ofertar ahora');
 }
 function bcAucTick(){
   bcAucSecs=Math.max(0,bcAucSecs-1);
@@ -4758,6 +4661,12 @@ function bcSimBid(){
     while(feed.children.length>3)feed.removeChild(feed.lastChild);
   }
   addBcMsg('💛',user,`Oferta: $${bcAucTopBid}`);
+  // Persist bot bid to Firestore so buyers see it too
+  const _bid=bcAucTopBid;const _user=user;
+  if(window._bcGetAucId){
+    const _id=window._bcGetAucId();
+    if(_id) fsSet('auctions',_id,{currentBid:_bid,currentWinner:_user,lastBidAt:Date.now()}).catch(()=>{});
+  }
   // Schedule next bid
   if(bcAucIv&&bcAucSecs>5) setTimeout(()=>bcSimBid(),2000+Math.random()*5000);
 }
@@ -4795,37 +4704,62 @@ function startBroadcast(){
     const el=document.getElementById('bc-timer');
     if(el)el.textContent=m+':'+s;
   },1000);
-  // Viewers simulation
-  let viewers=1;
+  // Warmup: show a couple of simulated msgs at start
+  setTimeout(()=>addBcMsg('😊','carlos.VE','🔥 ¡Ya empezó!'),1200);
+  setTimeout(()=>addBcMsg('👩','luisa_mpn','¿Cuánto cuesta el envío?'),2800);
+
+  // Real Firestore polling — viewers + chat + auction bids
+  let _bcLastMsgTs=Date.now();
+  let _bcAucId='';
   if(bcViewerIv)clearInterval(bcViewerIv);
-  bcViewerIv=setInterval(()=>{
-    viewers+=Math.random()<.7?~~(Math.random()*8+1):-(~~(Math.random()*3));
-    viewers=Math.max(1,viewers);
-    const el=document.getElementById('bc-viewers');
-    if(el)el.textContent=viewers;
-  },3000);
-  // Chat simulation
-  const msgs=[
-    {u:'carlos.VE',t:'🔥 Ya empezó!',a:'😊'},
-    {u:'luisa_mpn',t:'¿Cuánto cuesta?',a:'👩'},
-    {u:'pedro_mcs',t:'Envían a Valencia?',a:'🧔'},
-    {u:'yoli_shop',t:'¡Chévere el producto!',a:'💁'},
-    {u:'el_pana99',t:'Comprando ahora 🛒',a:'😎'},
-    {u:'cristi_vzla',t:'Me encantó 😍',a:'🤩'},
-    {u:'marleny07',t:'¿Aceptas Zelle?',a:'😄'},
-    {u:'rosmary.ve',t:'Más tallas disponibles?',a:'👩'},
-  ];
-  let msgIdx=0;
   if(bcChatIv)clearInterval(bcChatIv);
-  bcChatIv=setInterval(()=>{
-    const m=msgs[msgIdx%msgs.length];msgIdx++;
-    addBcMsg(m.a,m.u,m.t);
-  },7000+~~(Math.random()*5000));
+  bcViewerIv=setInterval(async()=>{
+    const ch=window._bcChannelName;if(!ch)return;
+    try{
+      // Viewers
+      const stream=await fsGet('streams',ch);
+      const v=stream?.viewerCount||1;
+      const el=document.getElementById('bc-viewers');
+      if(el)el.textContent=v;
+      // Real chat messages
+      const msgs=await fsQuery('messages',[{field:'channel',value:ch}]);
+      const fresh=msgs.filter(m=>m.ts>_bcLastMsgTs).sort((a,b)=>a.ts-b.ts);
+      fresh.forEach(m=>{
+        addBcMsg('💬',m.user,m.text);
+        if(m.ts>_bcLastMsgTs)_bcLastMsgTs=m.ts;
+      });
+      // Real auction bids
+      if(_bcAucId){
+        const auc=await fsGet('auctions',_bcAucId);
+        if(auc&&auc.currentBid>bcAucTopBid){
+          const prev=bcAucTopBid;
+          bcAucTopBid=auc.currentBid;
+          const topBidEl=document.getElementById('bc-auc-top-bid');
+          if(topBidEl)topBidEl.textContent='$'+bcAucTopBid;
+          // Show in bids feed
+          const feed=document.getElementById('bc-auc-bids-feed');
+          if(feed&&auc.currentWinner){
+            const row=document.createElement('div');
+            row.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-top:1px solid rgba(255,255,255,.06);animation:fi .2s ease';
+            row.innerHTML=`<span style="font-size:11px;font-weight:800;color:var(--y)">@${auc.currentWinner}</span><span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff">$${bcAucTopBid}</span>`;
+            feed.prepend(row);
+            while(feed.children.length>3)feed.removeChild(feed.lastChild);
+          }
+          addBcMsg('🔨',auc.currentWinner||'Comprador',`¡Oferta! $${bcAucTopBid} 🔥`);
+        }
+      }
+    }catch(e){}
+  },3000);
+  window._bcChatLastTs=Date.now();
+  window._bcGetAucId=()=>_bcAucId;
+  window._bcSetAucId=(id)=>{_bcAucId=id;};
   // Push notif to "audience"
   pushNotif('🔴','live',`<strong>Tú</strong> estás en vivo ahora — ${title}`,()=>go('broadcast'),false);
   go('broadcast');
-  // Join Agora as host — use UID-based channel
-  const channelName=getMyChannel();
+  // Join Agora as host
+  const channelName=getChannelForSeller(getMySellerIdx());
+  window._bcChannelName=channelName;
+  window._currentStreamChannel=channelName;
   joinAsHost(channelName);
   // Save stream to Firestore
   const uid=window.fbUser?.uid;
@@ -4835,7 +4769,7 @@ function startBroadcast(){
       shopName:window.fbUser?.shop||'', channelName, title,
       isLive:true, viewerCount:1, startedAt:Date.now()
     });
-    fsSet('stores',uid,{isLive:true, channelName, uid});
+    fsSet('stores',uid,{isLive:true,channelName});
   }
   // If auction mode selected, auto-open auction panel
   if(glSaleType==='auction'){setTimeout(()=>bcShowAucPanel(),1000);}
@@ -4886,18 +4820,23 @@ function addBcMsg(av,user,text){
 
 function bcSend(){
   const inp=document.getElementById('bc-inp');
-  if(!inp||!inp.value.trim())return;
-  addBcMsg('😊','Tú (vendedor)',inp.value.trim());
+  const v=inp?.value.trim();if(!v)return;
+  const ch=window._bcChannelName||'ic_0';
+  const sellerName=window.fbUser?.username||window.fbUser?.name||'Vendedor';
+  addBcMsg('📡',sellerName+' (vendedor)',v);
+  fsAdd('messages',{channel:ch,user:sellerName+' 📡',text:v,ts:Date.now()}).catch(()=>{});
   inp.value='';
 }
 
 function endBroadcast(){
   clearInterval(bcTimerIv);clearInterval(bcViewerIv);clearInterval(bcChatIv);
+  if(window._bcSetAucId)window._bcSetAucId('');
+  window._bcChannelName='';
   stopCamera();
   leaveAgoraChannel();
   // Mark stream offline in Firestore
   const uid=window.fbUser?.uid;
-  const channelName=getMyChannel();
+  const channelName=getChannelForSeller(getMySellerIdx());
   if(uid){
     fsSet('streams',channelName,{isLive:false,endedAt:Date.now()});
     fsSet('stores',uid,{isLive:false});
@@ -4909,7 +4848,10 @@ function endBroadcast(){
 }
 
 // ═══ MODAL ═══
-function openModal(){initGoLive();}
+function openModal(){
+  if(requireAccount('📡','Para transmitir en vivo necesitas una cuenta','Regístrate gratis como vendedor.'))return;
+  initGoLive();
+}
 function closeModal(e,force){if(force||e?.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('on');}
 
 // ═══ GUEST MODE ═══
@@ -4919,7 +4861,7 @@ function enterAsGuest(){
   window.isGuest=true;
   const ob=document.getElementById('s-onboard');
   if(ob){ob.classList.remove('on');ob.style.display='none';}
-  buildLiveStrip();buildGrid();go('home',false);
+  loadHomeFeed();go('home',false);
 }
 
 function requireAccount(emoji,title,desc){
@@ -5120,26 +5062,17 @@ function showNotifBanner(icon, text, action){
 
 
 // ═══ PROFILE EDIT ═══
-function loadProfData(){
+async function loadProfData(){
   const u=window.fbUser;
   if(!u)return;
-  // Sync wallet balance from Firestore user data
-  if(typeof u.walletBalance==='number'){
-    walletBalance=u.walletBalance;
-    updateWalletDisplay();
-    const wpb=document.getElementById('wallet-prof-badge');
-    if(wpb)wpb.textContent=`${walletBalance} IC`;
-    const icEl=document.getElementById('co-ic-balance');
-    if(icEl)icEl.textContent=walletBalance+' IC';
-  }
   // Name
   const nameEl=document.getElementById('prof-name-display');
-  if(nameEl) nameEl.textContent=u.name||u.email||'Usuario';
+  if(nameEl) nameEl.textContent=u.name||u.displayName||u.email||'Usuario';
   // Handle
   const handleEl=document.getElementById('prof-handle-display');
   if(handleEl){
     const handle=u.username?('@'+u.username):(u.email?u.email.split('@')[0]:'');
-    const city=u.city?(' · '+u.city+' 🇻🇪'):' 🇻🇪';
+    const city=u.city?(' · '+u.city+' 🇻🇪'):'';
     handleEl.textContent=handle+city;
   }
   // Bio
@@ -5154,7 +5087,7 @@ function loadProfData(){
   // Avatar initials
   const initEl=document.getElementById('prof-av-initials');
   if(initEl){
-    const name=u.name||u.email||'?';
+    const name=u.name||u.displayName||u.email||'?';
     const parts=name.trim().split(' ');
     const initials=parts.length>=2?(parts[0][0]+parts[1][0]).toUpperCase():name[0].toUpperCase();
     initEl.textContent=initials;
@@ -5165,12 +5098,84 @@ function loadProfData(){
     const ini=document.getElementById('prof-av-initials');
     if(img&&ini){img.src=u.avatar;img.style.display='block';ini.style.display='none';}
   }
-  // Checkout name + city
+  // Checkout name
   const coName=document.getElementById('co-name-display');
-  if(coName) coName.textContent=u.name||'—';
-  const coCity=document.getElementById('co-city-display');
-  if(coCity) coCity.textContent=(u.city||'Venezuela')+', VE';
+  if(coName) coName.textContent=u.name||u.displayName||'—';
+  // Wallet badge
+  const wbal=document.getElementById('wallet-prof-badge');
+  if(wbal) wbal.textContent=(u.wallet||u.credits||500)+' IC';
+
+  // Fetch real order stats from Firestore
+  if(u.uid){
+    fsQuery('orders',[{field:'buyerId',value:u.uid}]).then(orders=>{
+      const totalBuys=orders.length;
+      const totalSpent=orders.reduce((s,o)=>s+(o.amt||0),0);
+      const pending=orders.filter(o=>o.status==='pending').length;
+      const buyEl=document.getElementById('st-buy');
+      const spentEl=document.getElementById('st-spent');
+      if(buyEl) buyEl.textContent=totalBuys;
+      if(spentEl) spentEl.textContent=totalSpent;
+      // Badge on Mis Pedidos
+      const badge=document.getElementById('my-orders-badge');
+      if(badge&&totalBuys>0){badge.textContent=totalBuys;badge.style.display='inline-flex';}
+      // Badge con pendientes
+      const pendingBadge=document.getElementById('my-orders-count');
+      if(pendingBadge&&pending>0) pendingBadge.textContent=pending+' pendiente'+(pending>1?'s':'');
+      // Cache orders for openMyOrders
+      window._buyerOrders=orders;
+    }).catch(()=>{});
+  }
 }
+
+// ── Historial de pedidos del comprador ───────────────────────────────────────
+async function openMyOrders(){
+  go('my-orders');
+  const list=document.getElementById('my-orders-list');
+  list.innerHTML='<div style="text-align:center;padding:40px;color:var(--mu);font-size:12px">⏳ Cargando pedidos...</div>';
+  const uid=window.fbUser?.uid;
+  if(!uid){
+    list.innerHTML='<div style="text-align:center;padding:40px;color:var(--mu)"><div style="font-size:36px;margin-bottom:10px">🔒</div><div>Inicia sesión para ver tus pedidos</div></div>';
+    return;
+  }
+  let orders=window._buyerOrders||[];
+  if(!orders.length){
+    orders=await fsQuery('orders',[{field:'buyerId',value:uid}]);
+    window._buyerOrders=orders;
+  }
+  // Sort newest first
+  orders.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  const countEl=document.getElementById('my-orders-count');
+  if(countEl) countEl.textContent=orders.length+' pedido'+(orders.length!==1?'s':'');
+  if(!orders.length){
+    list.innerHTML='<div style="text-align:center;padding:56px 24px;color:var(--mu)"><div style="font-size:48px;margin-bottom:14px">📦</div><div style="font-size:14px;font-weight:800;color:var(--tx);margin-bottom:6px">Sin pedidos aún</div><div style="font-size:12px">Tus compras aparecerán aquí</div></div>';
+    return;
+  }
+  const statusLabel={pending:'⏳ Pendiente',processing:'🚀 En camino',transit:'🏍️ En ruta',delivered:'✅ Entregado'};
+  const statusColor={pending:'rgba(255,208,0,.15)',processing:'rgba(33,150,243,.12)',transit:'rgba(255,152,0,.12)',delivered:'rgba(76,175,80,.1)'};
+  const statusTxt={pending:'var(--y)',processing:'#2196F3',transit:'#FF9800',delivered:'#4CAF50'};
+  list.innerHTML=orders.map(o=>{
+    const st=o.status||'pending';
+    const date=o.date||new Date(o.createdAt||Date.now()).toLocaleDateString('es-VE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    return `<div style="margin:12px 16px 0;background:var(--dk3);border-radius:16px;border:1px solid rgba(255,255,255,.06);overflow:hidden;cursor:pointer" onclick="openTrack('${o._id||''}')">
+      <div style="display:flex;align-items:center;gap:12px;padding:13px 14px">
+        <div style="width:52px;height:52px;border-radius:12px;background:var(--dk4);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">
+          ${o.img?`<img src="${o.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:''}
+          ${o.e||'📦'}
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">${o.prod||'Producto'}</div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:6px">${o.sellerName||'Vendedor'} · ${date}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--y)">$${o.amt||0}</span>
+            <span style="font-size:10px;font-weight:900;padding:3px 9px;border-radius:20px;background:${statusColor[st]||statusColor.pending};color:${statusTxt[st]||statusTxt.pending}">${statusLabel[st]||statusLabel.pending}</span>
+          </div>
+        </div>
+      </div>
+      ${st!=='delivered'?`<div style="height:3px;background:var(--dk4);position:relative"><div style="position:absolute;left:0;top:0;height:100%;background:var(--y);border-radius:2px;width:${{pending:'25%',processing:'55%',transit:'80%',delivered:'100%'}[st]||'25%'};transition:width .5s ease"></div></div>`:''}
+    </div>`;
+  }).join('');
+}
+
 function openProfEdit(){
   const modal=document.getElementById('prof-edit-modal');
   if(!modal)return;
@@ -5178,6 +5183,7 @@ function openProfEdit(){
   const h=document.getElementById('prof-handle-display').textContent.split('@')[1]?.split('·')[0]?.trim()||'';
   document.getElementById('prof-edit-handle').value=h;
   document.getElementById('prof-edit-bio').value=document.getElementById('prof-bio-display').textContent.trim();
+  const waEl=document.getElementById('prof-edit-whatsapp');if(waEl)waEl.value=window.fbUser?.whatsapp||'';
   updateBioCount();
   modal.style.display='flex';
   document.getElementById('prof-edit-name').focus();
@@ -5191,30 +5197,26 @@ function updateBioCount(){
   const cnt=document.getElementById('prof-bio-count');
   if(ta&&cnt)cnt.textContent=ta.value.length;
 }
-function saveProfEdit(){
+async function saveProfEdit(){
   const name=document.getElementById('prof-edit-name').value.trim();
   const handle=document.getElementById('prof-edit-handle').value.trim();
   const bio=document.getElementById('prof-edit-bio').value.trim();
+  const whatsapp=(document.getElementById('prof-edit-whatsapp')?.value||'').trim().replace(/[^0-9]/g,'');
   if(!name){toast('⚠️ Escribe tu nombre');return;}
-  // Update UI
   if(name)document.getElementById('prof-name-display').textContent=name;
   const city=window.fbUser?.city||'';
-  if(handle)document.getElementById('prof-handle-display').textContent=`@${handle}`+(city?' · '+city+' 🇻🇪':' 🇻🇪');
+  if(handle)document.getElementById('prof-handle-display').textContent=`@${handle}${city?' · '+city+' 🇻🇪':''}`;
   if(bio)document.getElementById('prof-bio-display').textContent=bio;
-  // Update local state
+  // Save to Firestore and local cache
+  const updates={name,bio};
+  if(handle)updates.username=handle;
+  if(whatsapp)updates.whatsapp=whatsapp;
   if(window.fbUser){
-    if(name)window.fbUser.name=name;
-    if(handle)window.fbUser.username=handle;
-    if(bio)window.fbUser.bio=bio;
-    fbCacheUser({...window.fbUser});
-    // Persist to Firestore
-    if(window.fbToken&&window.fbUser.uid){
-      const updates={};
-      if(name)updates.name=name;
-      if(handle)updates.username=handle;
-      if(bio)updates.bio=bio;
-      fsSet('users',window.fbUser.uid,updates).catch(()=>{});
-    }
+    Object.assign(window.fbUser,updates);
+    fbCacheUser(window.fbUser);
+  }
+  if(window.fbUser?.uid&&window.fbToken){
+    fsSet('users',window.fbUser.uid,updates).catch(()=>{});
   }
   closeProfEdit();
   toast('✅ Perfil actualizado');
@@ -5250,66 +5252,92 @@ function profUploadBanner(input){
 }
 
 // ═══ ORDER TRACKING ═══
-const TRACK_STEPS=[
-  {icon:'✅',title:'Pedido confirmado',desc:'El vendedor recibió y confirmó tu pedido',time:'Hoy 1:05 PM',status:'done'},
-  {icon:'📦',title:'Preparando envío',desc:'El vendedor está empacando tu producto',time:'Hoy 2:30 PM',status:'done'},
-  {icon:'🏍️',title:'En camino',desc:'Tu moto delivery está en ruta hacia ti',time:'Hoy 3:15 PM',status:'active'},
-  {icon:'🏠',title:'Entregado',desc:'Tu pedido llegará pronto a tu dirección',time:'Estimado 3-5 PM',status:'pending'},
-];
+let _trackPollIv=null;
+let _curTrackOrder=null;
 
-function openTrack(cartIdx){
-  // Prefer real Firestore order if available
-  const fsOrder=FS_USER_ORDERS[0]||null;
-  const item=cart.length?cart[cartIdx||0]:null;
-  const prod=item?PRODS[item.pi]:PRODS[0];
-  const seller=SELLERS[prod?.s||0];
+function _buildTrackSteps(status){
+  const steps=[
+    {icon:'✅',title:'Pedido confirmado',desc:'El vendedor recibió y confirmó tu pedido',key:'confirmed'},
+    {icon:'📦',title:'Preparando envío',desc:'El vendedor está empacando tu producto',key:'processing'},
+    {icon:'🏍️',title:'En camino',desc:'Tu moto delivery está en ruta hacia ti',key:'transit'},
+    {icon:'🏠',title:'Entregado',desc:'Tu pedido llegó a tu dirección',key:'delivered'},
+  ];
+  // Map Firestore status → step index
+  const doneUntil={pending:0,processing:1,transit:2,delivered:3}[status]??0;
+  return steps.map((s,i)=>({
+    ...s,
+    status:i<doneUntil?'done':i===doneUntil?'active':'pending'
+  }));
+}
 
-  const num=fsOrder?.num||fsOrder?.orderId||('IC-'+~~(Math.random()*90000+10000));
+function _renderTrackUI(order){
+  if(!order)return;
+  _curTrackOrder=order;
+  const num=order.num||order.orderId||order._id||'IC-00000';
   document.getElementById('track-order-num').textContent='#'+num;
   document.getElementById('track-num2').textContent='#'+num;
-  document.getElementById('track-emo').textContent=fsOrder?.e||prod?.e||'📦';
+  const emo=order.e||'📦';
+  document.getElementById('track-emo').textContent=emo;
   const img=document.getElementById('track-img');
-  const imgSrc=fsOrder?.img||prod?.img||'';
-  if(imgSrc)img.innerHTML=`<img src="${imgSrc}" onerror="this.style.display='none'">${fsOrder?.e||prod?.e||'📦'}`;
-  document.getElementById('track-prod-name').textContent=fsOrder?.prod||prod?.n||'Pedido';
-  document.getElementById('track-prod-seller').textContent=fsOrder?.sellerName||seller?.n||'Vendedor';
-  document.getElementById('track-prod-price').textContent='$'+(fsOrder?.amt||(item?prod?.p*item.q:prod?.p)||0);
+  img.innerHTML=order.img?`<img src="${order.img}" onerror="this.style.display='none'">${emo}`:emo;
+  document.getElementById('track-prod-name').textContent=order.prod||'Producto';
+  document.getElementById('track-prod-seller').textContent=order.sellerName||'Vendedor';
+  document.getElementById('track-prod-price').textContent='$'+(order.amt||0);
   document.getElementById('track-pay').textContent='⚡ InstaCreditos';
-
-  // Build timeline based on real status
-  const realStatus=fsOrder?.status||'pending';
-  const statusMap={'pending':0,'processing':1,'delivered':2};
-  const curStep=statusMap[realStatus]??0;
-  const updatedAt=fsOrder?.updatedAt?new Date(fsOrder.updatedAt).toLocaleTimeString('es-VE',{hour:'2-digit',minute:'2-digit'}):'';
-  const steps=[
-    {icon:'✅',title:'Pedido confirmado',desc:'El vendedor recibió y confirmó tu pedido',time:updatedAt||'Ahora',done:curStep>=0},
-    {icon:'📦',title:'Preparando envío',desc:'El vendedor está empacando tu producto',time:curStep>=1?updatedAt:'Pendiente',done:curStep>=1,active:curStep===1},
-    {icon:'🏍️',title:'En camino',desc:'Tu moto delivery está en ruta hacia ti',time:curStep>=2?updatedAt:'Pendiente',done:curStep>=2,active:curStep===2},
-    {icon:'🏠',title:'Entregado',desc:'¡Tu pedido ha llegado!',time:curStep>=3?updatedAt:'',done:curStep>=3},
-  ];
+  // ETA según status
+  const etas={pending:'En preparación',processing:'Hoy entre 3–5 PM',transit:'En camino, 20–40 min',delivered:'¡Entregado!'};
+  document.getElementById('track-eta').textContent=etas[order.status]||'En proceso';
+  // Timeline
+  const steps=_buildTrackSteps(order.status);
   document.getElementById('track-timeline').innerHTML=steps.map(s=>`
-    <div class="track-step ${s.done?'done':''}${s.active?' active':''}">
+    <div class="track-step ${s.status}">
       <div class="track-dot">${s.icon}</div>
       <div class="track-info">
         <div class="track-step-title">${s.title}</div>
         <div class="track-step-desc">${s.desc}</div>
-        ${s.time?`<div class="track-step-time">${s.time}</div>`:''}
       </div>
     </div>`).join('');
+}
 
-  // Pull latest status in background
-  if(fsOrder?._id&&window.fbToken){
-    fsGet('orders',fsOrder._id).then(latest=>{
-      if(latest&&latest.status!==realStatus){
-        // Status changed — refresh
-        FS_USER_ORDERS[0]={...FS_USER_ORDERS[0],...latest};
-        openTrack(cartIdx);
-        toast('📦 Estado actualizado: '+latest.status);
-      }
-    }).catch(()=>{});
+async function openTrack(orderOrIdx){
+  go('track');
+  clearInterval(_trackPollIv);
+
+  // Acepta: objeto orden, ID string, o índice numérico (legado)
+  let order=null;
+  if(orderOrIdx&&typeof orderOrIdx==='object'){
+    order=orderOrIdx;
+  } else if(typeof orderOrIdx==='string'){
+    // Es un ID de Firestore — buscar en DASH_ORDERS primero
+    order=DASH_ORDERS.find(o=>o._id===orderOrIdx||o.orderId===orderOrIdx)||null;
+    if(!order){
+      const fsOrder=await fsGet('orders',orderOrIdx);
+      if(fsOrder)order=fsOrder;
+    }
+  } else {
+    // Legado: índice numérico o undefined — usa última orden
+    order=DASH_ORDERS[0]||null;
+    if(!order){
+      // fallback visual con carrito
+      const item=cart.length?cart[orderOrIdx||0]:null;
+      const prod=item?PRODS[item.pi]:PRODS[0];
+      const seller=SELLERS[prod.s];
+      order={prod:prod.n,e:prod.e||'📦',img:prod.img,sellerName:seller.n,amt:prod.p*(item?.q||1),status:'pending',num:'IC-'+~~(Math.random()*90000+10000)};
+    }
   }
 
-  go('track');
+  _renderTrackUI(order);
+
+  // Polling cada 12s si hay _id
+  if(order?._id||order?.orderId){
+    const oid=order._id||order.orderId;
+    _trackPollIv=setInterval(async()=>{
+      const cur=document.getElementById('s-track');
+      if(!cur||!cur.classList.contains('on')){clearInterval(_trackPollIv);return;}
+      const fresh=await fsGet('orders',oid);
+      if(fresh&&fresh.status!==_curTrackOrder?.status)_renderTrackUI(fresh);
+    },12000);
+  }
 }
 
 // ═══ INIT ═══
@@ -5400,6 +5428,10 @@ function startPdLiveSim(seller){
     viewers.textContent=Math.max(10,cur+(~~(Math.random()*7)-2));
   },3000);
 }
+function stopAuction(){
+  clearInterval(aucTimerIv);clearInterval(aucPollIv);
+  aucTimerIv=null;aucPollIv=null;aucId='';
+}
 function stopPdLiveSim(){
   clearInterval(_pdChatIv);clearInterval(_pdHeartIv);clearInterval(_pdViewIv);
   _pdChatIv=_pdHeartIv=_pdViewIv=null;
@@ -5410,7 +5442,58 @@ function stopPdLiveSim(){
   const hearts=document.getElementById('pd-hearts');
   if(hearts)hearts.innerHTML='';
 }
-buildLiveStrip();buildCats();buildGrid();buildSellers();buildCoPays();updateCart();
+buildCats();buildCoPays();updateCart();
+
+// ═══ HOME FEED DESDE FIRESTORE ═══
+async function loadHomeFeed(){
+  buildLiveStrip();buildGrid();buildSellers();
+  const lives=await fsQuery('lives',[{field:'live',value:true}]);
+  if(lives.length>0){
+    const el=document.getElementById('live-strip');
+    if(el){el.innerHTML=lives.map((s,i)=>`
+      <div class="lcard" onclick="openStreamFS('${s._id}')">
+        <div class="lcard-img ${BG[i%4]}">
+          ${s.thumb?`<img src="${s.thumb}" onerror="this.style.display='none'" loading="lazy">`:''}
+          <div class="lcard-live"><div class="lbadge" style="font-size:8px">LIVE</div></div>
+          <div class="lcard-viewers">👁 ${s.viewers||0}</div>
+        </div>
+        <div class="lcard-info">
+          <div class="lcard-name">${s.name||'Vendedor'}</div>
+          <div class="lcard-price">desde $${s.minPrice||0}</div>
+        </div>
+      </div>`).join('');}
+  }
+  const prods=await fsQuery('products');
+  if(prods.length>0){
+    const grid=document.getElementById('pgrid');
+    if(!grid)return;
+    const render=(list,offset=0)=>list.map((p,i)=>`
+      <div class="pcard" onclick="openProdFS('${p._id}')">
+        <div class="pcard-img ${BG[(i+offset)%4]}">
+          <img src="${p.img||''}" onerror="this.style.display='none'" loading="lazy">
+          ${(p.origPrice>p.price)?`<div class="pcard-disc">-${Math.round((1-p.price/p.origPrice)*100)}%</div>`:''}
+          ${p.live?`<div class="pcard-live-dot"><div class="lbadge" style="font-size:7px;padding:2px 5px">LIVE</div></div>`:''}
+          <button class="pcard-qadd" onclick="event.stopPropagation();toast('🛒 Agregado!')">🛒</button>
+        </div>
+        <div class="pcard-body">
+          <div class="pcard-name">${p.name||'Producto'}</div>
+          <div class="pcard-seller-row">
+            <div class="pcard-seller-dot">${p.sellerEmoji||'🛍️'}</div>
+            <div class="pcard-seller-name">${p.sellerName||''}</div>
+          </div>
+          <div class="pcard-price-row">
+            <div class="pcard-price">$${p.price||0}</div>
+            ${(p.origPrice>p.price)?`<div class="pcard-old">$${p.origPrice}</div>`:''}
+          </div>
+        </div>
+      </div>`).join('');
+    grid.innerHTML=render(prods.slice(0,8));
+    if(prods.length>8)requestAnimationFrame(()=>grid.innerHTML+=render(prods.slice(8),8));
+  }
+}
+function openStreamFS(id){openStream(0);}
+function openProdFS(id){openProd(0);}
+loadHomeFeed();
 // Show initial unread count
 (()=>{const count=notifData.filter(n=>n.unread).length;const b=document.getElementById('notif-badge');if(b&&count){b.style.display='flex';b.textContent=count;}})();
 // notif-btn onclick set inline
@@ -5424,89 +5507,17 @@ buildLiveStrip();buildCats();buildGrid();buildSellers();buildCoPays();updateCart
     // Hide onboarding immediately
     const ob=document.getElementById('s-onboard');
     if(ob){ob.classList.remove('on');ob.style.display='none';}
-    buildLiveStrip();buildGrid();go('home',false);
+    loadHomeFeed();go('home',false);
   }
 })();
 
 function fbLogout(){
   fbClearSession();
-  try{localStorage.removeItem('fb_refresh');}catch(e){}
   window.fbUser=null;
   window.fbToken=null;
-  walletBalance=0;
-  cart=[];updateCart();
   toast('👋 Sesión cerrada');
   setTimeout(()=>go('register',false),400);
 }
 </script>
-<!-- ═══ PWA — Service Worker + Install Prompt ═══ -->
-<script>
-// Register service worker
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js')
-      .then(reg=>{
-        console.log('SW registered, scope:',reg.scope);
-        // Check for updates every time app loads
-        reg.update();
-      })
-      .catch(err=>console.warn('SW registration failed:',err));
-  });
-}
-
-// Install prompt (Android / desktop Chrome)
-let _deferredPrompt=null;
-window.addEventListener('beforeinstallprompt',e=>{
-  e.preventDefault();
-  _deferredPrompt=e;
-  // Show our custom install banner after 30s or first purchase
-  setTimeout(showInstallBanner,30000);
-});
-window.addEventListener('appinstalled',()=>{
-  _deferredPrompt=null;
-  hideInstallBanner();
-  toast('✅ ¡InstaCompras instalada!');
-});
-
-function showInstallBanner(){
-  // Don't show if already installed or dismissed
-  if(!_deferredPrompt&&!_isIOS())return;
-  if(localStorage.getItem('pwa_dismissed'))return;
-  if(window.matchMedia('(display-mode: standalone)').matches)return;
-  const banner=document.getElementById('pwa-banner');
-  if(banner)banner.classList.add('on');
-}
-function hideInstallBanner(){
-  const banner=document.getElementById('pwa-banner');
-  if(banner)banner.classList.remove('on');
-}
-function installApp(){
-  if(_deferredPrompt){
-    _deferredPrompt.prompt();
-    _deferredPrompt.userChoice.then(choice=>{
-      if(choice.outcome==='accepted')toast('✅ Instalando InstaCompras...');
-      _deferredPrompt=null;
-      hideInstallBanner();
-    });
-  } else if(_isIOS()){
-    // iOS instructions
-    toast('📱 Toca Compartir → "Añadir a inicio" para instalar');
-    hideInstallBanner();
-  }
-}
-function dismissInstallBanner(){
-  hideInstallBanner();
-  try{localStorage.setItem('pwa_dismissed','1');}catch(e){}
-}
-function _isIOS(){
-  return /iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.MSStream;
-}
-
-// Show install banner on iOS after delay (Safari doesn't fire beforeinstallprompt)
-if(_isIOS()&&!window.matchMedia('(display-mode: standalone)').matches){
-  setTimeout(showInstallBanner,45000);
-}
-</script>
-
 </body>
 </html>
