@@ -2355,7 +2355,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
       <div class="ok-order-title">Detalles del pedido</div>
       <div id="ok-order"></div>
     </div>
-    <button class="ok-whatsapp-btn" onclick="window.open('https://wa.me/584242244622?text=Hola%2C+acabo+de+hacer+un+pedido+en+InstaCompras+y+quiero+coordinar+la+entrega+%F0%9F%93%A6','_blank')"><span style="font-size:18px">💬</span> Contactar al Vendedor</button>
+    <button class="ok-whatsapp-btn"><span style="font-size:18px">💬</span> Contactar al Vendedor</button>
     <button class="ok-back" onclick="goHome()">← Seguir Comprando</button>
   </div>
 </div>
@@ -5877,10 +5877,6 @@ async function openTrack(orderOrIdx){
 }
 
 // ═══ INIT ═══
-// Reorder PRODS for maximum visual impact (investor demo)
-const _ORDER=[0,1,16,29,40,41,42,43,44,45,11,6,35,31,34,10,3,36,22,4,37,18,2,5,7,8,9,12,13,14,15,17,19,20,21,23,24,25,26,27,28,30,32,33,38,39];
-const _origProds=[...PRODS];
-_ORDER.forEach((idx,i)=>{if(i<PRODS.length&&idx<_origProds.length)PRODS[i]=_origProds[idx];});
 
 
 
@@ -5990,6 +5986,9 @@ async function loadHomeFeed(){
   _homePollIv=setInterval(_refreshLiveStrip, 30000);
   const prods=await fsQuery('products');
   if(prods.length>0){
+    // Cache FS products for openProdFS/quickAddFS
+    window._fsProdCache={};
+    prods.forEach(p=>{if(p._id)window._fsProdCache[p._id]=p;});
     const grid=document.getElementById('pgrid');
     if(!grid)return;
     const render=(list,offset=0)=>list.map((p,i)=>`
@@ -5998,7 +5997,7 @@ async function loadHomeFeed(){
           <img src="${p.img||''}" onerror="this.style.display='none'" loading="lazy">
           ${(p.origPrice>p.price)?`<div class="pcard-disc">-${Math.round((1-p.price/p.origPrice)*100)}%</div>`:''}
           ${p.live?`<div class="pcard-live-dot"><div class="lbadge" style="font-size:7px;padding:2px 5px">LIVE</div></div>`:''}
-          <button class="pcard-qadd" onclick="event.stopPropagation();toast('🛒 Agregado!')">🛒</button>
+          <button class="pcard-qadd" onclick="event.stopPropagation();quickAddFS('${p._id}')">🛒</button>
         </div>
         <div class="pcard-body">
           <div class="pcard-name">${p.name||'Producto'}</div>
@@ -6080,7 +6079,26 @@ async function openStreamFS(channelName){
     openStream(0); // fallback
   }
 }
-function openProdFS(id){openProd(0);}
+function openProdFS(id){
+  const p=window._fsProdCache?.[id];
+  if(!p){openProd(0);return;}
+  // Map FS product into PRODS slot so all existing cart/detail logic works
+  const fsIdx=PRODS.length;
+  const sellerIdx=SELLERS.length;
+  SELLERS.push({n:p.sellerName||'Vendedor',e:p.sellerEmoji||'🛍️',v:0,f:'0',p:p.price||0,logo:'',cat:p.cat||'General'});
+  PRODS.push({n:p.name||'Producto',s:sellerIdx,p:p.price||0,op:p.origPrice||p.price||0,img:p.img||'',e:p.emoji||'📦',sz:p.sizes||['Único'],d:p.desc||'',live:!!p.live});
+  openProd(fsIdx);
+}
+function quickAddFS(id){
+  if(requireAccount('🛒','Para comprar necesitas cuenta','Crea tu cuenta gratis y compra en vivo al instante.'))return;
+  const p=window._fsProdCache?.[id];
+  if(!p){toast('❌ Producto no disponible');return;}
+  const fsIdx=PRODS.length;
+  const sellerIdx=SELLERS.length;
+  SELLERS.push({n:p.sellerName||'Vendedor',e:p.sellerEmoji||'🛍️',v:0,f:'0',p:p.price||0,logo:'',cat:p.cat||'General'});
+  PRODS.push({n:p.name||'Producto',s:sellerIdx,p:p.price||0,op:p.origPrice||p.price||0,img:p.img||'',e:p.emoji||'📦',sz:p.sizes||['Único'],d:p.desc||'',live:!!p.live});
+  addItem(fsIdx,PRODS[fsIdx].sz[0],1);animateCartBadge();toast(`✅ ${p.name||'Producto'} al carrito`);
+}
 
 // Fetch live streams from Firestore and update the strip
 async function _refreshLiveStrip(){
