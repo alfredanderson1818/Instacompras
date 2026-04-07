@@ -242,10 +242,8 @@ async function fbRestoreSession(){
   --sar:env(safe-area-inset-right,0px);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{height:100%}
-body{height:100%;overflow:hidden;background:var(--dk);color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;margin:0;padding:0}
-#app{max-width:430px;margin:0 auto;position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;background:var(--dk)}
-@media(min-width:431px){#app{left:50%;transform:translateX(-50%)}}
+html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;height:100%}
+#app{position:fixed;top:0;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;overflow:hidden;background:var(--dk)}
 .scr{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateX(44px) scale(.98);transition:opacity .32s cubic-bezier(.4,0,.2,1),transform .36s cubic-bezier(.34,1.10,.64,1);overflow:hidden;will-change:transform,opacity}
 .scr.on{opacity:1;pointer-events:all;transform:translateX(0) scale(1)}
 .scr.out{opacity:0;transform:translateX(-28px) scale(.98);transition:opacity .2s ease,transform .2s ease}
@@ -5470,29 +5468,8 @@ function toast(msg){const t=document.getElementById('toast-el');t.textContent=ms
 function fmt(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n);}
 
 // ═══ MOBILE VIEWPORT FIX ═══
-// position:fixed on #app handles full-screen layout
-// Only needed for keyboard resize on input focus
-function setAppHeight(){
-  // No-op: position:fixed handles iOS standalone correctly
-}
-setAppHeight();
-if(window.visualViewport){
-  window.visualViewport.addEventListener('resize',()=>{
-    // Only adjust when keyboard opens (height shrinks significantly)
-    const h=window.visualViewport.height;
-    const app=document.getElementById('app');
-    if(app){
-      if(h<window.innerHeight*0.75){
-        app.style.height=h+'px';
-        app.style.bottom='auto';
-      }else{
-        app.style.height='';
-        app.style.bottom='0';
-      }
-    }
-  });
-}
-window.addEventListener('orientationchange',()=>setTimeout(setAppHeight,200));
+// Pure CSS handles height (html,body,#app all height:100%)
+
 
 // ═══ NOTIFICATIONS ═══
 let notifData=[
@@ -6552,16 +6529,27 @@ if('serviceWorker' in navigator){
     window.addEventListener('load', ()=>{
       navigator.serviceWorker.register('/Instacompras/sw.js')
         .then(reg=>{
+          // Force check for updates
+          reg.update().catch(()=>{});
           reg.addEventListener('updatefound',()=>{
             const newSW=reg.installing;
             newSW.addEventListener('statechange',()=>{
-              if(newSW.state==='installed'&&navigator.serviceWorker.controller){
-                toast('🔄 App actualizada — recarga para ver cambios');
+              if(newSW.state==='installed'){
+                // Auto-activate new SW immediately
+                if(newSW.postMessage) newSW.postMessage({type:'SKIP_WAITING'});
+                if(navigator.serviceWorker.controller){
+                  location.reload();
+                }
               }
             });
           });
         })
         .catch(()=>{});
+    });
+  } else {
+    // Not on GH Pages — unregister any stale SW
+    navigator.serviceWorker.getRegistrations().then(regs=>{
+      regs.forEach(r=>r.unregister());
     });
   }
 }
