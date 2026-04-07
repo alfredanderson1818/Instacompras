@@ -1496,7 +1496,16 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
     <!-- Confirm button -->
     <div style="padding:0 16px">
-      <button onclick="depConfirm()" style="width:100%;background:var(--y);color:var(--dk);border:none;border-radius:13px;padding:16px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .2s;margin-bottom:10px">Confirmar Recarga</button>
+      <!-- Reference and note -->
+      <div style="margin-bottom:12px">
+        <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Número de referencia / comprobante</div>
+        <input id="dep-ref" type="text" placeholder="Ej: 123456789" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='rgba(255,208,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Nota adicional (opcional)</div>
+        <input id="dep-note" type="text" placeholder="Ej: Enviado desde Banco Venezuela" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='rgba(255,208,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+      </div>
+      <button onclick="depConfirm()" style="width:100%;background:var(--y);color:var(--dk);border:none;border-radius:13px;padding:16px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .2s;margin-bottom:10px">📋 Enviar Solicitud</button>
       <div style="font-size:10px;color:rgba(255,255,255,.3);text-align:center;line-height:1.5">Mínimo $1 USD · Sin comisión · Créditos no expiran</div>
     </div>
   </div>
@@ -2029,6 +2038,14 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
           <div style="width:10px;height:10px;border-radius:50%;background:var(--rd);animation:pulse-live 2s infinite"></div>
         </div>
         <div class="pmil">Iniciar Stream</div>
+        <div class="pmia">›</div>
+      </div>
+
+      <!-- Admin button — only visible for admin UID -->
+      <div id="admin-menu-btn" style="display:none" class="pmi" onclick="openAdmin()" style="border-radius:13px;background:rgba(255,208,0,.05);border:1px solid rgba(255,208,0,.15)">
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,208,0,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">⚡</div>
+        <div class="pmil" style="color:var(--y)">Panel Admin</div>
+        <div id="admin-menu-badge" style="display:none;background:var(--rd);color:#fff;font-size:10px;font-weight:900;padding:2px 8px;border-radius:20px"></div>
         <div class="pmia">›</div>
       </div>
 
@@ -2672,6 +2689,49 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
   </div>
 </div>
 
+<!-- ADMIN PANEL -->
+<div id="s-admin" class="scr">
+  <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06);background:var(--dk)">
+    <button class="bk" style="position:static;background:var(--dk3);border:1px solid rgba(255,255,255,.07)" onclick="goBack()">←</button>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1">⚡ Panel Admin</div>
+    <div id="admin-pending-badge" style="display:none;background:var(--rd);color:#fff;font-size:11px;font-weight:900;padding:3px 10px;border-radius:20px"></div>
+  </div>
+
+  <div class="sb" style="padding-bottom:88px">
+    <!-- Stats row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:16px 16px 0">
+      <div style="background:var(--dk3);border-radius:14px;padding:14px 12px;text-align:center;border:1px solid rgba(255,255,255,.06)">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--y)" id="admin-stat-pending">0</div>
+        <div style="font-size:10px;font-weight:800;color:var(--mu);margin-top:2px">Pendientes</div>
+      </div>
+      <div style="background:var(--dk3);border-radius:14px;padding:14px 12px;text-align:center;border:1px solid rgba(255,255,255,.06)">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#4CAF50" id="admin-stat-approved">0</div>
+        <div style="font-size:10px;font-weight:800;color:var(--mu);margin-top:2px">Aprobados</div>
+      </div>
+      <div style="background:var(--dk3);border-radius:14px;padding:14px 12px;text-align:center;border:1px solid rgba(255,255,255,.06)">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--tx)" id="admin-stat-total">$0</div>
+        <div style="font-size:10px;font-weight:800;color:var(--mu);margin-top:2px">Total IC</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:0;margin:16px 16px 0;background:var(--dk3);border-radius:12px;padding:3px;border:1px solid rgba(255,255,255,.06)">
+      <div id="admin-tab-dep" onclick="adminTab('dep')" style="flex:1;padding:9px;text-align:center;border-radius:9px;font-size:12px;font-weight:900;cursor:pointer;background:var(--y);color:var(--dk);transition:all .2s">💰 Depósitos</div>
+      <div id="admin-tab-users" onclick="adminTab('users')" style="flex:1;padding:9px;text-align:center;border-radius:9px;font-size:12px;font-weight:900;cursor:pointer;color:var(--mu);transition:all .2s">👥 Usuarios</div>
+    </div>
+
+    <!-- Deposits panel -->
+    <div id="admin-panel-dep" style="padding:12px 16px 0">
+      <div id="admin-dep-list"><div style="text-align:center;padding:40px;color:var(--mu);font-size:12px">⏳ Cargando...</div></div>
+    </div>
+
+    <!-- Users panel -->
+    <div id="admin-panel-users" style="padding:12px 16px 0;display:none">
+      <div id="admin-users-list"><div style="text-align:center;padding:40px;color:var(--mu);font-size:12px">⏳ Cargando...</div></div>
+    </div>
+  </div>
+</div>
+
 <!-- Guest Wall Modal -->
 <div id="guest-wall" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center">
   <div style="background:var(--dk2);border-radius:24px 24px 0 0;padding:32px 24px 40px;width:100%;max-width:430px;text-align:center;border-top:1px solid rgba(255,255,255,.08)">
@@ -2967,12 +3027,46 @@ function prodCard(p,i,list){
     </div>
   </div>`;
 }
-function buildExpScreen(){
+// Combined list of static + FS sellers for explore
+let _expFsSellers=[];
+
+async function buildExpScreen(){
   const EXP_CATS=['🔥 Todo','👟 Calzado','📱 Tech','👗 Ropa','💄 Belleza','🏠 Hogar','⚽ Deportes','💍 Joyería','🎮 Gaming','☕ Comida','🎸 Música'];
   const catBar=document.getElementById('exp-cats');
   if(catBar) catBar.innerHTML=EXP_CATS.map((c,i)=>`<div class="exp-cat ${i===0?'on':''}" onclick="expFilterCat(this,'${c}')">${c}</div>`).join('');
   expActiveCat='🔥 Todo';
-  renderExpSections(SELLER_ORDER.map(i=>({s:SELLERS[i],i})));
+  // Render static immediately
+  renderExpSections(SELLER_ORDER.map(i=>({s:SELLERS[i],i,fs:false})));
+  // Fetch real stores from Firestore
+  try{
+    const fsStores=await fsQuery('stores');
+    const fsStreams=await fsQuery('streams',[{field:'isLive',value:true}]);
+    const liveChannels=new Set(fsStreams.map(s=>s.channelName||s._id));
+    // Map FS stores to seller-like objects
+    _expFsSellers=fsStores.map(st=>({
+      s:{
+        n:st.shopName||st.ownerName||'Tienda',
+        e:'📡',
+        cat:st.category||'General',
+        v:st.viewerCount||0,
+        f:st.followers||0,
+        p:st.minPrice||0,
+        logo:st.avatar||'',
+        verified:st.isVerified||false,
+        live:liveChannels.has(st.channelName||st._id)||st.isLive||false,
+        viewers:st.viewerCount||0,
+        channelName:st.channelName||''
+      },
+      i:'fs_'+st._id,
+      fs:true,
+      _id:st._id
+    }));
+    if(_expFsSellers.length>0){
+      // Merge: FS stores first (real), then static
+      const combined=[..._expFsSellers,...SELLER_ORDER.map(i=>({s:SELLERS[i],i,fs:false}))];
+      renderExpSections(combined);
+    }
+  }catch(e){/* stay with static */}
 }
 
 function expGetBestImg(si,skip=0){
@@ -2980,19 +3074,42 @@ function expGetBestImg(si,skip=0){
   return imgs[skip]||imgs[0]||'';
 }
 
+function _expOpenSeller(item){
+  if(item.fs&&item._id){
+    // Real FS store — open stream if live, else show profile toast
+    if(item.s.channelName)openStreamFS(item.s.channelName);
+    else toast(`🛍️ ${item.s.n} — próximamente`);
+  } else {
+    openSeller(item.i);
+  }
+}
+function _expImg(item){
+  if(item.fs) return item.s.logo||'';
+  return expGetBestImg(item.i);
+}
+function _expImg2(item){
+  if(item.fs) return '';
+  return expGetBestImg(item.i,1);
+}
+
 function renderExpSections(list){
+  // Sort: live first
+  list=[...list].sort((a,b)=>(b.s.live?1:0)-(a.s.live?1:0));
+  const liveList=list.filter(x=>x.s.live||x.s.v>50);
+  const showList=liveList.length?liveList:list;
   // ── EN VIVO strip ──
   const liveEl=document.getElementById('exp-live-strip');
   if(liveEl){
-    liveEl.innerHTML=list.slice(0,10).map(({s,i})=>{
-      const img=expGetBestImg(i);
+    liveEl.innerHTML=showList.slice(0,10).map(item=>{
+      const {s}=item;
+      const img=_expImg(item);
       const avHtml=s.logo?`<img src="${s.logo}" style="width:100%;height:100%;object-fit:cover">`:`<span style="font-size:14px">${s.e}</span>`;
-      return `<div class="exp-lc" onclick="openSeller(${i})">
+      return `<div class="exp-lc" onclick="_expOpenSeller(${JSON.stringify(item).replace(/"/g,'&quot;')})">
         ${img?`<img class="exp-lc-img" src="${img}" loading="lazy" onerror="this.style.display='none'">`:`<div class="exp-lc-img" style="display:flex;align-items:center;justify-content:center;font-size:40px;background:var(--dk4)">${s.e}</div>`}
         <div class="exp-lc-grad"></div>
         <div class="exp-lc-top">
           <div class="exp-lc-live"><div class="exp-lc-live-dot"></div>LIVE</div>
-          <div class="exp-lc-v">👁 ${s.v}</div>
+          <div class="exp-lc-v">👁 ${s.v||s.viewers||0}</div>
         </div>
         <div class="exp-lc-bottom">
           <div class="exp-lc-av">${avHtml}</div>
@@ -3005,21 +3122,21 @@ function renderExpSections(list){
   // ── FEATURED GRID ──
   const featEl=document.getElementById('exp-featured-grid');
   if(featEl){
-    featEl.innerHTML=list.slice(0,6).map(({s,i})=>{
-      const img=expGetBestImg(i);
-      const img2=expGetBestImg(i,1);
+    featEl.innerHTML=list.slice(0,6).map(item=>{
+      const {s}=item;
+      const img=_expImg(item);
       const avHtml=s.logo?`<img src="${s.logo}" style="width:100%;height:100%;object-fit:cover">`:`<span style="font-size:20px">${s.e}</span>`;
-      return `<div class="exp-fc" onclick="openSeller(${i})">
+      return `<div class="exp-fc" onclick="_expOpenSeller(${JSON.stringify(item).replace(/"/g,'&quot;')})">
         ${img?`<img class="exp-fc-img" src="${img}" loading="lazy" onerror="this.style.background='var(--dk4)'">`:`<div class="exp-fc-img" style="display:flex;align-items:center;justify-content:center;font-size:44px;background:var(--dk4)">${s.e}</div>`}
         <div class="exp-fc-grad"></div>
-        <div class="exp-fc-live"></div>
-        <div class="exp-fc-vbadge">👁 ${s.v}</div>
+        ${s.live?'<div class="exp-fc-live"></div>':''}
+        <div class="exp-fc-vbadge">👁 ${s.v||0}</div>
         <div class="exp-fc-av" style="${s.logo?'background:#000;':'background:var(--dk4);'}">${avHtml}</div>
         <div class="exp-fc-body">
           <div class="exp-fc-name">${s.n}${s.verified?` <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--y)" stroke="none"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`:''}</div>
           <div class="exp-fc-cat">${s.cat}</div>
           <div class="exp-fc-bottom">
-            <div class="exp-fc-fol">${s.f} seguidores</div>
+            <div class="exp-fc-fol">${typeof s.f==='number'?s.f.toLocaleString():s.f} seg.</div>
             <div class="exp-fc-price">$${s.p}</div>
           </div>
         </div>
@@ -3031,20 +3148,22 @@ function renderExpSections(list){
   const countEl=document.getElementById('exp-count');
   if(countEl) countEl.textContent=list.length+' tiendas';
   if(allEl){
-    allEl.innerHTML=list.map(({s,i})=>{
-      const imgs=[expGetBestImg(i,0),expGetBestImg(i,1),expGetBestImg(i,2)].filter(Boolean);
+    allEl.innerHTML=list.map(item=>{
+      const {s}=item;
+      const img1=_expImg(item),img2=_expImg2(item);
+      const imgs=[img1,img2].filter(Boolean);
       const avHtml=s.logo?`<img src="${s.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:11px">`:`<span style="font-size:22px">${s.e}</span>`;
-      const thumbs=imgs.slice(0,3).map(u=>`<img class="exp-ar-thumb" src="${u}" loading="lazy" onerror="this.style.display='none'">`).join('');
-      return `<div class="exp-ar" onclick="openSeller(${i})">
+      const thumbs=imgs.map(u=>`<img class="exp-ar-thumb" src="${u}" loading="lazy" onerror="this.style.display='none'">`).join('');
+      return `<div class="exp-ar" onclick="_expOpenSeller(${JSON.stringify(item).replace(/"/g,'&quot;')})">
         <div class="exp-ar-av" style="${s.logo?'background:#000;':'background:var(--dk4);'}">${avHtml}</div>
         ${imgs.length>=2?`<div class="exp-ar-imgs">${thumbs}</div>`:''}
         <div class="exp-ar-info">
           <div class="exp-ar-name">${s.n}${s.verified?`<svg width="12" height="12" viewBox="0 0 24 24" fill="var(--y)" stroke="none"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`:''}</div>
-          <div class="exp-ar-sub">${s.cat} · ${s.f} seg.</div>
+          <div class="exp-ar-sub">${s.cat}${s.live?' · 🔴 EN VIVO':''} · ${typeof s.f==='number'?s.f.toLocaleString():s.f} seg.</div>
         </div>
         <div class="exp-ar-right">
           <div class="exp-ar-price">$${s.p}</div>
-          <div class="exp-ar-vw"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${s.v}</div>
+          <div class="exp-ar-vw"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${s.v||0}</div>
         </div>
       </div>`;
     }).join('');
@@ -3058,9 +3177,14 @@ function expFilterCat(el,cat){
   expSearch(document.getElementById('exp-search-inp')?.value||'');
 }
 function expSearch(q){
-  const ordered=SELLER_ORDER.map(i=>({s:SELLERS[i],i}));
-  let list=ordered;
-  if(q) list=list.filter(({s})=>s.n.toLowerCase().includes(q.toLowerCase())||s.cat.toLowerCase().includes(q.toLowerCase())||PRODS.some(p=>p.s===s&&p.n.toLowerCase().includes(q.toLowerCase())));
+  // Combine FS sellers + static sellers
+  const staticList=SELLER_ORDER.map(i=>({s:SELLERS[i],i,fs:false}));
+  const combined=[..._expFsSellers,...staticList];
+  let list=combined;
+  if(q){
+    const ql=q.toLowerCase();
+    list=list.filter(({s})=>s.n.toLowerCase().includes(ql)||s.cat.toLowerCase().includes(ql));
+  }
   if(expActiveCat&&expActiveCat!=='🔥 Todo'){
     const ck=expActiveCat.replace(/^\S+ /,'').toLowerCase();
     list=list.filter(({s})=>s.cat.toLowerCase().includes(ck));
@@ -3077,20 +3201,22 @@ function expSearch(q){
   if(countEl) countEl.textContent=list.length+' tiendas';
   const allEl=document.getElementById('exp-all-list');
   if(allEl){
-    allEl.innerHTML=list.map(({s,i})=>{
-      const imgs=[expGetBestImg(i,0),expGetBestImg(i,1),expGetBestImg(i,2)].filter(Boolean);
+    allEl.innerHTML=list.map(item=>{
+      const {s}=item;
+      const img1=_expImg(item),img2=_expImg2(item);
+      const imgs=[img1,img2].filter(Boolean);
       const avHtml=s.logo?`<img src="${s.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:11px">`:`<span style="font-size:22px">${s.e}</span>`;
-      const thumbs=imgs.slice(0,3).map(u=>`<img class="exp-ar-thumb" src="${u}" loading="lazy" onerror="this.style.display='none'">`).join('');
-      return `<div class="exp-ar" onclick="openSeller(${i})">
+      const thumbs=imgs.map(u=>`<img class="exp-ar-thumb" src="${u}" loading="lazy" onerror="this.style.display='none'">`).join('');
+      return `<div class="exp-ar" onclick="_expOpenSeller(${JSON.stringify(item).replace(/"/g,'&quot;')})">
         <div class="exp-ar-av" style="${s.logo?'background:#000;':'background:var(--dk4);'}">${avHtml}</div>
         ${imgs.length>=2?`<div class="exp-ar-imgs">${thumbs}</div>`:''}
         <div class="exp-ar-info">
           <div class="exp-ar-name">${s.n}${s.verified?`<svg width="12" height="12" viewBox="0 0 24 24" fill="var(--y)" stroke="none"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`:''}</div>
-          <div class="exp-ar-sub">${s.cat} · ${s.f} seg.</div>
+          <div class="exp-ar-sub">${s.cat}${s.live?' · 🔴 EN VIVO':''} · ${typeof s.f==='number'?s.f.toLocaleString():s.f} seg.</div>
         </div>
         <div class="exp-ar-right">
           <div class="exp-ar-price">$${s.p}</div>
-          <div class="exp-ar-vw"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${s.v}</div>
+          <div class="exp-ar-vw"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${s.v||0}</div>
         </div>
       </div>`;
     }).join('');
@@ -3118,7 +3244,9 @@ function go(id,push=true){
   const next=document.getElementById('s-'+id);
   if(next){next.classList.add('on');}
   if(push&&hist[hist.length-1]!==id)hist.push(id);
-  const hide=['stream','co','ok','onboard','register','seller','wallet','deposit','dash','notif','track','my-orders'].includes(id);
+  // Stop home poll when leaving home
+  if(id!=='home')clearInterval(_homePollIv);
+  const hide=['stream','co','ok','onboard','register','seller','wallet','deposit','dash','notif','track','my-orders','admin'].includes(id);
   document.getElementById('nav').className='nav'+(hide?' hide':'');
   ['home','exp','cart','prof'].forEach(n=>document.getElementById('ni-'+n)?.classList.toggle('on',n===id));
 }
@@ -3504,6 +3632,16 @@ async function placeOrder(){
       date:dateStr
     };
     DASH_ORDERS.unshift({...orderData, _id:orderId});
+    // Wallet debit tx per item
+    if(window.fbUser?.uid){
+      fsAdd('wallet_txs',{
+        uid:buyerId,type:'out',
+        description:'Compra: '+p.n,
+        amount:unitPrice*item.q,
+        balanceAfter:walletBalance,
+        createdAt:Date.now()
+      }).catch(()=>{});
+    }
     return fsSet('orders',orderId,orderData);
   });
   try{
@@ -3593,7 +3731,8 @@ async function _pollChat(){
 
 function startChat(idx){
   stopChat();
-  _chatChannel='ic_'+idx;
+  _chatChannel=window._chatChannel||(idx>=0?'ic_'+idx:'ic_0');
+  window._chatChannel=null; // consume it
   _chatLastTs=Date.now()-5000; // load last 5s of history
   // Seed visual con msgs simulados para dar vida inmediata
   const s=SELLERS[idx];
@@ -3742,17 +3881,69 @@ const WALLET_METHODS=[
   {i:'💵',n:'Efectivo USD',d:'En persona · Caracas'},
 ];
 let walletSelMethod=0;
-const WALLET_TXS=[
-  {type:'in',icon:'💰',name:'Recarga vía Zelle',date:'Hoy 3:24 PM',amt:'+100',cls:'in'},
-  {type:'lock',icon:'🔒',name:'Reservado — Subasta Nike',date:'Hoy 1:10 PM',amt:'-85',cls:'lock'},
-  {type:'in',icon:'💰',name:'Recarga vía Pago Móvil',date:'Ayer 7:00 PM',amt:'+50',cls:'in'},
-  {type:'out',icon:'✅',name:'Compra DualSense PS5',date:'Hace 3 días',amt:'-65',cls:'out'},
-  {type:'in',icon:'🔓',name:'Créditos liberados',date:'Hace 4 días',amt:'+30',cls:'in'},
-];
-function openWallet(){
+function _txDate(ts){
+  if(!ts)return'';
+  const d=new Date(ts);
+  const now=new Date();
+  const diff=now-d;
+  if(diff<60000)return'Ahora mismo';
+  if(diff<3600000)return'Hace '+Math.floor(diff/60000)+' min';
+  if(diff<86400000)return'Hoy '+d.toLocaleTimeString('es-VE',{hour:'2-digit',minute:'2-digit'});
+  if(diff<172800000)return'Ayer '+d.toLocaleTimeString('es-VE',{hour:'2-digit',minute:'2-digit'});
+  return d.toLocaleDateString('es-VE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+
+async function openWallet(){
   document.getElementById('wallet-methods').innerHTML=WALLET_METHODS.map((m,i)=>`<div class="wallet-method ${i===walletSelMethod?'sel':''}" onclick="walletSelPay(${i})"><div class="wm-icon">${m.i}</div><div class="wm-info"><div class="wm-name">${m.n}</div><div class="wm-detail">${m.d}</div></div><div class="wm-radio ${i===walletSelMethod?'on':''}"></div></div>`).join('');
-  document.getElementById('wallet-txs').innerHTML=WALLET_TXS.map(t=>`<div class="wallet-tx"><div class="wallet-tx-icon ${t.type}">${t.icon}</div><div class="wallet-tx-info"><div class="wallet-tx-name">${t.name}</div><div class="wallet-tx-date">${t.date}</div></div><div class="wallet-tx-amount ${t.cls}">${t.amt} cr</div></div>`).join('');
-  updateWalletDisplay();go('wallet');
+  updateWalletDisplay();
+  go('wallet');
+  // Skeleton while loading
+  const txEl=document.getElementById('wallet-txs');
+  txEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu);font-size:12px">⏳ Cargando movimientos...</div>';
+  const uid=window.fbUser?.uid;
+  if(!uid){txEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu)">Inicia sesión para ver tus movimientos</div>';return;}
+  try{
+    // Fetch from wallet_txs collection
+    const txs=await fsQuery('wallet_txs',[{field:'uid',value:uid}]);
+    // Also derive transactions from orders (purchases)
+    const orders=window._buyerOrders||await fsQuery('orders',[{field:'buyerId',value:uid}]);
+    // Build unified tx list
+    const allTxs=[
+      ...txs.map(t=>({
+        type:t.type||'in',
+        icon:{in:'💰',out:'✅',lock:'🔒',credit:'🎁'}[t.type]||'💰',
+        name:t.description||t.name||'Movimiento',
+        date:_txDate(t.createdAt||t.ts),
+        amt:(t.type==='in'||t.type==='credit'?'+':'-')+Math.abs(t.amount||0),
+        cls:t.type==='in'||t.type==='credit'?'in':t.type==='lock'?'lock':'out',
+        ts:t.createdAt||t.ts||0
+      })),
+      ...orders.map(o=>({
+        type:'out',icon:'✅',
+        name:'Compra: '+(o.prod||'Producto'),
+        date:_txDate(o.createdAt),
+        amt:'-'+(o.amt||0),
+        cls:'out',
+        ts:o.createdAt||0
+      }))
+    ].sort((a,b)=>(b.ts||0)-(a.ts||0));
+
+    if(!allTxs.length){
+      txEl.innerHTML='<div style="text-align:center;padding:40px 24px;color:var(--mu)"><div style="font-size:40px;margin-bottom:10px">📭</div><div style="font-size:13px;font-weight:800;color:var(--tx);margin-bottom:4px">Sin movimientos aún</div><div style="font-size:11px">Tus recargas y compras aparecerán aquí</div></div>';
+      return;
+    }
+    txEl.innerHTML=allTxs.map(t=>`
+      <div class="wallet-tx">
+        <div class="wallet-tx-icon ${t.type}">${t.icon}</div>
+        <div class="wallet-tx-info">
+          <div class="wallet-tx-name">${t.name}</div>
+          <div class="wallet-tx-date">${t.date}</div>
+        </div>
+        <div class="wallet-tx-amount ${t.cls}">${t.amt} IC</div>
+      </div>`).join('');
+  }catch(e){
+    txEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu)">Error al cargar movimientos</div>';
+  }
 }
 function updateWalletDisplay(){
   const b=document.getElementById('wallet-bal');const u=document.getElementById('wallet-bal-usd');
@@ -3803,28 +3994,27 @@ function depConfirm(){
     'Reserve':'⬡ Número Reserve: +58 412 000 0001',
     'Efectivo USD':'💵 Coordina entrega con el soporte de InstaCompras'
   };
-  const inst=instructions[method.n]||'';
-  toast(`${method.i} ${inst}`);
-  // Simulate credit after 2s
-  setTimeout(()=>{
-    walletBalance+=v;
-    updateWalletDisplay();
-    document.getElementById('dep-balance').textContent=walletBalance;
-    document.getElementById('dep-balance-usd').textContent=`≈ $${walletBalance.toFixed(2)} USD`;
-    document.getElementById('dep-bal-top').textContent=`${walletBalance} cr`;
-    const awd=document.getElementById('auc-wallet-display');if(awd)awd.textContent=walletBalance+' IC';
-    const wpb=document.getElementById('wallet-prof-badge');if(wpb)wpb.textContent=walletBalance+' IC';
-    const coWal=document.getElementById('co-wallet-balance');if(coWal)coWal.textContent=walletBalance+' IC';
-    // Persist to Firestore
-    if(window.fbUser){
-      window.fbUser.wallet=walletBalance;
-      fbCacheUser(window.fbUser);
-      if(window.fbUser.uid&&window.fbToken)
-        fsSet('users',window.fbUser.uid,{wallet:walletBalance}).catch(()=>{});
-    }
-    toast(`✅ +${v} créditos acreditados a tu wallet`);
-    setTimeout(()=>goBack(),1200);
-  },2000);
+  toast(`${method.i} Solicitud enviada — el equipo la revisará pronto`);
+  // Save deposit request for admin review
+  const uid=window.fbUser?.uid;
+  const ref=document.getElementById('dep-ref')?.value?.trim()||'';
+  const note=document.getElementById('dep-note')?.value?.trim()||'';
+  if(uid){
+    fsAdd('deposit_requests',{
+      userId:uid,
+      userName:window.fbUser?.name||window.fbUser?.username||'Usuario',
+      userEmail:window.fbUser?.email||'',
+      amount:v,
+      method:method.n,
+      reference:ref,
+      note,
+      status:'pending',
+      createdAt:Date.now()
+    }).then(()=>{
+      toast('📋 Solicitud registrada — te notificaremos cuando sea aprobada');
+    }).catch(()=>{});
+  }
+  setTimeout(()=>goBack(),1500);
 }
 // ═══ AUCTION ═══
 // ═══ SUBASTAS MULTI-USUARIO ═══
@@ -3952,6 +4142,16 @@ function aucTick(){
       updateCart();
       DASH_ORDERS.unshift({...orderData,buyer:buyerName,_id:orderId});
       fsSet('orders',orderId,orderData).catch(()=>{});
+      // Save wallet debit transaction
+      if(window.fbUser?.uid){
+        fsAdd('wallet_txs',{
+          uid:buyerId,type:'out',
+          description:'Subasta ganada: '+p.n,
+          amount:aucCurrentBid,
+          balanceAfter:walletBalance-aucCurrentBid,
+          createdAt:Date.now()
+        }).catch(()=>{});
+      }
       window._buyerOrders=null;
       pushNotif('🏆','auction',`¡Ganaste la subasta! ${p.n} por $${aucCurrentBid} — revisa tu carrito`,()=>nav('cart'),true);
       setTimeout(()=>showWinCelebration(p.n,aucCurrentBid),600);
@@ -4793,10 +4993,21 @@ function startBroadcast(){
   // Save stream to Firestore
   const uid=window.fbUser?.uid;
   if(uid){
+    const sellerName=window.fbUser?.name||window.fbUser?.displayName||window.fbUser?.username||'Vendedor';
+    const sellerEmoji=window.fbUser?.shop?'📡':'🛍️';
+    const cat=document.querySelector('#gl-cats .gl-chip.on')?.textContent?.replace(/^./,'').trim()||'General';
+    // Grab thumbnail from first selected product
+    const thumbProd=PRODS[bcSelectedProds[0]||0];
+    const thumb=thumbProd?.img||'';
+    const minPrice=bcSelectedProds.length?Math.min(...bcSelectedProds.map(i=>PRODS[i]?.p||0)):0;
     fsSet('streams',channelName,{
-      sellerId:uid, sellerName:window.fbUser?.name||window.fbUser?.username||'Vendedor',
-      shopName:window.fbUser?.shop||'', channelName, title,
-      isLive:true, viewerCount:1, startedAt:Date.now()
+      sellerId:uid,
+      sellerName, sellerEmoji,
+      shopName:window.fbUser?.shop||sellerName,
+      channelName, title, cat, thumb, minPrice,
+      isLive:true, viewerCount:1, startedAt:Date.now(),
+      sellerAvatar:window.fbUser?.avatar||'',
+      whatsapp:window.fbUser?.whatsapp||''
     });
     fsSet('stores',uid,{isLive:true,channelName});
   }
@@ -4873,6 +5084,7 @@ function endBroadcast(){
   const m=String(~~(bcSecs/60)).padStart(2,'0');
   const s=String(bcSecs%60).padStart(2,'0');
   toast(`✅ Stream terminado — Duración: ${m}:${s}`);
+  setTimeout(_refreshLiveStrip,1000); // refresh strip
   hist=['home'];go('home',false);
 }
 
@@ -5117,6 +5329,7 @@ async function loadProfData(){
   if(!u)return;
   // Following count
   const folEl=document.getElementById('st-fol');
+  _showAdminBtn();
   if(folEl) folEl.textContent=following.size;
   // Sync wallet balance from user profile
   if(u.wallet!==undefined) walletBalance=Number(u.wallet)||0;
@@ -5509,24 +5722,13 @@ function stopPdLiveSim(){
 buildCats();buildCoPays();updateCart();
 
 // ═══ HOME FEED DESDE FIRESTORE ═══
+let _homePollIv=null;
 async function loadHomeFeed(){
   buildLiveStrip();buildGrid();buildSellers();
-  const lives=await fsQuery('lives',[{field:'live',value:true}]);
-  if(lives.length>0){
-    const el=document.getElementById('live-strip');
-    if(el){el.innerHTML=lives.map((s,i)=>`
-      <div class="lcard" onclick="openStreamFS('${s._id}')">
-        <div class="lcard-img ${BG[i%4]}">
-          ${s.thumb?`<img src="${s.thumb}" onerror="this.style.display='none'" loading="lazy">`:''}
-          <div class="lcard-live"><div class="lbadge" style="font-size:8px">LIVE</div></div>
-          <div class="lcard-viewers">👁 ${s.viewers||0}</div>
-        </div>
-        <div class="lcard-info">
-          <div class="lcard-name">${s.name||'Vendedor'}</div>
-          <div class="lcard-price">desde $${s.minPrice||0}</div>
-        </div>
-      </div>`).join('');}
-  }
+  await _refreshLiveStrip();
+  // Poll every 30s to catch new/ended streams
+  clearInterval(_homePollIv);
+  _homePollIv=setInterval(_refreshLiveStrip, 30000);
   const prods=await fsQuery('products');
   if(prods.length>0){
     const grid=document.getElementById('pgrid');
@@ -5555,8 +5757,107 @@ async function loadHomeFeed(){
     if(prods.length>8)requestAnimationFrame(()=>grid.innerHTML+=render(prods.slice(8),8));
   }
 }
-function openStreamFS(id){openStream(0);}
+// Opens a real stream from Firestore by channelName/docId
+async function openStreamFS(channelName){
+  if(!channelName){openStream(0);return;}
+  try{
+    const s=await fsGet('streams',channelName);
+    if(!s||!s.isLive){toast('⚠️ Este live ya terminó');return;}
+    // Build a fake seller object from Firestore data to populate stream UI
+    const sellerObj={
+      n:s.sellerName||s.shopName||'Vendedor',
+      e:s.sellerEmoji||'📡',
+      v:s.viewerCount||1,
+      f:s.followers||'0',
+      p:s.minPrice||0,
+      logo:s.sellerAvatar||'',
+      cat:s.cat||'General'
+    };
+    // Populate stream screen manually
+    curStream=-1; // -1 = real FS stream
+    window._fsStreamData=s;
+    const svImg=document.getElementById('sv-img');
+    if(svImg)svImg.src=s.thumb||'';
+    document.getElementById('sv-viewers').textContent=s.viewerCount||1;
+    document.getElementById('sv-hot').textContent=Math.max(1,~~((s.viewerCount||1)*.03));
+    const _svAv=document.getElementById('sv-av');
+    const _svAvS=document.getElementById('sv-av-small');
+    [_svAv,_svAvS].forEach(el=>{
+      if(!el)return;
+      if(s.sellerAvatar){el.innerHTML=`<img src="${s.sellerAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;el.style.background='#000';el.style.overflow='hidden';}
+      else{el.textContent=sellerObj.e;el.style.background='';el.style.overflow='';}
+    });
+    document.getElementById('sv-name').textContent=sellerObj.n;
+    document.getElementById('sv-name-mini').textContent=sellerObj.n;
+    document.getElementById('sv-foll').textContent=`${sellerObj.f} seguidores`;
+    document.getElementById('sv-fol').textContent='Seguir';
+    document.getElementById('sv-fol').className='fol';
+    // Featured product — first product or placeholder
+    document.getElementById('spname').textContent=s.title||sellerObj.n;
+    document.getElementById('spprice').textContent=`$${s.minPrice||0}`;
+    document.getElementById('spold').textContent='';
+    document.getElementById('sp-disc').textContent='';
+    document.getElementById('chat-msgs').innerHTML='';
+    startChat(-1); // use channelName for real chat
+    window._chatChannel=channelName;
+    startTimer();
+    svTab('chat');
+    go('stream');
+    // Join Agora as audience
+    joinAsAudience(channelName);
+    // Poll viewer count
+    clearInterval(window._fsViewerIv);
+    window._fsViewerIv=setInterval(async()=>{
+      const cur=document.getElementById('s-stream');
+      if(!cur?.classList.contains('on')){clearInterval(window._fsViewerIv);return;}
+      const fresh=await fsGet('streams',channelName);
+      if(fresh){
+        const el=document.getElementById('sv-viewers');
+        if(el)el.textContent=fresh.viewerCount||1;
+      }
+    },8000);
+  }catch(e){
+    console.warn('openStreamFS:',e);
+    openStream(0); // fallback
+  }
+}
 function openProdFS(id){openProd(0);}
+
+// Fetch live streams from Firestore and update the strip
+async function _refreshLiveStrip(){
+  try{
+    const streams=await fsQuery('streams',[{field:'isLive',value:true}]);
+    const el=document.getElementById('live-strip');
+    if(!el)return;
+    if(!streams.length){
+      // No live streams — keep static strip
+      buildLiveStrip();
+      return;
+    }
+    // Sort by viewers desc
+    streams.sort((a,b)=>(b.viewerCount||0)-(a.viewerCount||0));
+    el.innerHTML=streams.map((s,i)=>{
+      const name=s.sellerName||s.shopName||'Vendedor';
+      const viewers=s.viewerCount||1;
+      const thumb=s.thumb||'';
+      const emoji=s.sellerEmoji||'📡';
+      const ch=s.channelName||s._id;
+      return `
+      <div class="lcard" onclick="openStreamFS('${ch}')">
+        <div class="lcard-img">
+          ${thumb?`<img src="${thumb}" onerror="this.style.display='none'" loading="lazy">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;background:var(--dk4)">${emoji}</div>`}
+          <div class="lcard-live"><div class="lbadge" style="font-size:8px;padding:2px 7px">LIVE</div></div>
+          <div class="lcard-viewers">👁 ${viewers}</div>
+          <div class="lcard-av">${s.sellerAvatar?`<img src="${s.sellerAvatar}" style="width:100%;height:100%;object-fit:cover">`:`<span>${emoji}</span>`}</div>
+          <div class="lcard-name">${name}</div>
+          <div class="lcard-price">${s.minPrice?'$'+s.minPrice:s.title||''}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    buildLiveStrip(); // fallback to static
+  }
+}
 loadHomeFeed();
 // Show initial unread count
 (()=>{const count=notifData.filter(n=>n.unread).length;const b=document.getElementById('notif-badge');if(b&&count){b.style.display='flex';b.textContent=count;}})();
@@ -5574,6 +5875,155 @@ loadHomeFeed();
     loadHomeFeed();go('home',false);
   }
 })();
+
+
+// ═══ ADMIN PANEL ═══
+const ADMIN_UIDS=['i6el8ICacKYNALR7Ibc9nWKkHZV2']; // reemplaza con tu UID de Firebase
+
+function _isAdmin(){return ADMIN_UIDS.includes(window.fbUser?.uid);}
+
+function _showAdminBtn(){
+  const btn=document.getElementById('admin-menu-btn');
+  if(btn) btn.style.display=_isAdmin()?'flex':'none';
+}
+
+let _adminCurTab='dep';
+function adminTab(tab){
+  _adminCurTab=tab;
+  document.getElementById('admin-panel-dep').style.display=tab==='dep'?'block':'none';
+  document.getElementById('admin-panel-users').style.display=tab==='users'?'block':'none';
+  const depT=document.getElementById('admin-tab-dep');
+  const usrT=document.getElementById('admin-tab-users');
+  depT.style.background=tab==='dep'?'var(--y)':'transparent';
+  depT.style.color=tab==='dep'?'var(--dk)':'var(--mu)';
+  usrT.style.background=tab==='users'?'var(--y)':'transparent';
+  usrT.style.color=tab==='users'?'var(--dk)':'var(--mu)';
+  if(tab==='users') _adminLoadUsers();
+}
+
+async function openAdmin(){
+  if(!_isAdmin()){toast('🚫 Sin acceso');return;}
+  go('admin');
+  await _adminLoadDeps();
+}
+
+async function _adminLoadDeps(){
+  const listEl=document.getElementById('admin-dep-list');
+  listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu);font-size:12px">⏳ Cargando depósitos...</div>';
+  try{
+    const deps=await fsQuery('deposit_requests');
+    deps.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    const pending=deps.filter(d=>d.status==='pending');
+    const approved=deps.filter(d=>d.status==='approved');
+    // Stats
+    document.getElementById('admin-stat-pending').textContent=pending.length;
+    document.getElementById('admin-stat-approved').textContent=approved.length;
+    document.getElementById('admin-stat-total').textContent='$'+deps.reduce((s,d)=>s+(d.amount||0),0);
+    // Badge
+    const badge=document.getElementById('admin-pending-badge');
+    const menuBadge=document.getElementById('admin-menu-badge');
+    if(pending.length>0){
+      badge.textContent=pending.length+' pendiente'+(pending.length>1?'s':'');badge.style.display='inline-flex';
+      if(menuBadge){menuBadge.textContent=pending.length;menuBadge.style.display='inline-flex';}
+    } else {
+      badge.style.display='none';
+      if(menuBadge)menuBadge.style.display='none';
+    }
+    if(!deps.length){
+      listEl.innerHTML='<div style="text-align:center;padding:48px 24px;color:var(--mu)"><div style="font-size:40px;margin-bottom:10px">📭</div><div style="font-size:13px;font-weight:800;color:var(--tx);margin-bottom:4px">Sin solicitudes aún</div><div style="font-size:11px">Aparecerán cuando un usuario solicite recarga</div></div>';
+      return;
+    }
+    const statusColor={pending:'rgba(255,208,0,.15)',approved:'rgba(76,175,80,.12)',rejected:'rgba(255,59,59,.1)'};
+    const statusTxt={pending:'var(--y)',approved:'#4CAF50',rejected:'var(--rd)'};
+    const statusLabel={pending:'⏳ Pendiente',approved:'✅ Aprobado',rejected:'❌ Rechazado'};
+    const methodIcons={'Pago Móvil':'📱','Zelle':'💜','Binance Pay':'₿','Reserve':'⬡','Efectivo USD':'💵'};
+    listEl.innerHTML=deps.map(d=>`
+      <div style="background:var(--dk3);border-radius:16px;border:1px solid rgba(255,255,255,.06);margin-bottom:12px;overflow:hidden">
+        <div style="padding:14px 16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="font-size:22px">${methodIcons[d.method]||'💰'}</div>
+              <div>
+                <div style="font-size:13px;font-weight:900;color:#fff">${d.method||'Depósito'}</div>
+                <div style="font-size:10px;color:var(--mu)">${d.userName||d.userEmail||'Usuario'} · ${d._id?.slice(-6)||''}</div>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--y);line-height:1">$${d.amount||0}</div>
+              <div style="font-size:9px;color:var(--mu)">${d.amount||0} IC</div>
+            </div>
+          </div>
+          ${d.reference?`<div style="background:var(--dk4);border-radius:9px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:rgba(255,255,255,.6)">Ref: <span style="color:#fff;font-weight:800">${d.reference}</span></div>`:''}
+          ${d.note?`<div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:10px;font-style:italic">"${d.note}"</div>`:''}
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:10px;color:var(--mu)">${d.createdAt?new Date(d.createdAt).toLocaleDateString('es-VE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):''}</div>
+            <span style="font-size:10px;font-weight:900;padding:3px 10px;border-radius:20px;background:${statusColor[d.status]||statusColor.pending};color:${statusTxt[d.status]||statusTxt.pending}">${statusLabel[d.status]||statusLabel.pending}</span>
+          </div>
+        </div>
+        ${d.status==='pending'?`
+        <div style="display:flex;gap:0;border-top:1px solid rgba(255,255,255,.06)">
+          <button onclick="adminApprove('${d._id}','${d.userId}',${d.amount||0})" style="flex:1;padding:13px;background:rgba(76,175,80,.12);border:none;border-right:1px solid rgba(255,255,255,.06);color:#4CAF50;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer">✅ Aprobar y acreditar</button>
+          <button onclick="adminReject('${d._id}')" style="flex:1;padding:13px;background:rgba(255,59,59,.08);border:none;color:var(--rd);font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer">❌ Rechazar</button>
+        </div>`:''}
+      </div>`).join('');
+  }catch(e){
+    listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu)">Error al cargar</div>';
+    console.warn('admin deps:',e);
+  }
+}
+
+async function adminApprove(depId, userId, amount){
+  if(!userId||!amount){toast('⚠️ Datos incompletos');return;}
+  try{
+    // Get current wallet
+    const user=await fsGet('users',userId);
+    const currentWallet=Number(user?.wallet)||0;
+    const newBalance=currentWallet+amount;
+    // Update user wallet
+    await fsSet('users',userId,{wallet:newBalance});
+    // Mark deposit as approved
+    await fsSet('deposit_requests',depId,{status:'approved',approvedAt:Date.now(),approvedBy:window.fbUser?.uid});
+    // Add wallet_txs record for user
+    await fsAdd('wallet_txs',{
+      uid:userId,type:'in',
+      description:'Recarga aprobada por admin',
+      amount,balanceAfter:newBalance,
+      createdAt:Date.now()
+    });
+    toast('✅ +'+amount+' IC acreditados al usuario');
+    _adminLoadDeps();
+  }catch(e){toast('❌ Error: '+e.message);console.warn(e);}
+}
+
+async function adminReject(depId){
+  try{
+    await fsSet('deposit_requests',depId,{status:'rejected',rejectedAt:Date.now()});
+    toast('Solicitud rechazada');
+    _adminLoadDeps();
+  }catch(e){toast('❌ Error');}
+}
+
+async function _adminLoadUsers(){
+  const listEl=document.getElementById('admin-users-list');
+  listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu);font-size:12px">⏳ Cargando...</div>';
+  try{
+    const users=await fsQuery('users');
+    users.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    listEl.innerHTML=users.map(u=>`
+      <div style="background:var(--dk3);border-radius:14px;border:1px solid rgba(255,255,255,.06);padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px">
+        <div style="width:42px;height:42px;border-radius:50%;background:var(--y);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--dk);flex-shrink:0">${(u.name||u.email||'?')[0].toUpperCase()}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.name||'Sin nombre'}</div>
+          <div style="font-size:10px;color:var(--mu)">${u.email||''} · @${u.username||'?'}</div>
+          <div style="font-size:10px;color:var(--mu)">${u.type==='seller'?'📡 Seller':'🛍️ Comprador'} · ${u.city||'Sin ciudad'}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--y)">${u.wallet||0} IC</div>
+          <div style="font-size:9px;color:var(--mu)">wallet</div>
+        </div>
+      </div>`).join('');
+  }catch(e){listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu)">Error al cargar</div>';}
+}
 
 function fbLogout(){
   fbClearSession();
