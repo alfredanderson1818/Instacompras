@@ -198,11 +198,22 @@ async function fbRestoreSession(){
     // Use cached user data for instant load
     const cached=fbGetCachedUser();
     if(cached&&cached.uid===uid){
-      window.fbUser={...cached};
+      // Load from cache but strip wallet — always fetch fresh from Firestore
+      window.fbUser={...cached, wallet:undefined};
       window.fbToken=token;
-      // Refresh silently in background
+      // Refresh silently in background (updates wallet + all data)
       fbGetUser(uid,token).then(d=>{
-        if(d){window.fbUser={uid,...d};fbCacheUser({uid,...d});}
+        if(d){
+          window.fbUser={uid,...d};
+          fbCacheUser({uid,...d});
+          // Sync wallet display after fresh data arrives
+          if(d.wallet!==undefined){
+            walletBalance=Number(d.wallet)||0;
+            updateWalletDisplay();
+            const wpb=document.getElementById('wallet-prof-badge');
+            if(wpb)wpb.textContent=walletBalance+' IC';
+          }
+        }
       }).catch(()=>{});
       return true;
     }
@@ -4900,7 +4911,10 @@ function closeWinOverlay(){
   const ov=document.getElementById('win-overlay');
   const card=document.getElementById('win-card');
   card.style.transform='translate(-50%,-50%) scale(0)';
-  setTimeout(()=>{ov.style.display='none';},350);
+  setTimeout(()=>{
+    ov.style.display='none';
+    ov.style.pointerEvents='none';
+  },350);
   openTrack(0);
 }
 
@@ -4915,7 +4929,7 @@ function _showAucResult(won, winner, finalBid){
       <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;margin-bottom:4px">Subasta terminada</div>
       <div style="font-size:13px;color:rgba(255,255,255,.6);margin-bottom:16px">Ganó <strong style="color:var(--y)">@${winner}</strong> con <strong style="color:var(--y)">$${finalBid}</strong></div>
       <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:20px">¡Sigue en el live, hay más subastas! 🔥</div>
-      <button onclick="document.getElementById('win-overlay').style.display='none';document.getElementById('win-overlay').style.pointerEvents='none'" style="width:100%;padding:13px;background:var(--dk3);border:1.5px solid rgba(255,255,255,.15);border-radius:12px;color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;cursor:pointer;pointer-events:all">Cerrar</button>`;
+      <button onclick="const o=document.getElementById('win-overlay');o.style.display='none';o.style.pointerEvents='none'" style="width:100%;padding:13px;background:var(--dk3);border:1.5px solid rgba(255,255,255,.15);border-radius:12px;color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;cursor:pointer;pointer-events:all">Cerrar</button>`;
   }
   ov.style.display='block';
   ov.style.pointerEvents='all';
@@ -4977,7 +4991,7 @@ function showWinCelebration(itemName,price){
     if(alive)requestAnimationFrame(draw);else ctx.clearRect(0,0,W,H);
   }
   requestAnimationFrame(draw);
-  setTimeout(()=>{if(ov.style.display!=='none')closeWinOverlay();},6000);
+  setTimeout(()=>{if(ov.style.display!=='none'){ov.style.display='none';ov.style.pointerEvents='none';}},6000);
 }
 
 // ═══ UTILS ═══
@@ -5101,6 +5115,9 @@ function showNotifBanner(icon, text, action){
 async function loadProfData(){
   const u=window.fbUser;
   if(!u)return;
+  // Following count
+  const folEl=document.getElementById('st-fol');
+  if(folEl) folEl.textContent=following.size;
   // Sync wallet balance from user profile
   if(u.wallet!==undefined) walletBalance=Number(u.wallet)||0;
   else if(u.credits!==undefined) walletBalance=Number(u.credits)||0;
@@ -5596,22 +5613,25 @@ function fbLogout(){
 <script>
 // ── Service Worker ────────────────────────────────────────────────────────────
 if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('/Instacompras/sw.js')
-      .then(reg=>{
-        console.log('SW registrado:', reg.scope);
-        // Check for updates
-        reg.addEventListener('updatefound',()=>{
-          const newSW=reg.installing;
-          newSW.addEventListener('statechange',()=>{
-            if(newSW.state==='installed'&&navigator.serviceWorker.controller){
-              toast('🔄 App actualizada — recarga para ver cambios');
-            }
+  // Solo registrar en GitHub Pages, no en previews/local
+  const _host=location.hostname;
+  const _isGH=_host.endsWith('github.io')||_host.endsWith('github.com');
+  if(_isGH){
+    window.addEventListener('load', ()=>{
+      navigator.serviceWorker.register('/Instacompras/sw.js')
+        .then(reg=>{
+          reg.addEventListener('updatefound',()=>{
+            const newSW=reg.installing;
+            newSW.addEventListener('statechange',()=>{
+              if(newSW.state==='installed'&&navigator.serviceWorker.controller){
+                toast('🔄 App actualizada — recarga para ver cambios');
+              }
+            });
           });
-        });
-      })
-      .catch(e=>console.warn('SW error:',e));
-  });
+        })
+        .catch(()=>{});
+    });
+  }
 }
 
 // ── Install Prompt (A2HS) ─────────────────────────────────────────────────────
