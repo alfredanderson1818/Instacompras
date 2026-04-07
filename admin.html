@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InstaCompras — Panel Admin</title>
+<link rel="icon" href="https://em-content.zobj.net/source/apple/391/shopping-bags_1f6cd-fe0f.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --y:#FFD000;--y2:#FFE100;--dk:#0A0A0F;--dk2:#111118;--dk3:#1A1A25;--dk4:#22222F;
+  --rd:#FF3B3B;--gn:#4CAF50;--bl:#2196F3;--or:#FF9800;--pu:#9C27B0;
+  --tx:#F0F0F0;--mu:#777;--r:12px;
+  --sidebar:240px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:var(--dk);color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px}
+
+/* ═══ LOGIN ═══ */
+#login-screen{position:fixed;inset:0;background:var(--dk);display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column;gap:24px}
+.login-box{background:var(--dk2);border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:40px;width:380px;max-width:90vw;text-align:center}
+.login-logo{margin-bottom:6px}
+.login-sub{font-size:12px;color:var(--mu);margin-bottom:28px;font-weight:500}
+.login-input{width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:13px 16px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;margin-bottom:12px;transition:border-color .2s}
+.login-input:focus{border-color:rgba(255,208,0,.4)}
+.login-btn{width:100%;background:var(--y);color:var(--dk);border:none;border-radius:10px;padding:13px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;margin-top:4px}
+.login-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.login-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.login-err{font-size:12px;color:var(--rd);margin-top:10px;min-height:18px}
+
+/* ═══ LAYOUT ═══ */
+#app{display:none;height:100%;width:100%}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar);background:var(--dk2);border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;z-index:100;transition:transform .3s ease}
+.sb-logo{padding:24px 20px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.04)}
+.sb-logo-dot{width:4px;height:32px;background:var(--y);border-radius:2px;flex-shrink:0}
+.sb-nav{flex:1;padding:16px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.sb-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--mu);transition:all .15s;position:relative}
+.sb-item:hover{background:rgba(255,255,255,.04);color:var(--tx)}
+.sb-item.on{background:rgba(255,208,0,.08);color:var(--y)}
+.sb-item .ico{width:20px;text-align:center;font-size:16px;flex-shrink:0}
+.sb-badge{position:absolute;right:10px;background:var(--rd);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;min-width:20px;text-align:center}
+.sb-foot{padding:16px 20px;border-top:1px solid rgba(255,255,255,.04);font-size:11px;color:var(--mu)}
+.sb-foot-user{font-weight:700;color:var(--tx);margin-bottom:2px}
+
+.main{margin-left:var(--sidebar);height:100%;overflow-y:auto;padding:0}
+.topbar{padding:20px 28px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:rgba(10,10,15,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:50;border-bottom:1px solid rgba(255,255,255,.04)}
+.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:26px;font-weight:400;letter-spacing:.5px}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-btn{background:var(--dk3);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:8px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s}
+.topbar-btn:hover{border-color:rgba(255,208,0,.3);color:var(--y)}
+.content{padding:0 28px 40px}
+
+/* ═══ CARDS ═══ */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.stat-card{background:var(--dk2);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:0 0 0 80px;opacity:.06}
+.stat-card.gold::after{background:var(--y)}.stat-card.green::after{background:var(--gn)}.stat-card.blue::after{background:var(--bl)}.stat-card.red::after{background:var(--rd)}.stat-card.purple::after{background:var(--pu)}
+.stat-label{font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px}
+.stat-value{font-family:'Bebas Neue',sans-serif;font-size:34px;font-weight:400;line-height:1;margin-bottom:4px;letter-spacing:.5px}
+.stat-sub{font-size:11px;color:var(--mu)}
+.stat-card.gold .stat-value{color:var(--y)}
+.stat-card.green .stat-value{color:var(--gn)}
+.stat-card.blue .stat-value{color:var(--bl)}
+.stat-card.red .stat-value{color:var(--rd)}
+.stat-card.purple .stat-value{color:var(--pu)}
+
+/* ═══ SECTIONS ═══ */
+.section{display:none}
+.section.on{display:block}
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-top:20px}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:20px;font-weight:400;letter-spacing:.5px}
+.section-actions{display:flex;gap:8px}
+
+/* ═══ TABLE ═══ */
+.tbl-wrap{background:var(--dk2);border:1px solid rgba(255,255,255,.06);border-radius:14px;overflow:hidden;margin-bottom:20px}
+.tbl-toolbar{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.04)}
+.tbl-search{background:var(--dk3);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:8px 12px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:13px;outline:none;width:260px;transition:border-color .15s}
+.tbl-search:focus{border-color:rgba(255,208,0,.3)}
+.tbl-filter{background:var(--dk3);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:8px 12px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:12px;cursor:pointer;outline:none}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:11px 16px;font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap}
+td{padding:12px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.015)}
+.tbl-empty{padding:40px;text-align:center;color:var(--mu);font-size:13px}
+.tbl-scroll{max-height:65vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
+.tbl-scroll::-webkit-scrollbar{width:5px}.tbl-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+
+/* ═══ BADGES ═══ */
+.badge{display:inline-block;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.3px}
+.badge-pending{background:rgba(255,152,0,.12);color:var(--or)}
+.badge-approved,.badge-delivered{background:rgba(76,175,80,.12);color:var(--gn)}
+.badge-rejected{background:rgba(255,59,59,.12);color:var(--rd)}
+.badge-buyer{background:rgba(33,150,243,.1);color:var(--bl)}
+.badge-seller{background:rgba(255,208,0,.1);color:var(--y)}
+.badge-processing{background:rgba(156,39,176,.12);color:var(--pu)}
+.badge-transit{background:rgba(33,150,243,.12);color:var(--bl)}
+.badge-live{background:rgba(255,59,59,.12);color:var(--rd)}
+
+/* ═══ ACTION BUTTONS ═══ */
+.act{padding:5px 10px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'Nunito',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.act:hover{filter:brightness(1.2);transform:translateY(-1px)}
+.act-approve{background:rgba(76,175,80,.15);color:var(--gn)}
+.act-reject{background:rgba(255,59,59,.12);color:var(--rd)}
+.act-edit{background:rgba(33,150,243,.12);color:var(--bl)}
+.act-delete{background:rgba(255,59,59,.08);color:var(--rd)}
+.act-primary{background:var(--y);color:var(--dk);font-weight:700;padding:8px 16px;border-radius:9px;font-size:13px}
+.act-primary:hover{box-shadow:0 4px 16px rgba(255,208,0,.3)}
+
+/* ═══ CHART ═══ */
+.chart-card{background:var(--dk2);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;margin-bottom:20px}
+.chart-title{font-family:'Bebas Neue',sans-serif;font-size:17px;font-weight:400;letter-spacing:.5px;margin-bottom:14px}
+.chart-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.chart-bar-label{width:60px;font-size:11px;color:var(--mu);text-align:right;font-weight:600;flex-shrink:0}
+.chart-bar-track{flex:1;height:22px;background:var(--dk3);border-radius:6px;overflow:hidden;position:relative}
+.chart-bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--y),var(--y2));transition:width .8s cubic-bezier(.25,1,.5,1);position:relative}
+.chart-bar-val{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;color:var(--dk)}
+
+/* ═══ MODAL ═══ */
+.modal-ovl{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-ovl.on{display:flex}
+.modal-box{background:var(--dk2);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:28px;width:440px;max-width:90vw;max-height:85vh;overflow-y:auto}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;font-weight:400;letter-spacing:.5px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:var(--dk3);border:1px solid rgba(255,255,255,.08);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--mu);font-size:14px}
+.modal-close:hover{color:var(--tx)}
+.modal-field{margin-bottom:14px}
+.modal-label{font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.modal-input{width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:11px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;transition:border-color .15s}
+.modal-input:focus{border-color:rgba(255,208,0,.4)}
+.modal-select{width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:11px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;cursor:pointer}
+.modal-row{display:flex;gap:10px}
+.modal-row>*{flex:1}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+
+/* ═══ PUSH COMPOSE ═══ */
+.push-preview{background:var(--dk3);border-radius:14px;padding:16px;margin-top:14px;border:1px solid rgba(255,255,255,.06)}
+.push-preview-title{font-size:11px;font-weight:700;color:var(--mu);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.push-preview-body{background:var(--dk2);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px}
+.push-preview-icon{width:36px;height:36px;border-radius:8px;background:var(--y);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.push-preview-text{flex:1}
+.push-preview-text strong{display:block;font-size:13px;margin-bottom:2px}
+.push-preview-text span{font-size:12px;color:var(--mu)}
+
+/* ═══ TOAST ═══ */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--y);color:var(--dk);padding:12px 20px;border-radius:10px;font-weight:700;font-size:13px;z-index:9999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}
+.toast.on{opacity:1;transform:none}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:none}
+  .main{margin-left:0}
+  .topbar{padding:16px 16px 12px}
+  .content{padding:0 16px 30px}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .tbl-search{width:100%}
+  .tbl-toolbar{flex-wrap:wrap}
+  .modal-box{padding:20px}
+}
+
+/* ═══ LOADING ═══ */
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--mu);font-size:13px;gap:10px}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,208,0,.2);border-top-color:var(--y);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse-live{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ═══ USER AVATAR ═══ */
+.av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+.av-buyer{background:rgba(33,150,243,.15);color:var(--bl)}
+.av-seller{background:rgba(255,208,0,.15);color:var(--y)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div style="display:flex;align-items:center;gap:10px;justify-content:center">
+        <div style="width:4px;height:36px;background:var(--y);border-radius:2px"></div>
+        <div style="text-align:left">
+          <div style="font-family:system-ui,sans-serif;font-size:28px;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1">InstaCompras</div>
+          <div style="display:flex;align-items:center;gap:5px;margin-top:3px">
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--rd);animation:pulse-live 2s infinite"></div>
+            <div style="font-size:9px;font-weight:800;color:var(--rd);letter-spacing:3px">EN VIVO</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="login-sub">Panel de Administración</div>
+    <input class="login-input" id="l-email" type="email" placeholder="Email de administrador">
+    <input class="login-input" id="l-pass" type="password" placeholder="Contraseña" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" id="l-btn" onclick="doLogin()">Iniciar Sesión</button>
+    <div class="login-err" id="l-err"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-dot"></div>
+    <div>
+      <div style="font-family:system-ui,sans-serif;font-size:16px;font-weight:900;color:#fff;letter-spacing:-.3px;line-height:1">InstaCompras</div>
+      <div style="display:flex;align-items:center;gap:4px;margin-top:3px">
+        <div style="width:5px;height:5px;border-radius:50%;background:var(--rd);animation:pulse-live 2s infinite"></div>
+        <div style="font-size:8px;font-weight:800;color:var(--rd);letter-spacing:2px">EN VIVO</div>
+        <div style="font-size:8px;font-weight:800;color:var(--y);letter-spacing:1px;margin-left:4px;background:rgba(255,208,0,.1);border:1px solid rgba(255,208,0,.25);border-radius:3px;padding:1px 5px">ADMIN</div>
+      </div>
+    </div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-item on" onclick="goSection('overview')"><span class="ico">📊</span>Overview</div>
+    <div class="sb-item" onclick="goSection('users')"><span class="ico">👥</span>Usuarios<span class="sb-badge" id="badge-users" style="display:none"></span></div>
+    <div class="sb-item" onclick="goSection('products')"><span class="ico">📦</span>Productos</div>
+    <div class="sb-item" onclick="goSection('orders')"><span class="ico">🛒</span>Órdenes<span class="sb-badge" id="badge-orders" style="display:none"></span></div>
+    <div class="sb-item" onclick="goSection('deposits')"><span class="ico">💰</span>Depósitos<span class="sb-badge" id="badge-deposits" style="display:none"></span></div>
+    <div class="sb-item" onclick="goSection('sellers')"><span class="ico">🏪</span>Sellers</div>
+    <div class="sb-item" onclick="goSection('push')"><span class="ico">🔔</span>Push Notifications</div>
+    <div class="sb-item" onclick="goSection('streams')"><span class="ico">📡</span>Streams</div>
+  </div>
+  <div class="sb-foot">
+    <div class="sb-foot-user" id="sb-user">Admin</div>
+    <div>v1.0 · Firebase REST</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="cursor:pointer;font-size:20px;display:none" class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</div>
+      <div class="topbar-title" id="topbar-title">Overview</div>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-btn" onclick="refreshAll()">🔄 Refrescar</button>
+      <button class="topbar-btn" onclick="doLogout()" style="color:var(--rd)">↗ Salir</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══ OVERVIEW ═══ -->
+    <div class="section on" id="sec-overview">
+      <div class="stats-grid" id="overview-stats"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="chart-card">
+          <div class="chart-title">💰 Revenue Semanal</div>
+          <div id="chart-revenue"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">👥 Usuarios Nuevos (7 días)</div>
+          <div id="chart-users"></div>
+        </div>
+      </div>
+      <div class="section-hdr"><div class="section-title">Últimas Órdenes</div></div>
+      <div class="tbl-wrap"><div class="tbl-scroll" id="overview-orders"></div></div>
+      <div class="section-hdr"><div class="section-title">Depósitos Pendientes</div></div>
+      <div class="tbl-wrap"><div class="tbl-scroll" id="overview-deposits"></div></div>
+    </div>
+
+    <!-- ═══ USERS ═══ -->
+    <div class="section" id="sec-users">
+      <div class="tbl-wrap">
+        <div class="tbl-toolbar">
+          <input class="tbl-search" placeholder="🔍 Buscar usuario..." oninput="filterUsers(this.value)">
+          <select class="tbl-filter" onchange="filterUserType(this.value)">
+            <option value="">Todos</option>
+            <option value="buyer">Compradores</option>
+            <option value="seller">Vendedores</option>
+          </select>
+        </div>
+        <div class="tbl-scroll" id="users-table"></div>
+      </div>
+    </div>
+
+    <!-- ═══ PRODUCTS ═══ -->
+    <div class="section" id="sec-products">
+      <div class="section-hdr">
+        <div class="section-title">Todos los Productos</div>
+        <button class="act act-primary" onclick="openProductModal()">+ Nuevo Producto</button>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-toolbar">
+          <input class="tbl-search" placeholder="🔍 Buscar producto..." oninput="filterProducts(this.value)">
+        </div>
+        <div class="tbl-scroll" id="products-table"></div>
+      </div>
+    </div>
+
+    <!-- ═══ ORDERS ═══ -->
+    <div class="section" id="sec-orders">
+      <div class="tbl-wrap">
+        <div class="tbl-toolbar">
+          <input class="tbl-search" placeholder="🔍 Buscar orden..." oninput="filterOrders(this.value)">
+          <select class="tbl-filter" onchange="filterOrderStatus(this.value)">
+            <option value="">Todos</option>
+            <option value="pending">Pendiente</option>
+            <option value="processing">Procesando</option>
+            <option value="transit">En tránsito</option>
+            <option value="delivered">Entregado</option>
+          </select>
+        </div>
+        <div class="tbl-scroll" id="orders-table"></div>
+      </div>
+    </div>
+
+    <!-- ═══ DEPOSITS ═══ -->
+    <div class="section" id="sec-deposits">
+      <div class="tbl-wrap">
+        <div class="tbl-toolbar">
+          <input class="tbl-search" placeholder="🔍 Buscar depósito..." oninput="filterDeposits(this.value)">
+          <select class="tbl-filter" onchange="filterDepositStatus(this.value)">
+            <option value="">Todos</option>
+            <option value="pending">Pendiente</option>
+            <option value="approved">Aprobado</option>
+            <option value="rejected">Rechazado</option>
+          </select>
+        </div>
+        <div class="tbl-scroll" id="deposits-table"></div>
+      </div>
+    </div>
+
+    <!-- ═══ SELLERS ═══ -->
+    <div class="section" id="sec-sellers">
+      <div class="tbl-wrap">
+        <div class="tbl-toolbar">
+          <input class="tbl-search" placeholder="🔍 Buscar seller..." oninput="filterSellers(this.value)">
+        </div>
+        <div class="tbl-scroll" id="sellers-table"></div>
+      </div>
+    </div>
+
+    <!-- ═══ PUSH ═══ -->
+    <div class="section" id="sec-push">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <div class="section-hdr"><div class="section-title">Enviar Notificación</div></div>
+          <div class="modal-field">
+            <div class="modal-label">Título</div>
+            <input class="modal-input" id="push-title" placeholder="Ej: ¡Oferta Flash!">
+          </div>
+          <div class="modal-field">
+            <div class="modal-label">Mensaje</div>
+            <input class="modal-input" id="push-body" placeholder="Ej: 50% de descuento por 1 hora" oninput="updatePushPreview()">
+          </div>
+          <div class="modal-field">
+            <div class="modal-label">Audiencia</div>
+            <select class="modal-select" id="push-target">
+              <option value="all">Todos los usuarios</option>
+              <option value="buyers">Solo compradores</option>
+              <option value="sellers">Solo vendedores</option>
+            </select>
+          </div>
+          <button class="act act-primary" style="width:100%;margin-top:10px;justify-content:center" onclick="sendPush()">🔔 Enviar Push</button>
+          <div class="push-preview" id="push-preview">
+            <div class="push-preview-title">Vista previa</div>
+            <div class="push-preview-body">
+              <div class="push-preview-icon">🛍️</div>
+              <div class="push-preview-text">
+                <strong id="push-p-title">InstaCompras</strong>
+                <span id="push-p-body">Tu mensaje aquí...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="section-hdr"><div class="section-title">Historial</div></div>
+          <div class="tbl-wrap"><div class="tbl-scroll" id="push-history"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ STREAMS ═══ -->
+    <div class="section" id="sec-streams">
+      <div class="tbl-wrap">
+        <div class="tbl-scroll" id="streams-table"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-ovl" id="modal-product" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="modal-box">
+    <div class="modal-title">
+      <span id="modal-prod-title">Nuevo Producto</span>
+      <div class="modal-close" onclick="document.getElementById('modal-product').classList.remove('on')">✕</div>
+    </div>
+    <div class="modal-field"><div class="modal-label">Nombre</div><input class="modal-input" id="mp-name"></div>
+    <div class="modal-row">
+      <div class="modal-field"><div class="modal-label">Precio ($)</div><input class="modal-input" id="mp-price" type="number"></div>
+      <div class="modal-field"><div class="modal-label">Precio original ($)</div><input class="modal-input" id="mp-orig" type="number"></div>
+    </div>
+    <div class="modal-field"><div class="modal-label">Imagen URL</div><input class="modal-input" id="mp-img"></div>
+    <div class="modal-row">
+      <div class="modal-field"><div class="modal-label">Categoría</div><input class="modal-input" id="mp-cat" placeholder="Ej: Tecnología"></div>
+      <div class="modal-field"><div class="modal-label">Seller Name</div><input class="modal-input" id="mp-seller"></div>
+    </div>
+    <div class="modal-field"><div class="modal-label">Descripción</div><input class="modal-input" id="mp-desc"></div>
+    <div class="modal-field"><div class="modal-label">Emoji</div><input class="modal-input" id="mp-emoji" placeholder="📦" style="width:60px"></div>
+    <input type="hidden" id="mp-id">
+    <div class="modal-footer">
+      <button class="act act-edit" onclick="document.getElementById('modal-product').classList.remove('on')">Cancelar</button>
+      <button class="act act-primary" onclick="saveProduct()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-ovl" id="modal-user" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="modal-box">
+    <div class="modal-title">
+      <span>Detalle de Usuario</span>
+      <div class="modal-close" onclick="document.getElementById('modal-user').classList.remove('on')">✕</div>
+    </div>
+    <div id="modal-user-body"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ FIREBASE CONFIG ═══
+const FB={
+  apiKey:"AIzaSyDG2IUweNwWifE75MFr9mk90Eon1Qo9qPs",
+  projectId:"instacompras-fe791",
+  authUrl:"https://identitytoolkit.googleapis.com/v1/accounts",
+  dbUrl:"https://firestore.googleapis.com/v1/projects/instacompras-fe791/databases/(default)/documents"
+};
+const ADMIN_UIDS=['i6el8ICacKYNALR7Ibc9nWKkHZV2'];
+let token=null,uid=null;
+
+// ═══ FIRESTORE HELPERS ═══
+function toFSVal(v){
+  if(v===null||v===undefined)return{nullValue:null};
+  if(typeof v==='boolean')return{booleanValue:v};
+  if(typeof v==='number')return Number.isInteger(v)?{integerValue:String(v)}:{doubleValue:v};
+  if(typeof v==='string')return{stringValue:v};
+  if(Array.isArray(v))return{arrayValue:{values:v.map(toFSVal)}};
+  if(typeof v==='object')return{mapValue:{fields:Object.fromEntries(Object.entries(v).map(([k,val])=>[k,toFSVal(val)]))}};
+  return{stringValue:String(v)};
+}
+function toFS(obj){const f={};for(const[k,v]of Object.entries(obj))f[k]=toFSVal(v);return{fields:f};}
+function fromFSVal(v){
+  if(!v)return null;
+  if('stringValue'in v)return v.stringValue;
+  if('integerValue'in v)return parseInt(v.integerValue);
+  if('doubleValue'in v)return v.doubleValue;
+  if('booleanValue'in v)return v.booleanValue;
+  if('nullValue'in v)return null;
+  if('arrayValue'in v)return(v.arrayValue.values||[]).map(fromFSVal);
+  if('mapValue'in v)return Object.fromEntries(Object.entries(v.mapValue.fields||{}).map(([k,val])=>[k,fromFSVal(val)]));
+  return null;
+}
+function fromFS(doc){
+  if(!doc||!doc.fields)return{};
+  const obj=Object.fromEntries(Object.entries(doc.fields).map(([k,v])=>[k,fromFSVal(v)]));
+  if(doc.name)obj._id=doc.name.split('/').pop();
+  return obj;
+}
+function hdr(){const h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;return h;}
+async function fsGet(col,id){try{const r=await fetch(`${FB.dbUrl}/${col}/${id}`,{headers:hdr()});if(!r.ok)return null;return fromFS(await r.json());}catch(e){return null;}}
+async function fsSet(col,id,data){
+  try{const keys=Object.keys(data);const mask=keys.map(k=>'updateMask.fieldPaths='+encodeURIComponent(k)).join('&');
+  const r=await fetch(`${FB.dbUrl}/${col}/${id}?${mask}`,{method:'PATCH',headers:hdr(),body:JSON.stringify(toFS(data))});
+  if(!r.ok)return null;return fromFS(await r.json());}catch(e){return null;}
+}
+async function fsAdd(col,data){try{const r=await fetch(`${FB.dbUrl}/${col}`,{method:'POST',headers:hdr(),body:JSON.stringify(toFS(data))});if(!r.ok)return null;return fromFS(await r.json());}catch(e){return null;}}
+async function fsDel(col,id){try{await fetch(`${FB.dbUrl}/${col}/${id}`,{method:'DELETE',headers:hdr()});return true;}catch(e){return false;}}
+async function fsQuery(col){
+  try{const url=`https://firestore.googleapis.com/v1/projects/${FB.projectId}/databases/(default)/documents:runQuery`;
+  const q={structuredQuery:{from:[{collectionId:col}]}};
+  const r=await fetch(url,{method:'POST',headers:hdr(),body:JSON.stringify(q)});
+  const data=await r.json();return data.filter(d=>d.document).map(d=>fromFS(d.document));}catch(e){return[];}
+}
+
+// ═══ AUTH ═══
+async function doLogin(){
+  const email=document.getElementById('l-email').value.trim();
+  const pass=document.getElementById('l-pass').value;
+  const btn=document.getElementById('l-btn');
+  const err=document.getElementById('l-err');
+  if(!email||!pass){err.textContent='Ingresa email y contraseña';return;}
+  btn.disabled=true;btn.textContent='Verificando...';err.textContent='';
+  try{
+    const r=await fetch(`${FB.authUrl}:signInWithPassword?key=${FB.apiKey}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email,password:pass,returnSecureToken:true})
+    });
+    const d=await r.json();
+    if(d.error){err.textContent=d.error.message==='INVALID_LOGIN_CREDENTIALS'?'Email o contraseña incorrecta':d.error.message;btn.disabled=false;btn.textContent='Iniciar Sesión';return;}
+    if(!ADMIN_UIDS.includes(d.localId)){err.textContent='🚫 No tienes acceso de administrador';btn.disabled=false;btn.textContent='Iniciar Sesión';return;}
+    token=d.idToken;uid=d.localId;
+    localStorage.setItem('admin_token',token);localStorage.setItem('admin_uid',uid);localStorage.setItem('admin_email',email);
+    document.getElementById('sb-user').textContent=email;
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    refreshAll();
+  }catch(e){err.textContent='Error de conexión';btn.disabled=false;btn.textContent='Iniciar Sesión';}
+}
+function doLogout(){token=null;uid=null;localStorage.removeItem('admin_token');localStorage.removeItem('admin_uid');localStorage.removeItem('admin_email');location.reload();}
+function tryRestore(){
+  const t=localStorage.getItem('admin_token');const u=localStorage.getItem('admin_uid');const e=localStorage.getItem('admin_email');
+  if(t&&u&&ADMIN_UIDS.includes(u)){token=t;uid=u;document.getElementById('sb-user').textContent=e||'Admin';document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='flex';refreshAll();return true;}
+  return false;
+}
+
+// ═══ NAVIGATION ═══
+function goSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.sb-item').forEach(s=>s.classList.remove('on'));
+  const sec=document.getElementById('sec-'+id);if(sec)sec.classList.add('on');
+  const items=document.querySelectorAll('.sb-item');
+  const map={overview:0,users:1,products:2,orders:3,deposits:4,sellers:5,push:6,streams:7};
+  if(items[map[id]])items[map[id]].classList.add('on');
+  const titles={overview:'Overview',users:'Usuarios',products:'Productos',orders:'Órdenes',deposits:'Depósitos',sellers:'Sellers',push:'Push Notifications',streams:'Streams'};
+  document.getElementById('topbar-title').textContent=titles[id]||id;
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+// ═══ DATA CACHE ═══
+let _users=[],_products=[],_orders=[],_deposits=[],_streams=[];
+
+async function refreshAll(){
+  toast('🔄 Cargando datos...');
+  const [users,products,orders,deposits,streams]=await Promise.all([
+    fsQuery('users'),fsQuery('products'),fsQuery('orders'),
+    fsQuery('deposit_requests'),fsQuery('streams')
+  ]);
+  _users=users;_products=products;_orders=orders;_deposits=deposits;_streams=streams;
+  renderOverview();renderUsers();renderProducts();renderOrders();renderDeposits();renderSellers();renderStreams();renderPushHistory();
+  // Badges
+  const pendingDep=deposits.filter(d=>d.status==='pending').length;
+  const pendingOrd=orders.filter(o=>o.status==='pending').length;
+  setBadge('badge-deposits',pendingDep);
+  setBadge('badge-orders',pendingOrd);
+  toast('✅ Datos actualizados');
+}
+function setBadge(id,n){const b=document.getElementById(id);if(!b)return;if(n>0){b.textContent=n;b.style.display='';}else{b.style.display='none';}}
+
+// ═══ OVERVIEW ═══
+function renderOverview(){
+  const totalRevenue=_orders.filter(o=>o.status==='delivered').reduce((s,o)=>s+(o.amt||0),0);
+  const totalUsers=_users.length;
+  const totalSellers=_users.filter(u=>u.type==='seller').length;
+  const totalOrders=_orders.length;
+  const pendingDeposits=_deposits.filter(d=>d.status==='pending').length;
+  const totalProducts=_products.length;
+  const activeStreams=_streams.filter(s=>s.isLive).length;
+  const totalWallets=_users.reduce((s,u)=>s+(u.wallet||u.credits||0),0);
+
+  document.getElementById('overview-stats').innerHTML=`
+    <div class="stat-card gold"><div class="stat-label">Revenue Total</div><div class="stat-value">$${totalRevenue}</div><div class="stat-sub">${_orders.filter(o=>o.status==='delivered').length} ventas completadas</div></div>
+    <div class="stat-card blue"><div class="stat-label">Usuarios</div><div class="stat-value">${totalUsers}</div><div class="stat-sub">${totalSellers} sellers · ${totalUsers-totalSellers} buyers</div></div>
+    <div class="stat-card green"><div class="stat-label">Órdenes</div><div class="stat-value">${totalOrders}</div><div class="stat-sub">${_orders.filter(o=>o.status==='pending').length} pendientes</div></div>
+    <div class="stat-card red"><div class="stat-label">Depósitos Pendientes</div><div class="stat-value">${pendingDeposits}</div><div class="stat-sub">Requieren aprobación</div></div>
+    <div class="stat-card purple"><div class="stat-label">Productos</div><div class="stat-value">${totalProducts}</div><div class="stat-sub">${_products.filter(p=>p.live).length} en live</div></div>
+    <div class="stat-card gold"><div class="stat-label">Wallet Circulante</div><div class="stat-value">${totalWallets} IC</div><div class="stat-sub">Total acreditado</div></div>
+  `;
+  // Revenue chart (last 7 days)
+  const days=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const now=Date.now();const dayMs=86400000;
+  const revByDay=Array(7).fill(0);
+  _orders.forEach(o=>{if(!o.createdAt)return;const d=Math.floor((now-o.createdAt)/dayMs);if(d<7)revByDay[6-d]+=(o.amt||0);});
+  const maxRev=Math.max(...revByDay,1);
+  const today=new Date().getDay();
+  document.getElementById('chart-revenue').innerHTML=revByDay.map((v,i)=>{
+    const dayIdx=(today-6+i+7)%7;
+    return`<div class="chart-bar-row"><div class="chart-bar-label">${days[dayIdx]}</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:${(v/maxRev)*100}%"><span class="chart-bar-val">$${v}</span></div></div></div>`;
+  }).join('');
+
+  // Users chart
+  const usersByDay=Array(7).fill(0);
+  _users.forEach(u=>{if(!u.createdAt)return;const d=Math.floor((now-u.createdAt)/dayMs);if(d<7)usersByDay[6-d]++;});
+  const maxU=Math.max(...usersByDay,1);
+  document.getElementById('chart-users').innerHTML=usersByDay.map((v,i)=>{
+    const dayIdx=(today-6+i+7)%7;
+    return`<div class="chart-bar-row"><div class="chart-bar-label">${days[dayIdx]}</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:${(v/maxU)*100}%;background:linear-gradient(90deg,var(--bl),#64B5F6)"><span class="chart-bar-val">${v}</span></div></div></div>`;
+  }).join('');
+
+  // Recent orders
+  const recent=_orders.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,5);
+  document.getElementById('overview-orders').innerHTML=renderOrdersTable(recent);
+
+  // Pending deposits
+  const pending=_deposits.filter(d=>d.status==='pending');
+  document.getElementById('overview-deposits').innerHTML=renderDepositsTable(pending);
+}
+
+// ═══ USERS ═══
+let _usersFiltered=null,_usersTypeFilter='';
+function renderUsers(list){
+  const data=list||_usersFiltered||_users;
+  document.getElementById('users-table').innerHTML=`<table><thead><tr><th>Usuario</th><th>Email</th><th>Tipo</th><th>Ciudad</th><th>Wallet</th><th>Registrado</th><th>Acciones</th></tr></thead><tbody>${
+    data.length?data.map(u=>`<tr>
+      <td><div style="display:flex;align-items:center;gap:10px"><div class="av av-${u.type==='seller'?'seller':'buyer'}">${(u.name||u.displayName||'?')[0].toUpperCase()}</div><div><div style="font-weight:700">${u.name||u.displayName||'—'}</div><div style="font-size:11px;color:var(--mu)">@${u.username||u.handle||'—'}</div></div></div></td>
+      <td style="font-size:12px;color:var(--mu)">${u.email||'—'}</td>
+      <td><span class="badge badge-${u.type==='seller'?'seller':'buyer'}">${u.type||'buyer'}</span></td>
+      <td>${u.city||'—'}</td>
+      <td style="font-family:'Bebas Neue',sans-serif;font-weight:700;color:var(--y)">${u.wallet||u.credits||0} IC</td>
+      <td style="font-size:11px;color:var(--mu)">${u.createdAt?new Date(u.createdAt).toLocaleDateString('es'):'—'}</td>
+      <td><button class="act act-edit" onclick="viewUser('${u._id}')">Ver</button> <button class="act act-approve" onclick="editWallet('${u._id}',${u.wallet||u.credits||0})">Wallet</button></td>
+    </tr>`).join(''):'<tr><td colspan="7" class="tbl-empty">No hay usuarios</td></tr>'
+  }</tbody></table>`;
+}
+function filterUsers(q){q=q.toLowerCase();_usersFiltered=_users.filter(u=>(u.name||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q)||(u.username||'').toLowerCase().includes(q));if(_usersTypeFilter)_usersFiltered=_usersFiltered.filter(u=>(u.type||'buyer')===_usersTypeFilter);renderUsers(_usersFiltered);}
+function filterUserType(t){_usersTypeFilter=t;filterUsers(document.querySelector('#sec-users .tbl-search')?.value||'');}
+function viewUser(id){
+  const u=_users.find(x=>x._id===id);if(!u)return;
+  const orders=_orders.filter(o=>o.buyerId===id||o.sellerId===id);
+  document.getElementById('modal-user-body').innerHTML=`
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+      <div class="av av-${u.type==='seller'?'seller':'buyer'}" style="width:50px;height:50px;font-size:24px">${(u.name||'?')[0].toUpperCase()}</div>
+      <div><div style="font-size:18px;font-weight:800">${u.name||u.displayName||'—'}</div><div style="color:var(--mu)">@${u.username||'—'} · ${u.email||'—'}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="background:var(--dk3);border-radius:10px;padding:12px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;font-weight:700;color:var(--y)">${u.wallet||u.credits||0}</div><div style="font-size:10px;color:var(--mu);margin-top:4px">WALLET IC</div></div>
+      <div style="background:var(--dk3);border-radius:10px;padding:12px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;font-weight:700;color:var(--bl)">${orders.length}</div><div style="font-size:10px;color:var(--mu);margin-top:4px">ÓRDENES</div></div>
+      <div style="background:var(--dk3);border-radius:10px;padding:12px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;font-weight:700;color:var(--gn)">${u.type||'buyer'}</div><div style="font-size:10px;color:var(--mu);margin-top:4px">TIPO</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--mu)"><strong>UID:</strong> ${u._id}<br><strong>Ciudad:</strong> ${u.city||'—'}<br><strong>Cédula:</strong> ${u.cedula||'—'}<br><strong>WhatsApp:</strong> ${u.whatsapp||u.phone||'—'}<br><strong>Tienda:</strong> ${u.shopName||'—'}</div>
+  `;
+  document.getElementById('modal-user').classList.add('on');
+}
+async function editWallet(id,current){
+  const val=prompt(`Wallet actual: ${current} IC\nNuevo saldo:`,current);
+  if(val===null)return;
+  const n=parseInt(val);if(isNaN(n)||n<0){toast('❌ Valor inválido');return;}
+  await fsSet('users',id,{wallet:n});
+  toast(`✅ Wallet actualizado a ${n} IC`);
+  refreshAll();
+}
+
+// ═══ PRODUCTS ═══
+function renderProducts(list){
+  const data=list||_products;
+  document.getElementById('products-table').innerHTML=`<table><thead><tr><th>Producto</th><th>Precio</th><th>Original</th><th>Seller</th><th>Categoría</th><th>Live</th><th>Acciones</th></tr></thead><tbody>${
+    data.length?data.map(p=>`<tr>
+      <td><div style="display:flex;align-items:center;gap:10px">${p.img?`<img src="${p.img}" style="width:36px;height:36px;border-radius:8px;object-fit:cover">`:`<div style="width:36px;height:36px;border-radius:8px;background:var(--dk3);display:flex;align-items:center;justify-content:center">${p.emoji||'📦'}</div>`}<div style="font-weight:700;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name||'—'}</div></div></td>
+      <td style="font-family:'Bebas Neue',sans-serif;font-weight:700;color:var(--gn)">$${p.price||0}</td>
+      <td style="font-family:'Bebas Neue',sans-serif;color:var(--mu);text-decoration:line-through">$${p.origPrice||0}</td>
+      <td>${p.sellerName||'—'}</td>
+      <td>${p.cat||'—'}</td>
+      <td>${p.live?'<span class="badge badge-live">LIVE</span>':'—'}</td>
+      <td><button class="act act-edit" onclick="editProduct('${p._id}')">✏️</button> <button class="act act-delete" onclick="deleteProduct('${p._id}','${(p.name||'').replace(/'/g,"\\'")}')">🗑️</button></td>
+    </tr>`).join(''):'<tr><td colspan="7" class="tbl-empty">No hay productos</td></tr>'
+  }</tbody></table>`;
+}
+function filterProducts(q){q=q.toLowerCase();renderProducts(_products.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.sellerName||'').toLowerCase().includes(q)));}
+function openProductModal(p){
+  document.getElementById('mp-name').value=p?.name||'';
+  document.getElementById('mp-price').value=p?.price||'';
+  document.getElementById('mp-orig').value=p?.origPrice||'';
+  document.getElementById('mp-img').value=p?.img||'';
+  document.getElementById('mp-cat').value=p?.cat||'';
+  document.getElementById('mp-seller').value=p?.sellerName||'';
+  document.getElementById('mp-desc').value=p?.desc||'';
+  document.getElementById('mp-emoji').value=p?.emoji||'📦';
+  document.getElementById('mp-id').value=p?._id||'';
+  document.getElementById('modal-prod-title').textContent=p?'Editar Producto':'Nuevo Producto';
+  document.getElementById('modal-product').classList.add('on');
+}
+function editProduct(id){const p=_products.find(x=>x._id===id);if(p)openProductModal(p);}
+async function saveProduct(){
+  const data={
+    name:document.getElementById('mp-name').value.trim(),
+    price:parseFloat(document.getElementById('mp-price').value)||0,
+    origPrice:parseFloat(document.getElementById('mp-orig').value)||0,
+    img:document.getElementById('mp-img').value.trim(),
+    cat:document.getElementById('mp-cat').value.trim(),
+    sellerName:document.getElementById('mp-seller').value.trim(),
+    desc:document.getElementById('mp-desc').value.trim(),
+    emoji:document.getElementById('mp-emoji').value.trim()||'📦',
+    sellerEmoji:'🛍️',live:false
+  };
+  if(!data.name){toast('❌ Nombre requerido');return;}
+  const id=document.getElementById('mp-id').value;
+  if(id){await fsSet('products',id,data);toast('✅ Producto actualizado');}
+  else{data.createdAt=Date.now();await fsAdd('products',data);toast('✅ Producto creado');}
+  document.getElementById('modal-product').classList.remove('on');
+  refreshAll();
+}
+async function deleteProduct(id,name){
+  if(!confirm(`¿Eliminar "${name}"?`))return;
+  await fsDel('products',id);
+  toast('🗑️ Producto eliminado');
+  refreshAll();
+}
+
+// ═══ ORDERS ═══
+function renderOrdersTable(data){
+  return`<table><thead><tr><th>N°</th><th>Producto</th><th>Comprador</th><th>Seller</th><th>Monto</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody>${
+    data.length?data.map(o=>`<tr>
+      <td style="font-family:'Bebas Neue',sans-serif;font-size:12px">${o.num||o.orderId||'—'}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><span>${o.e||'📦'}</span><span style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.prod||'—'}</span></div></td>
+      <td style="font-size:12px">${o.buyerName||'—'}</td>
+      <td style="font-size:12px">${o.sellerName||'—'}</td>
+      <td style="font-family:'Bebas Neue',sans-serif;font-weight:700;color:var(--y)">$${o.amt||0}</td>
+      <td><span class="badge badge-${o.status||'pending'}">${{pending:'Pendiente',processing:'Procesando',transit:'En tránsito',delivered:'Entregado'}[o.status]||o.status||'—'}</span></td>
+      <td style="font-size:11px;color:var(--mu)">${o.date||'—'}</td>
+      <td><select class="tbl-filter" style="font-size:11px;padding:4px 8px" onchange="updateOrderStatus('${o._id}',this.value)">
+        <option value="pending" ${o.status==='pending'?'selected':''}>Pendiente</option>
+        <option value="processing" ${o.status==='processing'?'selected':''}>Procesando</option>
+        <option value="transit" ${o.status==='transit'?'selected':''}>En tránsito</option>
+        <option value="delivered" ${o.status==='delivered'?'selected':''}>Entregado</option>
+      </select></td>
+    </tr>`).join(''):'<tr><td colspan="8" class="tbl-empty">No hay órdenes</td></tr>'
+  }</tbody></table>`;
+}
+function renderOrders(list){document.getElementById('orders-table').innerHTML=renderOrdersTable(list||_orders);}
+function filterOrders(q){q=q.toLowerCase();renderOrders(_orders.filter(o=>(o.prod||'').toLowerCase().includes(q)||(o.buyerName||'').toLowerCase().includes(q)||(o.num||'').toLowerCase().includes(q)));}
+function filterOrderStatus(s){renderOrders(s?_orders.filter(o=>o.status===s):_orders);}
+async function updateOrderStatus(id,status){
+  await fsSet('orders',id,{status});
+  const o=_orders.find(x=>x._id===id);if(o)o.status=status;
+  toast(`✅ Orden → ${status}`);
+  renderOrders();renderOverview();
+}
+
+// ═══ DEPOSITS ═══
+function renderDepositsTable(data){
+  return`<table><thead><tr><th>Usuario</th><th>Monto</th><th>Método</th><th>Referencia</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody>${
+    data.length?data.map(d=>`<tr>
+      <td style="font-weight:600">${d.userName||d.uid||'—'}</td>
+      <td style="font-family:'Bebas Neue',sans-serif;font-weight:700;color:var(--y)">${d.amount||0} IC</td>
+      <td>${d.method||'—'}</td>
+      <td style="font-size:12px;color:var(--mu)">${d.reference||'—'}</td>
+      <td><span class="badge badge-${d.status||'pending'}">${d.status||'pending'}</span></td>
+      <td style="font-size:11px;color:var(--mu)">${d.createdAt?new Date(d.createdAt).toLocaleDateString('es'):'—'}</td>
+      <td>${d.status==='pending'?`<button class="act act-approve" onclick="approveDeposit('${d._id}')">✅ Aprobar</button> <button class="act act-reject" onclick="rejectDeposit('${d._id}')">❌</button>`:'—'}</td>
+    </tr>`).join(''):'<tr><td colspan="7" class="tbl-empty">No hay depósitos</td></tr>'
+  }</tbody></table>`;
+}
+function renderDeposits(list){document.getElementById('deposits-table').innerHTML=renderDepositsTable(list||_deposits);}
+function filterDeposits(q){q=q.toLowerCase();renderDeposits(_deposits.filter(d=>(d.userName||'').toLowerCase().includes(q)||(d.reference||'').toLowerCase().includes(q)));}
+function filterDepositStatus(s){renderDeposits(s?_deposits.filter(d=>d.status===s):_deposits);}
+async function approveDeposit(id){
+  const dep=_deposits.find(d=>d._id===id);if(!dep)return;
+  await fsSet('deposit_requests',id,{status:'approved',approvedAt:Date.now(),approvedBy:uid});
+  // Credit user wallet
+  if(dep.uid){
+    const user=await fsGet('users',dep.uid);
+    const currentBal=(user?.wallet||user?.credits||0);
+    await fsSet('users',dep.uid,{wallet:currentBal+(dep.amount||0)});
+    await fsAdd('wallet_txs',{uid:dep.uid,type:'in',description:'Depósito aprobado — '+dep.method,amount:dep.amount||0,balanceAfter:currentBal+(dep.amount||0),createdAt:Date.now()});
+  }
+  toast(`✅ Depósito aprobado — ${dep.amount} IC acreditados`);
+  refreshAll();
+}
+async function rejectDeposit(id){
+  if(!confirm('¿Rechazar este depósito?'))return;
+  await fsSet('deposit_requests',id,{status:'rejected',rejectedAt:Date.now()});
+  toast('❌ Depósito rechazado');
+  refreshAll();
+}
+
+// ═══ SELLERS ═══
+function renderSellers(){
+  const sellers=_users.filter(u=>u.type==='seller');
+  document.getElementById('sellers-table').innerHTML=`<table><thead><tr><th>Tienda</th><th>Dueño</th><th>WhatsApp</th><th>Ciudad</th><th>Verificado</th><th>Wallet</th><th>Acciones</th></tr></thead><tbody>${
+    sellers.length?sellers.map(s=>`<tr>
+      <td style="font-weight:700">${s.shopName||'—'}</td>
+      <td>${s.name||s.displayName||'—'}</td>
+      <td style="font-size:12px">${s.whatsapp||s.phone||'—'}</td>
+      <td>${s.city||'—'}</td>
+      <td>${s.verified?'<span class="badge badge-approved">✅ Verificado</span>':'<span class="badge badge-pending">Sin verificar</span>'}</td>
+      <td style="font-family:'Bebas Neue',sans-serif;color:var(--y)">${s.wallet||0} IC</td>
+      <td>${!s.verified?`<button class="act act-approve" onclick="verifySeller('${s._id}')">✅ Verificar</button>`:''} <button class="act act-reject" onclick="unverifySeller('${s._id}')">🚫</button></td>
+    </tr>`).join(''):'<tr><td colspan="7" class="tbl-empty">No hay sellers</td></tr>'
+  }</tbody></table>`;
+}
+function filterSellers(q){q=q.toLowerCase();const s=_users.filter(u=>u.type==='seller'&&((u.shopName||'').toLowerCase().includes(q)||(u.name||'').toLowerCase().includes(q)));document.getElementById('sellers-table').innerHTML=`<table><thead><tr><th>Tienda</th><th>Dueño</th><th>WhatsApp</th><th>Ciudad</th><th>Verificado</th><th>Wallet</th><th>Acciones</th></tr></thead><tbody>${s.length?s.map(s=>`<tr><td style="font-weight:700">${s.shopName||'—'}</td><td>${s.name||'—'}</td><td>${s.whatsapp||'—'}</td><td>${s.city||'—'}</td><td>${s.verified?'<span class="badge badge-approved">✅</span>':'<span class="badge badge-pending">No</span>'}</td><td style="font-family:'Bebas Neue',sans-serif;color:var(--y)">${s.wallet||0}</td><td>${!s.verified?`<button class="act act-approve" onclick="verifySeller('${s._id}')">✅</button>`:''}</td></tr>`).join(''):'<tr><td colspan="7" class="tbl-empty">Sin resultados</td></tr>'}</tbody></table>`;}
+async function verifySeller(id){await fsSet('users',id,{verified:true,verifiedAt:Date.now()});toast('✅ Seller verificado');refreshAll();}
+async function unverifySeller(id){if(!confirm('¿Revocar verificación?'))return;await fsSet('users',id,{verified:false});toast('🚫 Verificación revocada');refreshAll();}
+
+// ═══ STREAMS ═══
+function renderStreams(){
+  document.getElementById('streams-table').innerHTML=`<table><thead><tr><th>Canal</th><th>Seller</th><th>Viewers</th><th>Estado</th><th>Iniciado</th><th>Acciones</th></tr></thead><tbody>${
+    _streams.length?_streams.map(s=>`<tr>
+      <td style="font-weight:700">${s.channelName||s._id||'—'}</td>
+      <td>${s.sellerName||s.shopName||'—'}</td>
+      <td style="font-family:'Bebas Neue',sans-serif">${s.viewerCount||0}</td>
+      <td>${s.isLive?'<span class="badge badge-live">🔴 EN VIVO</span>':'<span class="badge badge-pending">Offline</span>'}</td>
+      <td style="font-size:11px;color:var(--mu)">${s.startedAt?new Date(s.startedAt).toLocaleString('es'):'—'}</td>
+      <td>${s.isLive?`<button class="act act-reject" onclick="endStream('${s._id}')">⏹ Terminar</button>`:''}</td>
+    </tr>`).join(''):'<tr><td colspan="6" class="tbl-empty">No hay streams</td></tr>'
+  }</tbody></table>`;
+}
+async function endStream(id){if(!confirm('¿Terminar este stream?'))return;await fsSet('streams',id,{isLive:false,endedAt:Date.now()});toast('⏹ Stream terminado');refreshAll();}
+
+// ═══ PUSH NOTIFICATIONS ═══
+function updatePushPreview(){
+  const t=document.getElementById('push-title').value||'InstaCompras';
+  const b=document.getElementById('push-body').value||'Tu mensaje aquí...';
+  document.getElementById('push-p-title').textContent=t;
+  document.getElementById('push-p-body').textContent=b;
+}
+async function sendPush(){
+  const title=document.getElementById('push-title').value.trim();
+  const body=document.getElementById('push-body').value.trim();
+  const target=document.getElementById('push-target').value;
+  if(!title||!body){toast('❌ Título y mensaje requeridos');return;}
+  // Save to Firestore for the app to pick up
+  await fsAdd('push_jobs',{title,body,target,status:'queued',createdAt:Date.now(),sentBy:uid});
+  // Also save to push_history for admin view
+  await fsAdd('push_history',{title,body,target,createdAt:Date.now(),sentBy:uid,recipients:_users.filter(u=>u.pushSub&&(target==='all'||(target==='buyers'&&u.type!=='seller')||(target==='sellers'&&u.type==='seller'))).length});
+  document.getElementById('push-title').value='';
+  document.getElementById('push-body').value='';
+  updatePushPreview();
+  toast('✅ Push notification enviada');
+  renderPushHistory();
+}
+async function renderPushHistory(){
+  const history=await fsQuery('push_history');
+  history.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  document.getElementById('push-history').innerHTML=`<table><thead><tr><th>Título</th><th>Audiencia</th><th>Fecha</th></tr></thead><tbody>${
+    history.length?history.slice(0,20).map(h=>`<tr>
+      <td><div style="font-weight:700">${h.title||'—'}</div><div style="font-size:11px;color:var(--mu)">${h.body||''}</div></td>
+      <td><span class="badge badge-${h.target==='sellers'?'seller':'buyer'}">${h.target||'all'}</span></td>
+      <td style="font-size:11px;color:var(--mu)">${h.createdAt?new Date(h.createdAt).toLocaleString('es'):'—'}</td>
+    </tr>`).join(''):'<tr><td colspan="3" class="tbl-empty">Sin historial</td></tr>'
+  }</tbody></table>`;
+}
+
+// ═══ TOAST ═══
+let _toastTm;
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');
+  clearTimeout(_toastTm);_toastTm=setTimeout(()=>t.classList.remove('on'),2500);
+}
+
+// ═══ RESPONSIVE ═══
+function checkMobile(){
+  const m=window.innerWidth<=768;
+  document.querySelectorAll('.menu-toggle').forEach(e=>e.style.display=m?'block':'none');
+}
+window.addEventListener('resize',checkMobile);
+
+// ═══ INIT ═══
+checkMobile();
+tryRestore();
+</script>
+</body>
+</html>
