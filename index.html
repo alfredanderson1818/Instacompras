@@ -2058,6 +2058,12 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         <div class="pmia">›</div>
       </div>
 
+      <div class="pmi" id="verif-menu-item" onclick="openVerifRequest()" style="border-radius:13px;display:none">
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(76,175,80,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">🪪</div>
+        <div class="pmil" id="verif-menu-label">Solicitar verificación</div>
+        <div class="pmia">›</div>
+      </div>
+
       <div class="pmi" onclick="initGoLive()" style="border-radius:13px">
         <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,59,59,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
           <div style="width:10px;height:10px;border-radius:50%;background:var(--rd);animation:pulse-live 2s infinite"></div>
@@ -2754,6 +2760,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <!-- Tabs -->
     <div style="display:flex;gap:0;margin:16px 16px 0;background:var(--dk3);border-radius:12px;padding:3px;border:1px solid rgba(255,255,255,.06)">
       <div id="admin-tab-dep" onclick="adminTab('dep')" style="flex:1;padding:9px;text-align:center;border-radius:9px;font-size:12px;font-weight:900;cursor:pointer;background:var(--y);color:var(--dk);transition:all .2s">💰 Depósitos</div>
+      <div id="admin-tab-sellers" onclick="adminTab('sellers')" style="flex:1;padding:9px;text-align:center;border-radius:9px;font-size:12px;font-weight:900;cursor:pointer;color:var(--mu);transition:all .2s">📡 Sellers</div>
       <div id="admin-tab-users" onclick="adminTab('users')" style="flex:1;padding:9px;text-align:center;border-radius:9px;font-size:12px;font-weight:900;cursor:pointer;color:var(--mu);transition:all .2s">👥 Usuarios</div>
     </div>
 
@@ -2762,9 +2769,43 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
       <div id="admin-dep-list"><div style="text-align:center;padding:40px;color:var(--mu);font-size:12px">⏳ Cargando...</div></div>
     </div>
 
+    <!-- Sellers panel -->
+    <div id="admin-panel-sellers" style="padding:12px 16px 0;display:none">
+      <div id="admin-sellers-list"><div style="text-align:center;padding:40px;color:var(--mu);font-size:12px">⏳ Cargando...</div></div>
+    </div>
+
     <!-- Users panel -->
     <div id="admin-panel-users" style="padding:12px 16px 0;display:none">
       <div id="admin-users-list"><div style="text-align:center;padding:40px;color:var(--mu);font-size:12px">⏳ Cargando...</div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Verification Request Modal -->
+<div id="verif-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);align-items:flex-end;justify-content:center">
+  <div style="background:var(--dk2);border-radius:24px 24px 0 0;padding:28px 24px max(env(safe-area-inset-bottom),32px);width:100%;max-width:430px;border-top:1px solid rgba(255,255,255,.08)">
+    <div style="width:40px;height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin:0 auto 22px"></div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;margin-bottom:6px">🪪 Verificar Cuenta Seller</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:20px;line-height:1.6">Tu solicitud será revisada en menos de 24 horas. Una vez verificado podrás transmitir en vivo y aparecer con el badge ✅</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Número de cédula</div>
+        <input id="verif-cedula" type="text" placeholder="V-12345678" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='rgba(255,208,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">¿Qué vendes? Describe tu tienda</div>
+        <textarea id="verif-desc" rows="3" placeholder="Ej: Vendo ropa deportiva importada, zapatillas y accesorios. Tengo tienda física en Caracas." style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;resize:none;box-sizing:border-box;line-height:1.5" onfocus="this.style.borderColor='rgba(255,208,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'"></textarea>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">WhatsApp de tu tienda</div>
+        <input id="verif-wa" type="tel" placeholder="04120000000" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='rgba(255,208,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+      </div>
+      <div style="background:rgba(255,208,0,.06);border:1px solid rgba(255,208,0,.15);border-radius:10px;padding:10px 13px;font-size:11px;color:rgba(255,255,255,.5);line-height:1.6">
+        ⚠️ Información solo visible para el equipo de InstaCompras. Nunca se comparte públicamente.
+      </div>
+      <button onclick="submitVerifRequest()" style="width:100%;background:var(--y);color:var(--dk);border:none;border-radius:13px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer">🪪 Enviar solicitud</button>
+      <button onclick="closeVerifModal()" style="width:100%;background:none;border:none;color:var(--mu);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;padding:8px">Cancelar</button>
     </div>
   </div>
 </div>
@@ -5296,6 +5337,13 @@ function endBroadcast(){
 // ═══ MODAL ═══
 function openModal(){
   if(requireAccount('📡','Para transmitir en vivo necesitas una cuenta','Regístrate gratis como vendedor.'))return;
+  if(window.fbUser?.type!=='seller'){toast('⚠️ Solo sellers pueden transmitir en vivo');return;}
+  if(!window.fbUser?.isVerified){
+    // Show verification prompt
+    const confirmed=confirm('Necesitas verificar tu cuenta de seller para transmitir.\n¿Quieres solicitar verificación ahora?');
+    if(confirmed)openVerifRequest();
+    return;
+  }
   initGoLive();
 }
 function closeModal(e,force){if(force||e?.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('on');}
@@ -5540,6 +5588,7 @@ async function loadProfData(){
   // Following count
   const folEl=document.getElementById('st-fol');
   _showAdminBtn();
+  _updateVerifMenuItem();
   if(folEl) folEl.textContent=following.size;
   // Sync wallet balance from user profile
   if(u.wallet!==undefined) walletBalance=Number(u.wallet)||0;
@@ -6100,15 +6149,14 @@ function _showAdminBtn(){
 let _adminCurTab='dep';
 function adminTab(tab){
   _adminCurTab=tab;
-  document.getElementById('admin-panel-dep').style.display=tab==='dep'?'block':'none';
-  document.getElementById('admin-panel-users').style.display=tab==='users'?'block':'none';
-  const depT=document.getElementById('admin-tab-dep');
-  const usrT=document.getElementById('admin-tab-users');
-  depT.style.background=tab==='dep'?'var(--y)':'transparent';
-  depT.style.color=tab==='dep'?'var(--dk)':'var(--mu)';
-  usrT.style.background=tab==='users'?'var(--y)':'transparent';
-  usrT.style.color=tab==='users'?'var(--dk)':'var(--mu)';
-  if(tab==='users') _adminLoadUsers();
+  ['dep','sellers','users'].forEach(t=>{
+    const panel=document.getElementById('admin-panel-'+t);
+    const btn=document.getElementById('admin-tab-'+t);
+    if(panel)panel.style.display=t===tab?'block':'none';
+    if(btn){btn.style.background=t===tab?'var(--y)':'transparent';btn.style.color=t===tab?'var(--dk)':'var(--mu)';}
+  });
+  if(tab==='users')_adminLoadUsers();
+  if(tab==='sellers')_adminLoadSellers();
 }
 
 async function openAdmin(){
@@ -6241,6 +6289,92 @@ async function adminReject(depId){
   }catch(e){toast('❌ Error');}
 }
 
+
+async function _adminLoadSellers(){
+  const listEl=document.getElementById('admin-sellers-list');
+  listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu);font-size:12px">⏳ Cargando...</div>';
+  try{
+    const stores=await fsQuery('stores');
+    const verRequests=await fsQuery('verification_requests');
+    const reqByUid={};
+    verRequests.forEach(r=>reqByUid[r.sellerId]=r);
+    
+    stores.sort((a,b)=>{
+      // Pending first, then unverified, then verified
+      const aR=reqByUid[a._id];const bR=reqByUid[b._id];
+      const aPend=aR&&aR.status==='pending'?0:a.isVerified?2:1;
+      const bPend=bR&&bR.status==='pending'?0:b.isVerified?2:1;
+      return aPend-bPend;
+    });
+
+    if(!stores.length){
+      listEl.innerHTML='<div style="text-align:center;padding:48px 24px;color:var(--mu)"><div style="font-size:40px;margin-bottom:10px">📡</div><div style="font-size:13px;font-weight:800;color:var(--tx)">Sin sellers registrados</div></div>';
+      return;
+    }
+
+    listEl.innerHTML=stores.map(s=>{
+      const req=reqByUid[s._id];
+      const isVerified=s.isVerified||false;
+      const isPending=req&&req.status==='pending';
+      const statusBg=isPending?'rgba(255,208,0,.12)':isVerified?'rgba(76,175,80,.1)':'rgba(255,255,255,.04)';
+      const statusBorder=isPending?'rgba(255,208,0,.3)':isVerified?'rgba(76,175,80,.2)':'rgba(255,255,255,.07)';
+      const statusLabel=isPending?'⏳ Solicitud pendiente':isVerified?'✅ Verificado':'⚪ Sin verificar';
+      return `<div style="background:${statusBg};border:1px solid ${statusBorder};border-radius:16px;padding:14px 16px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:${(isPending||(!isVerified&&req))?'12px':'0'}">
+          <div style="width:44px;height:44px;border-radius:12px;background:var(--dk3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden">
+            ${s.avatar?`<img src="${s.avatar}" style="width:100%;height:100%;object-fit:cover">`:'📡'}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:900;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.shopName||s.ownerName||'Tienda'}</div>
+            <div style="font-size:11px;color:var(--mu)">${s.email||''} · ${s.city||'Sin ciudad'}</div>
+            <div style="font-size:10px;color:var(--mu)">${s.category||'Sin categoría'} · ${s.whatsapp?'📱 '+s.whatsapp:'Sin WhatsApp'}</div>
+          </div>
+          <div style="font-size:10px;font-weight:900;padding:3px 9px;border-radius:20px;background:${statusBg};color:${isPending?'var(--y)':isVerified?'#4CAF50':'var(--mu)'}">${statusLabel}</div>
+        </div>
+        ${isPending?`
+        <div style="background:var(--dk4);border-radius:10px;padding:10px 12px;margin-bottom:10px">
+          <div style="font-size:10px;font-weight:900;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Solicitud de verificación</div>
+          ${req.cedula?`<div style="font-size:11px;color:rgba(255,255,255,.7);margin-bottom:3px">🪪 Cédula: <strong style="color:#fff">${req.cedula}</strong></div>`:''}
+          ${req.description?`<div style="font-size:11px;color:rgba(255,255,255,.6);margin-bottom:3px">"${req.description}"</div>`:''}
+          ${req.whatsapp?`<div style="font-size:11px;color:rgba(255,255,255,.6)">📱 ${req.whatsapp}</div>`:''}
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="adminVerifySeller('${s._id}','${req._id}')" style="flex:1;padding:10px;background:rgba(76,175,80,.15);border:1px solid rgba(76,175,80,.3);border-radius:10px;color:#4CAF50;font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;cursor:pointer">✅ Verificar seller</button>
+          <button onclick="adminRejectSeller('${s._id}','${req._id}')" style="flex:1;padding:10px;background:rgba(255,59,59,.1);border:1px solid rgba(255,59,59,.2);border-radius:10px;color:var(--rd);font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;cursor:pointer">❌ Rechazar</button>
+        </div>`
+        :!isVerified?`<button onclick="adminVerifySeller('${s._id}',null)" style="width:100%;padding:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--mu);font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;cursor:pointer">Verificar manualmente</button>`
+        :`<button onclick="adminUnverifySeller('${s._id}')" style="width:100%;padding:9px;background:rgba(255,59,59,.08);border:1px solid rgba(255,59,59,.15);border-radius:10px;color:var(--rd);font-family:'Nunito',sans-serif;font-size:11px;font-weight:900;cursor:pointer">Revocar verificación</button>`}
+      </div>`;
+    }).join('');
+  }catch(e){listEl.innerHTML='<div style="padding:32px;text-align:center;color:var(--mu)">Error al cargar</div>';}
+}
+
+async function adminVerifySeller(storeId, reqId){
+  try{
+    await fsSet('stores',storeId,{isVerified:true,verifiedAt:Date.now(),verifiedBy:window.fbUser?.uid,verificationStatus:'approved'});
+    await fsSet('users',storeId,{isVerified:true,verificationStatus:'approved'});
+    if(reqId) await fsSet('verification_requests',reqId,{status:'approved',approvedAt:Date.now()});
+    toast('✅ Seller verificado');
+    _adminLoadSellers();
+  }catch(e){toast('❌ Error: '+e.message);}
+}
+
+async function adminUnverifySeller(storeId){
+  try{
+    await fsSet('stores',storeId,{isVerified:false});
+    toast('Verificación revocada');
+    _adminLoadSellers();
+  }catch(e){toast('❌ Error');}
+}
+
+async function adminRejectSeller(storeId, reqId){
+  try{
+    if(reqId) await fsSet('verification_requests',reqId,{status:'rejected',rejectedAt:Date.now()});
+    toast('Solicitud rechazada');
+    _adminLoadSellers();
+  }catch(e){toast('❌ Error');}
+}
+
 async function _adminLoadUsers(){
   const listEl=document.getElementById('admin-users-list');
   listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu);font-size:12px">⏳ Cargando...</div>';
@@ -6261,6 +6395,83 @@ async function _adminLoadUsers(){
         </div>
       </div>`).join('');
   }catch(e){listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu)">Error al cargar</div>';}
+}
+
+
+// ═══ SELLER VERIFICATION ═══
+function openVerifRequest(){
+  const u=window.fbUser;
+  if(!u||u.type!=='seller'){toast('⚠️ Solo para sellers');return;}
+  // Pre-fill
+  const cedula=document.getElementById('verif-cedula');
+  const wa=document.getElementById('verif-wa');
+  if(cedula&&u.cedula)cedula.value=u.cedula;
+  if(wa&&u.whatsapp)wa.value=u.whatsapp;
+  const modal=document.getElementById('verif-modal');
+  if(modal)modal.style.display='flex';
+}
+
+function closeVerifModal(){
+  const modal=document.getElementById('verif-modal');
+  if(modal)modal.style.display='none';
+}
+
+async function submitVerifRequest(){
+  const cedula=document.getElementById('verif-cedula').value.trim();
+  const desc=document.getElementById('verif-desc').value.trim();
+  const wa=document.getElementById('verif-wa').value.trim().replace(/[^0-9]/g,'');
+  if(!cedula){toast('⚠️ Ingresa tu cédula');return;}
+  if(!desc){toast('⚠️ Describe tu tienda');return;}
+  const uid=window.fbUser?.uid;
+  if(!uid){toast('⚠️ Inicia sesión');return;}
+  const btn=document.querySelector('#verif-modal button');
+  if(btn){btn.textContent='⏳ Enviando...';btn.disabled=true;}
+  try{
+    // Save verification request
+    await fsAdd('verification_requests',{
+      sellerId:uid,
+      sellerName:window.fbUser?.name||window.fbUser?.username||'Seller',
+      shopName:window.fbUser?.shop||'',
+      email:window.fbUser?.email||'',
+      cedula,description:desc,whatsapp:wa,
+      status:'pending',
+      createdAt:Date.now()
+    });
+    // Update store with pending status
+    await fsSet('stores',uid,{verificationStatus:'pending',whatsapp:wa});
+    // Update local user
+    window.fbUser.verificationStatus='pending';
+    fbCacheUser(window.fbUser);
+    closeVerifModal();
+    toast('✅ Solicitud enviada — revisamos en 24h');
+    // Update menu label
+    const lbl=document.getElementById('verif-menu-label');
+    if(lbl)lbl.textContent='Verificación pendiente ⏳';
+  }catch(e){
+    toast('❌ Error al enviar: '+e.message);
+  }finally{
+    if(btn){btn.textContent='🪪 Enviar solicitud';btn.disabled=false;}
+  }
+}
+
+function _updateVerifMenuItem(){
+  const u=window.fbUser;
+  if(!u||u.type!=='seller')return;
+  const item=document.getElementById('verif-menu-item');
+  const lbl=document.getElementById('verif-menu-label');
+  if(!item)return;
+  item.style.display='flex';
+  if(u.isVerified){
+    lbl.textContent='Cuenta verificada ✅';
+    item.style.opacity='.6';
+    item.onclick=()=>toast('✅ Tu cuenta está verificada');
+  } else if(u.verificationStatus==='pending'){
+    lbl.textContent='Verificación pendiente ⏳';
+    item.onclick=()=>toast('⏳ Tu solicitud está siendo revisada');
+  } else {
+    lbl.textContent='Solicitar verificación';
+    item.onclick=openVerifRequest;
+  }
 }
 
 function fbLogout(){
