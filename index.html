@@ -234,7 +234,13 @@ async function fbRestoreSession(){
 }
 </script>
 <style>
-:root{--y:#FFD000;--y2:#FFE100;--dk:#0A0A0F;--dk2:#111118;--dk3:#1A1A25;--dk4:#22222F;--rd:#FF3B3B;--tx:#F0F0F0;--mu:#777;--r:14px;--app-h:100vh}
+:root{
+  --y:#FFD000;--y2:#FFE100;--dk:#0A0A0F;--dk2:#111118;--dk3:#1A1A25;--dk4:#22222F;--rd:#FF3B3B;--tx:#F0F0F0;--mu:#777;--r:14px;--app-h:100vh;
+  --sat:env(safe-area-inset-top,0px);
+  --sab:env(safe-area-inset-bottom,0px);
+  --sal:env(safe-area-inset-left,0px);
+  --sar:env(safe-area-inset-right,0px);
+}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{height:100%;height:-webkit-fill-available}
 body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;background:var(--dk);color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px}
@@ -242,11 +248,11 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .scr{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateX(44px) scale(.98);transition:opacity .32s cubic-bezier(.4,0,.2,1),transform .36s cubic-bezier(.34,1.10,.64,1);overflow:hidden;will-change:transform,opacity}
 .scr.on{opacity:1;pointer-events:all;transform:translateX(0) scale(1)}
 .scr.out{opacity:0;transform:translateX(-28px) scale(.98);transition:opacity .2s ease,transform .2s ease}
-.sb{flex:1;overflow-y:auto;scrollbar-width:none;padding-bottom:72px}
+.sb{flex:1;overflow-y:auto;scrollbar-width:none;padding-bottom:calc(72px + var(--sab))}
 .sb::-webkit-scrollbar{display:none}
 
 /* NAV — minimal */
-.nav{position:absolute;bottom:0;left:0;right:0;background:rgba(8,8,12,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid rgba(255,255,255,.07);display:flex;z-index:50;padding-bottom:max(env(safe-area-inset-bottom),6px)}
+.nav{position:absolute;bottom:0;left:0;right:0;background:rgba(8,8,12,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid rgba(255,255,255,.07);display:flex;z-index:50;padding-bottom:max(var(--sab),6px);padding-left:var(--sal);padding-right:var(--sar)}
 .nav.hide{display:none}
 .ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;padding:10px 0 7px;position:relative;transition:all .15s}
 .ni-ico-wrap{width:24px;height:24px;display:flex;align-items:center;justify-content:center;position:relative}
@@ -265,7 +271,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .nb{position:absolute;top:6px;right:6px;width:14px;height:14px;background:var(--rd);border-radius:50%;border:2px solid var(--dk);font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center;color:#fff;z-index:2}
 
 /* TOPBAR */
-.top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;flex-shrink:0;background:var(--dk)}
+.top{display:flex;align-items:center;justify-content:space-between;padding:max(var(--sat),14px) 16px 10px;flex-shrink:0;background:var(--dk)}
 .logo{display:flex;align-items:center;gap:8px}
 .logo-icon{width:34px;height:34px;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(255,208,0,.5))}
 .logo-text{line-height:1}
@@ -389,17 +395,20 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .sv img{width:100%;height:100%;object-fit:cover;opacity:.9;display:block}
 .sv-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.55) 0%,transparent 28%,transparent 42%,rgba(0,0,0,.85) 100%);pointer-events:none}
 /* Top bar inside stream */
-.sv-topbar{position:absolute;top:0;left:0;right:0;padding:14px 14px 0;display:flex;align-items:center;justify-content:space-between;z-index:5}
+.sv-topbar{position:absolute;top:0;left:0;right:0;padding:max(var(--sat),14px) 14px 0;display:flex;align-items:center;justify-content:space-between;z-index:5}
 .sv-top-left{display:flex;align-items:center;gap:8px}
 .bk{width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;border:1px solid rgba(255,255,255,.12);color:#fff;transition:all .15s;flex-shrink:0}
 .bk:active{transform:scale(.88)}
 .sv-title-pill{background:rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:5px 10px;display:flex;align-items:center;gap:7px}
 .sv-title-pill .sv-avsmall{width:22px;height:22px;border-radius:50%;background:var(--y);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
 .sv-title-pill .sv-seller-mini{font-size:11px;font-weight:800;color:#fff}
-.sv-top-right{display:flex;flex-direction:column;gap:8px;align-items:center}
-.sv-act{width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:#fff;gap:1px;transition:transform .15s cubic-bezier(.34,1.56,.64,1)}
+.sv-top-right{display:flex;flex-direction:column;gap:20px;align-items:center;position:absolute;right:14px;bottom:100px;z-index:6}
+.sv-act{width:52px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;background:none;border:none;padding:0;-webkit-tap-highlight-color:transparent;transition:transform .18s cubic-bezier(.34,1.56,.64,1)}
 .sv-act:active{transform:scale(.88)}
-.sv-act-lbl{font-size:7px;font-weight:800;line-height:1}
+.sv-act-ico{width:52px;height:52px;border-radius:50%;background:rgba(20,20,28,.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1.5px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.5);transition:background .2s,border-color .2s}
+.sv-act svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sv-act-lbl{font-size:10px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.8);letter-spacing:.1px}
+.sv-act.liked .sv-act-ico{background:rgba(255,59,59,.45);border-color:rgba(255,59,59,.7)}
 /* Viewer + live pills */
 .sv-pills{position:absolute;top:14px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:5}
 /* Bottom overlay: seller + stats */
@@ -1046,7 +1055,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .ob-top-skip{position:absolute;top:168px;right:20px;z-index:10;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:6px 14px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;color:rgba(255,255,255,.7);cursor:pointer;transition:all .15s}
 .ob-top-skip:hover{color:#fff}
 /* ═══ REGISTER screen ═══ */
-#s-register{background:var(--dk);z-index:100;overflow-y:auto}
+#s-register{background:var(--dk);z-index:100;overflow-y:auto;padding-top:var(--sat)}
 .reg-wrap{flex:1;display:flex;flex-direction:column;padding:0 24px;overflow-y:auto;scrollbar-width:none}
 .reg-wrap::-webkit-scrollbar{display:none}
 .reg-logo{display:flex;align-items:center;gap:8px;padding:20px 0 28px}
@@ -1109,7 +1118,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .bc-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
 .bc-gt{position:absolute;top:0;left:0;right:0;height:160px;background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);z-index:2;pointer-events:none}
 .bc-gb{position:absolute;bottom:0;left:0;right:0;height:320px;background:linear-gradient(to top,rgba(0,0,0,.92),transparent);z-index:2;pointer-events:none}
-.bc-top{position:absolute;top:0;left:0;right:0;padding:14px;display:flex;align-items:center;gap:8px;z-index:5}
+.bc-top{position:absolute;top:0;left:0;right:0;padding:max(var(--sat),14px) 14px 14px;display:flex;align-items:center;gap:8px;z-index:5}
 .bc-live-pill{display:flex;align-items:center;gap:5px;background:var(--rd);border-radius:20px;padding:5px 12px;flex-shrink:0}
 .bc-live-dot{width:6px;height:6px;border-radius:50%;background:#fff;animation:pulse 1.5s infinite}
 .bc-live-lbl{font-size:11px;font-weight:900;color:#fff;letter-spacing:.5px}
@@ -1574,11 +1583,27 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
           <div class="lbadge" style="font-size:8px;padding:2px 6px">EN VIVO</div>
         </div>
       </div>
-      <div class="sv-top-right">
-        <button class="sv-act" onclick="shareStream()">↗<div class="sv-act-lbl">Compartir</div></button>
-        <button class="sv-act" id="sv-like" onclick="likeStream()">🤍<div class="sv-act-lbl" id="sv-likes">0</div></button>
-        <button class="sv-act" onclick="openSeller(curStream)">👤<div class="sv-act-lbl">Perfil</div></button>
-      </div>
+    </div>
+    <!-- Right action buttons -->
+    <div class="sv-top-right">
+      <button class="sv-act" id="sv-like" onclick="likeStream()">
+        <div class="sv-act-ico">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" id="sv-like-path" stroke="#fff" stroke-width="1.8" fill="none"/></svg>
+        </div>
+        <div class="sv-act-lbl" id="sv-likes">0</div>
+      </button>
+      <button class="sv-act" onclick="openSeller(curStream)">
+        <div class="sv-act-ico">
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#fff" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="sv-act-lbl">Perfil</div>
+      </button>
+      <button class="sv-act" onclick="shareStream()">
+        <div class="sv-act-ico">
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#fff" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </div>
+        <div class="sv-act-lbl">Compartir</div>
+      </button>
     </div>
     <div class="sv-bottom-overlay">
       <div class="sv-stats-row">
@@ -3324,7 +3349,7 @@ function openStream(idx){
   document.getElementById('sp-disc').textContent=`-${disc}%`;
   document.getElementById('spbuy').onclick=()=>quickAdd(curStreamProd);
   likes=Math.floor(s.v*6);
-  document.getElementById('sv-like').childNodes[0].textContent='🤍';
+  document.getElementById('sv-like').classList.remove('liked');const _lp=document.getElementById('sv-like-path');if(_lp)_lp.setAttribute('fill','none');
   document.getElementById('sv-likes').textContent=fmt(likes);
   document.getElementById('chat-msgs').innerHTML='';
   startChat(idx);startViewers(idx);startTimer();
@@ -4280,29 +4305,18 @@ async function openDash(){
   dashTab('orders');
   const uid=window.fbUser?.uid;
   if(!uid){renderDash();return;}
-  // Mostrar spinner mientras carga
   const listEl=document.getElementById('dash-orders-list');
-  if(listEl)listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu);font-size:12px">⏳ Cargando órdenes...</div>';
+  if(listEl)listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu);font-size:12px">⏳ Cargando...</div>';
   try{
     const fsOrders=await fsQuery('orders',[{field:'sellerId',value:uid}]);
-    // Reemplazar con data real (no mezclar con estáticos)
     DASH_ORDERS=fsOrders.map(o=>({
       ...o,
       buyer:o.buyerName||o.buyer||'Comprador',
       num:o.num||o.orderId||o._id,
       date:o.date||new Date(o.createdAt||Date.now()).toLocaleDateString('es-VE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})
     }));
-    // Calcular WEEK_DATA real por día de la semana
-    const wk=[0,0,0,0,0,0,0];
-    const now=Date.now();
-    DASH_ORDERS.forEach(o=>{
-      const d=new Date(o.createdAt||now);
-      const diff=Math.floor((now-d.getTime())/(86400000));
-      if(diff<7)wk[(d.getDay()+6)%7]+=o.amt||0;
-    });
-    if(wk.some(v=>v>0))WEEK_DATA.splice(0,7,...wk);
   }catch(e){console.warn('openDash:',e);}
-  renderDash();
+  await renderDash();
 }
 
 // ── B: SEED FIRESTORE ────────────────────────────────────────────────────────
@@ -4333,65 +4347,131 @@ async function seedFirestore(){
     loadHomeFeed();
   }catch(e){toast('❌ Error al sembrar data');}
 }
-function renderDash(){
-  const revenue=DASH_ORDERS.reduce((s,o)=>s+o.amt,0);
-  const todayRev=DASH_ORDERS.slice(0,3).reduce((s,o)=>s+o.amt,0);
-  const pending=DASH_ORDERS.filter(o=>o.status==='pending').reduce((s,o)=>s+o.amt,0);
+async function renderDash(){
+  const uid=window.fbUser?.uid;
+  // ── Revenue & orders ─────────────────────────────────────────────────────
+  const revenue=DASH_ORDERS.reduce((s,o)=>s+(o.amt||0),0);
+  const now=Date.now();
+  const todayStart=new Date();todayStart.setHours(0,0,0,0);
+  const todayRev=DASH_ORDERS.filter(o=>(o.createdAt||0)>=todayStart.getTime()).reduce((s,o)=>s+(o.amt||0),0);
+  const pending=DASH_ORDERS.filter(o=>o.status==='pending').reduce((s,o)=>s+(o.amt||0),0);
+  const prevRev=DASH_ORDERS.filter(o=>{const d=o.createdAt||0;const s=todayStart.getTime()-30*86400000;return d>=s&&d<s+30*86400000;}).reduce((s,o)=>s+(o.amt||0),0);
+  const pct=prevRev>0?Math.round((revenue-prevRev)/prevRev*100):0;
   document.getElementById('dash-revenue').textContent='$'+revenue;
-  document.getElementById('dash-rev-sub').textContent='+23% vs mes anterior';
+  document.getElementById('dash-rev-sub').textContent=(pct>=0?'+':'')+pct+'% vs mes anterior';
   document.getElementById('dash-today').textContent='$'+todayRev;
   document.getElementById('dash-pending').textContent='$'+pending;
   document.getElementById('dash-orders').textContent=DASH_ORDERS.length;
-  document.getElementById('dash-views').textContent='389';
-  document.getElementById('dash-followers').textContent='12.4k';
-  document.getElementById('dash-products').textContent=PRODS.filter(p=>p.s===0).length||6;
-  const maxVal=Math.max(...WEEK_DATA);
-  document.getElementById('dash-bars').innerHTML=WEEK_DATA.map((v,i)=>`<div class="dash-bar-wrap"><div class="dash-bar-val">${v>0?'$'+v:''}</div><div class="dash-bar ${i===6?'today':''}" style="height:${Math.round((v/maxVal)*72)+4}px"></div><div class="dash-bar-lbl">${DAYS[i]}</div></div>`).join('');
-  document.getElementById('dash-orders-list').innerHTML=DASH_ORDERS.map((o,i)=>{
-    const statusLabel=o.status==='pending'?'⏳ Pendiente':o.status==='processing'?'🔄 En camino':'✅ Entregado';
-    const auctionTag=o.fromAuction?`<span style="font-size:8px;font-weight:900;color:var(--rd);background:rgba(255,59,59,.12);border-radius:4px;padding:1px 5px;margin-left:4px">🔨 SUBASTA</span>`:'';
-    const buyerDetails=[o.buyerPhone,o.buyerCity].filter(Boolean).join(' · ');
-    const orderNum=o.num||('IC-'+(10000+i));
-    return `<div class="dash-order" style="flex-direction:column;align-items:stretch;gap:0;padding:14px 16px">
-      <div style="display:flex;align-items:center;gap:11px;margin-bottom:10px">
-        <div class="dash-order-thumb">${o.img?`<img src="${o.img}" onerror="this.style.display='none'">`:''}${o.e||''}</div>
-        <div style="flex:1">
-          <div class="dash-order-name">${o.prod}${auctionTag}</div>
-          <div class="dash-order-meta">${o.sz?`${o.sz} · `:''}x${o.qty||1} · ${o.date}</div>
-        </div>
-        <div class="dash-order-right">
-          <div class="dash-order-amt">$${o.amt}</div>
-          <div class="dash-order-status ${o.status}">${statusLabel}</div>
-        </div>
-      </div>
-      <div style="background:var(--dk4);border-radius:10px;padding:10px 12px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-          <span style="font-size:10px;font-weight:900;color:var(--mu);text-transform:uppercase;letter-spacing:.4px">Comprador</span>
-          <span style="font-size:10px;color:var(--mu)">#${orderNum}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--dk3);display:flex;align-items:center;justify-content:center;font-size:14px">👤</div>
-          <div>
-            <div style="font-size:13px;font-weight:900;color:#fff">${o.buyer}</div>
-            ${buyerDetails?`<div style="font-size:10px;color:var(--mu)">${buyerDetails}</div>`:''}
+
+  // ── Seller profile data from Firestore ───────────────────────────────────
+  let storeData=null;
+  try{storeData=uid?await fsGet('stores',uid):null;}catch(e){}
+  let streamData=null;
+  try{
+    const ch=window._bcChannelName||storeData?.channelName;
+    if(ch)streamData=await fsGet('streams',ch);
+  }catch(e){}
+  const viewers=streamData?.viewerCount||0;
+  const followers=storeData?.followers||window.fbUser?.followers||0;
+  document.getElementById('dash-views').textContent=viewers>0?viewers:'—';
+  document.getElementById('dash-followers').textContent=followers>999?(followers/1000).toFixed(1)+'k':followers||'0';
+
+  // ── Products count from FS ────────────────────────────────────────────────
+  let sellerProds=[];
+  try{sellerProds=uid?await fsQuery('products',[{field:'sellerId',value:uid}]):[];}catch(e){}
+  document.getElementById('dash-products').textContent=sellerProds.length||0;
+
+  // ── Weekly chart — real data ──────────────────────────────────────────────
+  const wk=[0,0,0,0,0,0,0];
+  DASH_ORDERS.forEach(o=>{
+    const d=new Date(o.createdAt||now);
+    const diff=Math.floor((now-d.getTime())/86400000);
+    if(diff<7)wk[(d.getDay()+6)%7]+=o.amt||0;
+  });
+  const chartData=wk.some(v=>v>0)?wk:WEEK_DATA;
+  const maxVal=Math.max(...chartData,1);
+  document.getElementById('dash-bars').innerHTML=chartData.map((v,i)=>`<div class="dash-bar-wrap"><div class="dash-bar-val">${v>0?'$'+v:''}</div><div class="dash-bar ${i===(new Date().getDay()+6)%7?'today':''}" style="height:${Math.round((v/maxVal)*72)+4}px"></div><div class="dash-bar-lbl">${DAYS[i]}</div></div>`).join('');
+
+  // ── Orders list ───────────────────────────────────────────────────────────
+  if(!DASH_ORDERS.length){
+    document.getElementById('dash-orders-list').innerHTML='<div style="text-align:center;padding:48px 24px;color:var(--mu)"><div style="font-size:40px;margin-bottom:10px">📭</div><div style="font-size:13px;font-weight:800;color:var(--tx);margin-bottom:4px">Sin pedidos aún</div><div style="font-size:11px">Las ventas aparecerán aquí en tiempo real</div></div>';
+  } else {
+    document.getElementById('dash-orders-list').innerHTML=DASH_ORDERS.map((o,i)=>{
+      const statusLabel=o.status==='pending'?'⏳ Pendiente':o.status==='processing'?'🚀 En camino':'✅ Entregado';
+      const auctionTag=o.fromAuction?`<span style="font-size:8px;font-weight:900;color:var(--rd);background:rgba(255,59,59,.12);border-radius:4px;padding:1px 5px;margin-left:4px">🔨 SUBASTA</span>`:'';
+      const buyerDetails=[o.buyerPhone,o.buyerCity].filter(Boolean).join(' · ');
+      const orderNum=o.num||o.orderId||('IC-'+(10000+i));
+      const dateStr=o.date||o.createdAt?new Date(o.createdAt||Date.now()).toLocaleDateString('es-VE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+      return `<div class="dash-order" style="flex-direction:column;align-items:stretch;gap:0;padding:14px 16px">
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:10px">
+          <div class="dash-order-thumb">${o.img?`<img src="${o.img}" onerror="this.style.display='none'">`:''}${o.e||'📦'}</div>
+          <div style="flex:1">
+            <div class="dash-order-name">${o.prod||'Producto'}${auctionTag}</div>
+            <div class="dash-order-meta">${o.sz?o.sz+' · ':''}x${o.qty||1} · ${dateStr}</div>
+          </div>
+          <div class="dash-order-right">
+            <div class="dash-order-amt">$${o.amt}</div>
+            <div class="dash-order-status ${o.status}">${statusLabel}</div>
           </div>
         </div>
-        <div style="display:flex;gap:6px">
-          <button onclick="event.stopPropagation();markOrderStatus(${i},'processing')" style="flex:1;padding:7px;background:rgba(33,150,243,.15);border:1px solid rgba(33,150,243,.3);border-radius:9px;color:#2196F3;font-size:10px;font-weight:900;cursor:pointer">🚀 Despachar</button>
-          <button onclick="event.stopPropagation();markOrderStatus(${i},'delivered')" style="flex:1;padding:7px;background:rgba(76,175,80,.12);border:1px solid rgba(76,175,80,.3);border-radius:9px;color:#4CAF50;font-size:10px;font-weight:900;cursor:pointer">✅ Entregado</button>
+        <div style="background:var(--dk4);border-radius:10px;padding:10px 12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:10px;font-weight:900;color:var(--mu);text-transform:uppercase;letter-spacing:.4px">Comprador</span>
+            <span style="font-size:10px;color:var(--mu)">#${orderNum}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--dk3);display:flex;align-items:center;justify-content:center;font-size:14px">👤</div>
+            <div>
+              <div style="font-size:13px;font-weight:900;color:#fff">${o.buyer||o.buyerName||'Comprador'}</div>
+              ${buyerDetails?`<div style="font-size:10px;color:var(--mu)">${buyerDetails}</div>`:''}
+            </div>
+          </div>
+          <div style="display:flex;gap:6px">
+            ${o.status!=='delivered'?`<button onclick="event.stopPropagation();markOrderStatus(${i},'processing')" style="flex:1;padding:7px;background:rgba(33,150,243,.15);border:1px solid rgba(33,150,243,.3);border-radius:9px;color:#2196F3;font-size:10px;font-weight:900;cursor:pointer">🚀 Despachar</button>`:''}
+            ${o.status!=='delivered'?`<button onclick="event.stopPropagation();markOrderStatus(${i},'delivered')" style="flex:1;padding:7px;background:rgba(76,175,80,.12);border:1px solid rgba(76,175,80,.3);border-radius:9px;color:#4CAF50;font-size:10px;font-weight:900;cursor:pointer">✅ Entregado</button>`:'<div style="font-size:11px;color:rgba(76,175,80,.7);font-weight:800;text-align:center;width:100%;padding:7px">✅ Completado</div>'}
+          </div>
         </div>
-      </div>
-    </div>`;
-  }).join('');
-  const topProds=PRODS.slice(0,5);
-  document.getElementById('dash-prods-list').innerHTML=topProds.map((p,i)=>`<div class="dash-top-prod"><div class="dash-tp-rank">${i+1}</div><div class="dash-tp-img">${p.img?`<img src="${p.img}" onerror="this.style.display='none'">`:''}${p.e}</div><div class="dash-tp-info"><div class="dash-tp-name">${p.n}</div><div class="dash-tp-sold">${~~(Math.random()*40+5)} vendidos</div></div><div class="dash-tp-rev">$${p.p*~~(Math.random()*40+5)}</div></div>`).join('');
+      </div>`;
+    }).join('');
+  }
+
+  // ── Top products — real from Firestore ────────────────────────────────────
+  const topProds=sellerProds.length?sellerProds:[];
+  // Enrich with real sales counts from orders
+  const prodSales={};
+  DASH_ORDERS.forEach(o=>{
+    const k=o.prod||'';
+    if(!prodSales[k])prodSales[k]={count:0,rev:0};
+    prodSales[k].count+=(o.qty||1);
+    prodSales[k].rev+=(o.amt||0);
+  });
+  if(topProds.length){
+    document.getElementById('dash-prods-list').innerHTML=topProds.slice(0,5).map((p,i)=>{
+      const sales=prodSales[p.name||p.n]||{count:0,rev:0};
+      return `<div class="dash-top-prod">
+        <div class="dash-tp-rank">${i+1}</div>
+        <div class="dash-tp-img">${p.img?`<img src="${p.img}" onerror="this.style.display='none'">`:''}${p.emoji||p.e||'📦'}</div>
+        <div class="dash-tp-info"><div class="dash-tp-name">${p.name||p.n}</div><div class="dash-tp-sold">${sales.count} vendidos</div></div>
+        <div class="dash-tp-rev">$${sales.rev||p.price||p.p||0}</div>
+      </div>`;
+    }).join('');
+  } else {
+    document.getElementById('dash-prods-list').innerHTML='<div style="text-align:center;padding:32px;color:var(--mu);font-size:12px">Aún no tienes productos registrados</div>';
+  }
+
+  // ── Stats — calculadas de datos reales ────────────────────────────────────
+  const totalStreams=storeData?.totalStreams||0;
+  const auctionOrders=DASH_ORDERS.filter(o=>o.fromAuction).length;
+  const convRate=DASH_ORDERS.length&&viewers>0?(DASH_ORDERS.length/Math.max(viewers,1)*100).toFixed(1)+'%':'—';
+  const avgResponse=storeData?.avgResponseMin||'—';
+  const rating=storeData?.rating||'—';
   const statsData=[
-    {icon:'👁',label:'Vistas al perfil',val:'2.4k',sub:'Esta semana'},
-    {icon:'🛒',label:'Tasa conversión',val:'8.2%',sub:'Vistas → compras'},
-    {icon:'⭐',label:'Rating promedio',val:'4.9',sub:'128 reseñas'},
-    {icon:'⏱',label:'Resp. promedio',val:'12 min',sub:'Tiempo respuesta'},
-    {icon:'🔴',label:'Streams este mes',val:'8',sub:'Total lives'},
-    {icon:'🏆',label:'Subastas cerradas',val:String(DASH_ORDERS.filter(o=>o.fromAuction).length||23),sub:'Este mes'},
+    {icon:'👁',label:'Viewers activos',val:viewers>0?String(viewers):'0',sub:'En tu stream'},
+    {icon:'🛒',label:'Tasa conversión',val:convRate,sub:'Viewers → compras'},
+    {icon:'⭐',label:'Rating',val:rating?String(rating):'—',sub:'Promedio reseñas'},
+    {icon:'💰',label:'Ticket promedio',val:DASH_ORDERS.length?'$'+Math.round(revenue/DASH_ORDERS.length):'$0',sub:'Por pedido'},
+    {icon:'🔴',label:'Streams realizados',val:String(totalStreams||0),sub:'Total histórico'},
+    {icon:'🏆',label:'Subastas cerradas',val:String(auctionOrders),sub:'Con pedido'},
   ];
   document.getElementById('dash-stats-grid').innerHTML=statsData.map(s=>`<div style="background:var(--dk3);border-radius:13px;padding:14px;border:1px solid rgba(255,255,255,.05)"><div style="font-size:22px;margin-bottom:6px">${s.icon}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--y);line-height:1">${s.val}</div><div style="font-size:11px;font-weight:800;color:var(--tx);margin-top:3px">${s.label}</div><div style="font-size:10px;color:var(--mu);margin-top:2px">${s.sub}</div></div>`).join('');
 }
@@ -4696,7 +4776,15 @@ async function joinAsHost(channelName){
     toast('📡 ¡Estás en vivo!');
   }catch(e){
     console.error('Agora host:',e);
-    toast('⚠️ Error al iniciar live: '+e.message);
+    const msg=e.message||'';
+    if(msg.includes('CAN_NOT_GET_GATEWAY')||msg.includes('token')||msg.includes('dynamic key')){
+      toast('⚠️ Token de Agora expirado — desactiva el App Certificate en console.agora.io');
+    } else if(msg.includes('NOT_SUPPORTED')||msg.includes('MEDIA_NOT_SUPPORT')){
+      toast('⚠️ Cámara no disponible — verifica permisos');
+    } else {
+      toast('⚠️ Error al iniciar live: '+msg.slice(0,60));
+    }
+    const btn=document.getElementById('gl-go-btn');
     if(btn){btn.textContent='Empezar en Vivo';btn.disabled=false;}
   }
 }
@@ -5010,6 +5098,10 @@ function startBroadcast(){
       whatsapp:window.fbUser?.whatsapp||''
     });
     fsSet('stores',uid,{isLive:true,channelName});
+    // Increment total stream count
+    fsGet('stores',uid).then(s=>{
+      fsSet('stores',uid,{totalStreams:(s?.totalStreams||0)+1});
+    }).catch(()=>{});
   }
   // If auction mode selected, auto-open auction panel
   if(glSaleType==='auction'){setTimeout(()=>bcShowAucPanel(),1000);}
@@ -5212,14 +5304,19 @@ function fmt(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n);}
 
 // ═══ MOBILE VIEWPORT FIX ═══
 function setAppHeight(){
-  const h=window.innerHeight;
+  // Use visualViewport when available (more accurate on mobile)
+  const h=(window.visualViewport?.height)||window.innerHeight;
   document.documentElement.style.setProperty('--app-h',h+'px');
-  document.getElementById('app').style.height=h+'px';
+  const app=document.getElementById('app');
+  if(app)app.style.height=h+'px';
 }
 setAppHeight();
-window.addEventListener('resize',setAppHeight);
-// Also fix on orientation change
-window.addEventListener('orientationchange',()=>setTimeout(setAppHeight,150));
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',setAppHeight);
+} else {
+  window.addEventListener('resize',setAppHeight);
+}
+window.addEventListener('orientationchange',()=>setTimeout(setAppHeight,200));
 
 // ═══ NOTIFICATIONS ═══
 let notifData=[
