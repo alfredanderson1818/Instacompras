@@ -476,7 +476,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 @keyframes pd-heart-fly{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-90px) scale(.4);opacity:0}}
 .pd-heart{position:absolute;right:0;font-size:22px;animation:pd-heart-fly 1.8s cubic-bezier(.2,.8,.4,1) forwards}
 .pd-view-pill{background:rgba(0,0,0,.55);backdrop-filter:blur(8px);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:800;color:#fff}
-.pd-bk{position:absolute;top:13px;left:13px;z-index:2;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;border:none;color:#fff}
+.pd-bk{position:absolute;top:max(var(--sat),13px);left:13px;z-index:2;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;border:none;color:#fff}
 .pd-wish{position:absolute;top:13px;right:13px;z-index:2;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:19px;border:none;transition:transform .2s}
 .pd-body{padding:15px}
 .pd-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.4px;margin-bottom:6px}
@@ -511,7 +511,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 /* ═══ CART ═══ */
 #s-cart{background:var(--dk)}
-.cart-hdr{padding:14px 16px;font-family:'Bebas Neue',sans-serif;font-size:22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
+.cart-hdr{padding:max(var(--sat),14px) 16px 14px;font-family:'Bebas Neue',sans-serif;font-size:22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
 .cart-clr{font-family:'Nunito',sans-serif;font-size:12px;color:var(--rd);font-weight:700;cursor:pointer}
 .cart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--mu);padding:50px 20px;text-align:center}
 .cart-empty-ico{font-size:56px;opacity:.35}
@@ -541,7 +541,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 /* ═══ EXPLORE ═══ */
 #s-exp{background:var(--dk)}
 /* ─── EXPLORE SCREEN ─── */
-.exp-search-wrap{padding:14px 16px 10px;flex-shrink:0}
+.exp-search-wrap{padding:max(var(--sat),14px) 16px 10px;flex-shrink:0}
 .exp-search{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:11px 16px;transition:all .2s}
 .exp-search.focus{border-color:rgba(255,208,0,.5);background:rgba(255,208,0,.05)}
 .exp-search input{background:none;border:none;outline:none;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;flex:1}
@@ -644,9 +644,9 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .sp-hero-img{width:100%;height:100%;object-fit:cover;opacity:.5}
 .sp-hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#111128,#0d1f4e)}
 .sp-hero-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,10,15,.2) 0%,rgba(10,10,15,.95) 100%)}
-.sp-hero-back{position:absolute;top:14px;left:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#fff;z-index:2}
+.sp-hero-back{position:absolute;top:max(var(--sat),14px);left:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#fff;z-index:2}
 .sp-hero-back:active{transform:scale(.88)}
-.sp-hero-share{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#fff;z-index:2}
+.sp-hero-share{position:absolute;top:max(var(--sat),14px);right:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#fff;z-index:2}
 /* Avatar overlapping hero */
 .sp-avatar-wrap{position:absolute;bottom:-34px;left:20px;z-index:3}
 .sp-avatar{width:68px;height:68px;border-radius:50%;background:var(--y);display:flex;align-items:center;justify-content:center;font-size:32px;border:3px solid var(--dk);box-shadow:0 4px 16px rgba(0,0,0,.4)}
@@ -711,7 +711,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 /* ═══ CHECKOUT redesigned ═══ */
 #s-co{background:var(--dk)}
-.co-hdr{padding:14px 16px 12px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.co-hdr{padding:max(var(--sat),14px) 16px 12px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .co-title{font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1}
 /* step indicator */
 .co-steps{display:flex;align-items:center;padding:0 16px 16px;gap:0;flex-shrink:0}
@@ -764,7 +764,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 /* ═══ NOTIFICATIONS ═══ */
 #s-notif{background:var(--dk)}
-.notif-hdr{padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.notif-hdr{padding:max(var(--sat),14px) 16px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .notif-title{font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1}
 .notif-clear{font-size:11px;font-weight:800;color:var(--y);cursor:pointer}
 .notif-item{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s;position:relative}
@@ -794,7 +794,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 /* ═══ ORDER TRACKING ═══ */
 #s-track{background:var(--dk)}
-.track-hdr{padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.track-hdr{padding:max(var(--sat),14px) 16px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .track-title{font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1}
 .track-order-card{margin:0 16px 16px;background:var(--dk3);border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
 .track-prod-row{display:flex;align-items:center;gap:12px;padding:14px}
@@ -840,7 +840,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 /* ═══ DASHBOARD VENDEDOR ═══ */
 #s-dash{background:var(--dk)}
-.dash-hdr{padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.dash-hdr{padding:max(var(--sat),14px) 16px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .dash-title{font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1}
 /* Hero revenue card */
 .dash-hero{margin:0 16px 16px;border-radius:18px;padding:20px;background:linear-gradient(135deg,#1a1a0a,#2a2200);border:1px solid rgba(255,208,0,.2);position:relative;overflow:hidden}
@@ -897,7 +897,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 /* ═══ WALLET ═══ */
 #s-wallet{background:var(--dk)}
-.wallet-hdr{padding:14px 16px 6px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.wallet-hdr{padding:max(var(--sat),14px) 16px 6px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .wallet-title{font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1}
 /* Balance hero card */
 .wallet-hero{margin:0 16px 16px;border-radius:20px;overflow:hidden;position:relative;padding:24px 20px;background:linear-gradient(135deg,#1a1a0a 0%,#2a2200 50%,#1a1500 100%);border:1px solid rgba(255,208,0,.2)}
@@ -952,7 +952,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 /* ═══ AUCTION ═══ */
 #s-auction{background:var(--dk)}
-.auc-hdr{padding:14px 16px 0;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.auc-hdr{padding:max(var(--sat),14px) 16px 0;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .auc-title{font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1}
 /* Product image */
 .auc-img{width:100%;height:220px;overflow:hidden;position:relative;flex-shrink:0}
@@ -1097,7 +1097,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 /* ═══ GO LIVE SETUP ═══ */
 #s-golive{background:var(--dk);z-index:90}
-.gl-hdr{padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.gl-hdr{padding:max(var(--sat),14px) 16px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .gl-preview{width:100%;height:220px;background:#000;position:relative;overflow:hidden;flex-shrink:0;border-radius:0}
 .gl-preview video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
 .gl-cam-off{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--mu);font-size:13px}
@@ -1442,7 +1442,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 <!-- DEPOSIT (wallet recharge page) -->
 <div id="s-deposit" class="scr">
   <div style="flex:1;overflow-y:auto;scrollbar-width:none;padding-bottom:40px">
-    <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+    <div style="padding:max(var(--sat),14px) 16px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0">
       <button onclick="goBack()" style="width:34px;height:34px;border-radius:50%;background:var(--dk3);border:1px solid rgba(255,255,255,.07);color:var(--tx);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">←</button>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1">Recargar Créditos</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--y)" id="dep-bal-top">0 cr</div>
@@ -1651,7 +1651,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 <!-- PRODUCT -->
 <div id="s-prod" class="scr">
-  <div class="sb" style="padding-bottom:90px">
+  <div class="sb">
     <div class="pd-hero" id="pd-hero">
       <!-- Fallback imagen producto -->
       <img id="pd-img" src="" onerror="this.style.display='none'">
@@ -1804,7 +1804,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     </div>
   </div>
 
-  <div class="sb" style="padding-bottom:80px">
+  <div class="sb">
     <div class="sp-body">
       <!-- Name + verify -->
       <div class="sp-name-row">
@@ -1904,7 +1904,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
   <!-- Category chips -->
   <div class="exp-cat-bar" id="exp-cats"></div>
 
-  <div class="sb" style="padding-bottom:80px">
+  <div class="sb">
     <!-- EN VIVO -->
     <div class="exp-sh" id="exp-sh-live">
       <div class="exp-sh-t">
@@ -1936,7 +1936,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
   <input type="file" id="prof-av-input" accept="image/*" style="display:none" onchange="profUploadAv(this)">
   <input type="file" id="prof-banner-input" accept="image/*" style="display:none" onchange="profUploadBanner(this)">
 
-  <div class="sb" style="padding-bottom:88px">
+  <div class="sb">
 
     <!-- BANNER — SVG gradient default, no external URL -->
     <div id="prof-banner-wrap" style="position:relative;height:160px;overflow:hidden;cursor:pointer" onclick="document.getElementById('prof-banner-input').click()">
@@ -2113,12 +2113,12 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 <!-- MIS PEDIDOS -->
 <div id="s-my-orders" class="scr">
-  <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06)">
+  <div style="display:flex;align-items:center;gap:12px;padding:max(var(--sat),14px) 16px 14px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06)">
     <button class="bk" style="position:static;background:var(--dk3);border:1px solid rgba(255,255,255,.07)" onclick="goBack()">←</button>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1">Mis Pedidos</div>
     <div id="my-orders-count" style="font-size:11px;color:var(--mu);font-weight:700"></div>
   </div>
-  <div class="sb" style="padding-bottom:88px" id="my-orders-list">
+  <div class="sb" id="my-orders-list">
     <div style="text-align:center;padding:48px 24px;color:var(--mu)">
       <div style="font-size:40px;margin-bottom:12px">📦</div>
       <div style="font-size:14px;font-weight:800;color:var(--tx);margin-bottom:6px">Sin pedidos aún</div>
@@ -2134,7 +2134,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <div class="notif-title">Notificaciones</div>
     <div class="notif-clear" onclick="clearNotifs()">Limpiar todo</div>
   </div>
-  <div class="sb" style="padding-bottom:80px" id="notif-list"></div>
+  <div class="sb" id="notif-list"></div>
 </div>
 
 <!-- ORDER TRACKING -->
@@ -2144,7 +2144,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <div class="track-title">Seguimiento</div>
     <div style="font-size:11px;font-weight:800;color:var(--mu)" id="track-order-num">#IC-00000</div>
   </div>
-  <div class="sb" style="padding-bottom:80px">
+  <div class="sb">
     <!-- Product card -->
     <div class="track-order-card">
       <div class="track-prod-row">
@@ -2200,7 +2200,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <div style="font-size:19px;cursor:pointer" onclick="toast('⚙️ Configuración de tienda')">⚙️</div>
   </div>
 
-  <div class="sb" style="padding-bottom:80px">
+  <div class="sb">
     <!-- Revenue hero -->
     <div class="dash-hero">
       <div class="dash-hero-row">
@@ -2368,12 +2368,12 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <div style="font-size:11px;font-weight:800;color:var(--mu);cursor:pointer" onclick="go('wallet-history')">Historial</div>
   </div>
 
-  <div class="sb" style="padding-bottom:80px">
+  <div class="sb">
     <!-- Balance card -->
     <div class="wallet-hero">
       <div class="wallet-hero-label">InstaCreditos disponibles</div>
-      <div class="wallet-balance" id="wallet-bal">250</div>
-      <div class="wallet-balance-usd" id="wallet-bal-usd">≈ $25.00 USD</div>
+      <div class="wallet-balance" id="wallet-bal">0</div>
+      <div class="wallet-balance-usd" id="wallet-bal-usd">≈ $0.00 USD</div>
       <div class="wallet-hero-actions">
         <button class="wallet-action-btn primary" onclick="openDeposit()">+ Recargar</button>
         <button class="wallet-action-btn secondary" onclick="toast('💬 Soporte: @instacompras.ve')">? Ayuda</button>
@@ -2498,7 +2498,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     </div>
   </div>
 
-  <div class="sb" style="padding-bottom:100px">
+  <div class="sb">
     <div class="gl-form">
 
       <!-- Título -->
@@ -2734,13 +2734,13 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 <!-- ADMIN PANEL -->
 <div id="s-admin" class="scr">
-  <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06);background:var(--dk)">
+  <div style="display:flex;align-items:center;gap:12px;padding:max(var(--sat),14px) 16px 14px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06);background:var(--dk)">
     <button class="bk" style="position:static;background:var(--dk3);border:1px solid rgba(255,255,255,.07)" onclick="goBack()">←</button>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1">⚡ Panel Admin</div>
     <div id="admin-pending-badge" style="display:none;background:var(--rd);color:#fff;font-size:11px;font-weight:900;padding:3px 10px;border-radius:20px"></div>
   </div>
 
-  <div class="sb" style="padding-bottom:88px">
+  <div class="sb">
     <!-- Stats row -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:16px 16px 0">
       <div style="background:var(--dk3);border-radius:14px;padding:14px 12px;text-align:center;border:1px solid rgba(255,255,255,.06)">
@@ -4210,7 +4210,7 @@ async function openAuction(prodIdx){
   // Precio base
   const basePrice=Math.floor(p.p*1.1);
   const asp=document.getElementById('auc-start-price');if(asp)asp.textContent=`$${p.p}`;
-  const awd=document.getElementById('auc-wallet-display');if(awd)awd.textContent=`${window.fbUser?.wallet||window.fbUser?.credits||0} IC`;
+  const awd=document.getElementById('auc-wallet-display');if(awd)awd.textContent=`${walletBalance} IC`;
 
   // Intentar cargar subasta existente desde Firestore
   let doc=await fsGet('auctions',aucId);
@@ -5639,7 +5639,7 @@ async function loadProfData(){
   if(coName) coName.textContent=u.name||u.displayName||'—';
   // Wallet badge
   const wbal=document.getElementById('wallet-prof-badge');
-  if(wbal) wbal.textContent=(u.wallet||u.credits||500)+' IC';
+  if(wbal) wbal.textContent=(u.wallet!=null?u.wallet:u.credits!=null?u.credits:0)+' IC';
 
   // Fetch real order stats from Firestore
   if(u.uid){
