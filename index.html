@@ -1709,6 +1709,31 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         </div>
       </div>
 
+      <!-- ═══ VENTA A PRECIO FIJO (cuando hay item en venta) ═══ -->
+      <div id="fixed-sale-card" style="display:none;background:linear-gradient(135deg,rgba(255,208,0,.1),rgba(255,208,0,.05));border:1.5px solid rgba(255,208,0,.4);border-radius:16px;overflow:hidden;margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:1px solid rgba(255,208,0,.15)">
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="font-size:16px">🏷️</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--y);letter-spacing:.5px">En Venta Ahora</span>
+            <div class="lbadge" style="font-size:7px;padding:2px 6px;background:rgba(255,208,0,.2);border:1px solid rgba(255,208,0,.4);color:var(--y)">NUEVO</div>
+          </div>
+          <div id="fs-qty-badge" style="background:rgba(255,208,0,.15);border:1px solid rgba(255,208,0,.3);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:900;color:var(--y)">1 disponible</div>
+        </div>
+        <div style="padding:14px 16px">
+          <div style="font-size:15px;font-weight:900;color:#fff;margin-bottom:10px" id="fs-item-name">—</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div>
+              <div style="font-size:9px;font-weight:800;color:var(--mu);letter-spacing:.5px;margin-bottom:2px">PRECIO</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--y);line-height:1" id="fs-item-price">$0</div>
+              <div style="font-size:10px;color:var(--mu);margin-top:3px">Pago con InstaCreditos</div>
+            </div>
+            <button id="fs-buy-btn" onclick="buyFixedItem()" style="background:var(--y);color:var(--dk);border:none;border-radius:14px;padding:14px 20px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;white-space:nowrap;transition:all .18s cubic-bezier(.34,1.3,.64,1);box-shadow:0 4px 20px rgba(255,208,0,.35)">
+              Comprar ahora 🛒
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- ═══ SUBASTA (solo productos LIVE) ═══ -->
       <div id="auc-inline-card" style="background:linear-gradient(135deg,rgba(255,59,59,.1),rgba(255,59,59,.05));border:1.5px solid rgba(255,59,59,.3);border-radius:16px;overflow:hidden;margin-bottom:14px;transition:background .4s,border-color .4s">
 
@@ -2626,6 +2651,11 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--rd)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6l4-4 2.5 2.5-5 5 2 2 5-5 7 7z"/><path d="M14 14l6 6"/><path d="M2 22l5-5"/></svg>
         <div style="font-size:8px;font-weight:900;color:var(--rd);letter-spacing:.3px">SUBASTA</div>
       </div>
+      <!-- Fixed price sell button -->
+      <div id="bc-sell-btn" onclick="bcShowSellPanel()" style="width:52px;flex-shrink:0;background:rgba(255,208,0,.12);border:1.5px solid rgba(255,208,0,.35);border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:all .15s;padding:8px 0">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--y)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        <div style="font-size:8px;font-weight:900;color:var(--y);letter-spacing:.3px">VENTA</div>
+      </div>
     </div>
     <!-- Chat -->
     <div class="bc-msgs" id="bc-msgs"></div>
@@ -2694,7 +2724,73 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     </div>
   </div>
 
-  <!-- ── ITEM EDIT PANEL (slides up) ── -->
+  <!-- ── FIXED PRICE SELL PANEL (slides up) ── -->
+  <div id="bc-sell-panel" style="display:none;position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);align-items:flex-end">
+    <div style="width:100%;background:var(--dk2);border-radius:24px 24px 0 0;padding:20px 20px 40px;border-top:1px solid rgba(255,255,255,.08)">
+      <div style="width:36px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:0 auto 18px"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;display:flex;align-items:center;gap:8px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--y)" stroke-width="2" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            Venta a Precio Fijo
+          </div>
+          <div style="font-size:12px;color:var(--mu);margin-top:2px">El primero que compre se lo lleva</div>
+        </div>
+        <button onclick="bcHideSellPanel()" style="background:var(--dk3);border:1px solid rgba(255,255,255,.08);border-radius:50%;width:32px;height:32px;color:var(--mu);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
+      </div>
+
+      <!-- Item name -->
+      <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">¿Qué vas a vender?</div>
+      <input id="bc-sell-name" type="text" placeholder="Ej: iPhone 13 128GB azul, Zapatos Nike 42…" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;box-sizing:border-box;margin-bottom:14px;transition:border-color .15s" onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+
+      <!-- Price + Qty row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+        <div>
+          <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Precio</div>
+          <div style="display:flex;align-items:center;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:11px 14px;transition:border-color .15s">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--y);margin-right:6px">$</span>
+            <input id="bc-sell-price" type="number" placeholder="0" min="0" style="background:none;border:none;outline:none;color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:24px;width:100%" onfocus="this.parentNode.style.borderColor='rgba(255,208,0,.5)'" onblur="this.parentNode.style.borderColor='rgba(255,255,255,.08)'">
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Cantidad</div>
+          <div style="display:flex;align-items:center;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:11px 14px;transition:border-color .15s">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:rgba(255,255,255,.4);margin-right:6px">✕</span>
+            <input id="bc-sell-qty" type="number" placeholder="1" min="1" value="1" style="background:none;border:none;outline:none;color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:24px;width:100%" onfocus="this.parentNode.style.borderColor='rgba(255,208,0,.5)'" onblur="this.parentNode.style.borderColor='rgba(255,255,255,.08)'">
+          </div>
+        </div>
+      </div>
+
+      <!-- Post button -->
+      <button onclick="bcPostFixedSale()" style="width:100%;background:var(--y);color:var(--dk);border:none;border-radius:14px;padding:16px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dk)" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        Publicar en el Live
+      </button>
+    </div>
+  </div>
+
+  <!-- ── FIXED SALE ACTIVE OVERLAY (shown while item is for sale) ── -->
+  <div id="bc-sale-overlay" style="display:none;position:absolute;top:80px;left:12px;right:12px;z-index:8;pointer-events:none">
+    <div style="background:rgba(0,0,0,.85);backdrop-filter:blur(16px);border-radius:18px;border:1px solid rgba(255,208,0,.4);padding:14px 16px;pointer-events:all">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:7px">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--y);animation:pulse-live 1s infinite"></div>
+          <div style="font-size:11px;font-weight:900;color:var(--y);letter-spacing:1.5px">EN VENTA AHORA</div>
+        </div>
+        <button onclick="bcCancelFixedSale()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:4px 10px;color:rgba(255,255,255,.5);font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer">Retirar</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:900;color:#fff;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="bc-sale-name-display">—</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--y);line-height:1" id="bc-sale-price-display">$0</div>
+            <div style="background:rgba(255,208,0,.15);border:1px solid rgba(255,208,0,.3);border-radius:8px;padding:3px 9px;font-size:11px;font-weight:900;color:var(--y)" id="bc-sale-qty-display">1 disponible</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="bc-item-panel" style="display:none;position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);align-items:flex-end">
     <div style="width:100%;background:var(--dk2);border-radius:24px 24px 0 0;padding:20px 20px 40px;border-top:1px solid rgba(255,255,255,.08)">
       <div style="width:36px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:0 auto 18px"></div>
@@ -3884,6 +3980,7 @@ function stopChat(){
   if(viewIv){clearInterval(viewIv);viewIv=null;}
   if(timerIv){clearInterval(timerIv);timerIv=null;}
   if(_chatPollIv){clearInterval(_chatPollIv);_chatPollIv=null;}
+  _stopFixedSalePoll();
   _chatChannel='';
 }
 
@@ -5194,6 +5291,214 @@ function bcEndAuction(){
   bcAucSecs=0;bcAucEnd();
 }
 
+// ═══ FIXED PRICE SALE — SELLER SIDE ═══
+let _bcActiveSaleId = null;
+let _bcSaleQtyLeft  = 0;
+
+function bcShowSellPanel(){
+  const p = document.getElementById('bc-sell-panel');
+  if(p){ p.style.display='flex'; }
+  const nameInp = document.getElementById('bc-sell-name');
+  const curName = document.getElementById('bc-pn')?.textContent;
+  if(nameInp && curName && curName !== '¿Qué vas a vender?') nameInp.value = curName;
+}
+function bcHideSellPanel(){
+  const p = document.getElementById('bc-sell-panel');
+  if(p) p.style.display='none';
+}
+
+async function bcPostFixedSale(){
+  const name  = (document.getElementById('bc-sell-name')?.value||'').trim();
+  const price = parseFloat(document.getElementById('bc-sell-price')?.value)||0;
+  const qty   = parseInt(document.getElementById('bc-sell-qty')?.value)||1;
+  if(!name){ toast('⚠️ Escribe qué vas a vender'); return; }
+  if(price<=0){ toast('⚠️ Ingresa un precio'); return; }
+
+  bcHideSellPanel();
+
+  const ch = window._bcChannelName||'ic_0';
+  const saleId = 'sale_'+ch+'_'+Date.now();
+  _bcActiveSaleId = saleId;
+  _bcSaleQtyLeft  = qty;
+
+  // Save to Firestore
+  await fsSet('fixedSales', saleId, {
+    channel: ch, name, price, qtyTotal: qty, qtyLeft: qty,
+    status: 'active', createdAt: Date.now(),
+    sellerName: window.fbUser?.name||'Vendedor'
+  }).catch(()=>{});
+
+  // Update overlay on seller screen
+  document.getElementById('bc-sale-name-display').textContent = name;
+  document.getElementById('bc-sale-price-display').textContent = '$'+price;
+  _updateBcSaleQtyBadge(qty);
+  document.getElementById('bc-sale-overlay').style.display='block';
+
+  // Update item bar
+  const pn=document.getElementById('bc-pn'); if(pn) pn.textContent='🏷️ '+name;
+  const pp=document.getElementById('bc-pp'); if(pp) pp.textContent='$'+price;
+  document.getElementById('bc-prod-sub').textContent='En venta — '+qty+' disponible'+(qty>1?'s':'');
+
+  // Announce in chat
+  const announceMsg={channel:ch,user:'Sistema',text:`🏷️ EN VENTA: "${name}" — $${price} IC × ${qty} uds. ¡El primero que compre se lo lleva!`,ts:Date.now()};
+  fsAdd('messages',announceMsg).catch(()=>{});
+  addBcMsg('🏷️','Sistema',announceMsg.text);
+
+  toast('✅ ¡Item publicado en el live!');
+}
+
+function _updateBcSaleQtyBadge(qty){
+  const b = document.getElementById('bc-sale-overlay');
+  const qd = document.getElementById('bc-sale-qty-display');
+  if(!qd) return;
+  if(qty<=0){
+    qd.textContent='AGOTADO';
+    qd.style.background='rgba(255,59,59,.15)';
+    qd.style.borderColor='rgba(255,59,59,.3)';
+    qd.style.color='var(--rd)';
+  } else {
+    qd.textContent=qty+' disponible'+(qty>1?'s':'');
+    qd.style.background='rgba(255,208,0,.15)';
+    qd.style.borderColor='rgba(255,208,0,.3)';
+    qd.style.color='var(--y)';
+  }
+}
+
+async function bcCancelFixedSale(){
+  if(_bcActiveSaleId){
+    await fsSet('fixedSales',_bcActiveSaleId,{status:'cancelled'}).catch(()=>{});
+    _bcActiveSaleId=null;
+  }
+  document.getElementById('bc-sale-overlay').style.display='none';
+  const pn=document.getElementById('bc-pn'); if(pn) pn.textContent='¿Qué vas a vender?';
+  const pp=document.getElementById('bc-pp'); if(pp) pp.textContent='—';
+  document.getElementById('bc-prod-sub').textContent='Toca para editar item';
+  toast('Item retirado del live');
+}
+
+// Called from Firestore polling when a buyer purchases
+function _bcOnSalePurchase(buyerName, qtyLeft){
+  _bcSaleQtyLeft = qtyLeft;
+  _updateBcSaleQtyBadge(qtyLeft);
+  const saleItemName = document.getElementById('bc-sale-name-display')?.textContent||'item';
+  addBcMsg('🛒', buyerName||'Comprador', `¡Compró "${saleItemName}"! 🔥`);
+  toast(`🛒 ${buyerName} compró — quedan ${qtyLeft}`);
+  if(qtyLeft<=0){
+    setTimeout(()=>{
+      document.getElementById('bc-sale-overlay').style.display='none';
+      _bcActiveSaleId=null;
+    },3000);
+  }
+}
+
+// ═══ FIXED PRICE SALE — BUYER SIDE ═══
+let _currentFixedSaleId  = null;
+let _currentFixedSaleDoc = null;
+let _fixedSalePollIv     = null;
+
+function _startFixedSalePoll(channel){
+  _stopFixedSalePoll();
+  _fixedSalePollIv = setInterval(async()=>{
+    try{
+      const sales = await fsQuery('fixedSales',[
+        {field:'channel',value:channel},{field:'status',value:'active'}
+      ]);
+      const active = sales.length ? sales[0] : null;
+      const card = document.getElementById('fixed-sale-card');
+      if(!card) return;
+      if(active && active.qtyLeft > 0){
+        _currentFixedSaleId  = active._id;
+        _currentFixedSaleDoc = active;
+        document.getElementById('fs-item-name').textContent  = active.name;
+        document.getElementById('fs-item-price').textContent = '$'+active.price;
+        document.getElementById('fs-qty-badge').textContent  = active.qtyLeft+' disponible'+(active.qtyLeft>1?'s':'');
+        const btn = document.getElementById('fs-buy-btn');
+        if(btn){ btn.textContent='Comprar ahora 🛒'; btn.disabled=false; }
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+        _currentFixedSaleId  = null;
+        _currentFixedSaleDoc = null;
+      }
+    }catch(e){}
+  }, 3000);
+}
+function _stopFixedSalePoll(){
+  if(_fixedSalePollIv){ clearInterval(_fixedSalePollIv); _fixedSalePollIv=null; }
+}
+
+async function buyFixedItem(){
+  if(requireAccount('🛒','Para comprar necesitas cuenta','Crea tu cuenta y empieza a comprar en los lives.')) return;
+  if(!_currentFixedSaleId || !_currentFixedSaleDoc){ toast('⚠️ Item ya no disponible'); return; }
+
+  const price = _currentFixedSaleDoc.price||0;
+  const name  = _currentFixedSaleDoc.name||'item';
+  const bal   = walletBalance;
+
+  if(bal < price){
+    toast('❌ Saldo insuficiente — recarga InstaCreditos');
+    openDeposit();
+    return;
+  }
+
+  const btn = document.getElementById('fs-buy-btn');
+  if(btn){ btn.textContent='Comprando…'; btn.disabled=true; }
+
+  try{
+    // Fetch freshest doc
+    const latest = await fsGet('fixedSales', _currentFixedSaleId);
+    if(!latest || latest.status!=='active' || latest.qtyLeft<=0){
+      toast('❌ Lo siento, ya se agotó');
+      document.getElementById('fixed-sale-card').style.display='none';
+      if(btn){ btn.textContent='Agotado 😞'; }
+      return;
+    }
+
+    const newQty = latest.qtyLeft - 1;
+    await fsSet('fixedSales', _currentFixedSaleId, {
+      qtyLeft: newQty,
+      status: newQty<=0 ? 'sold' : 'active',
+      lastBuyer: window.fbUser?.username||window.fbUser?.name||'comprador'
+    });
+
+    // Deduct from wallet
+    walletBalance = Math.max(0, walletBalance - price);
+    await fsSet('users', window.fbUser.uid, {wallet: walletBalance});
+    updateWalletDisplay();
+
+    // Save order
+    const orderData = {
+      type:'fixed', item:name, price, channel:latest.channel,
+      buyer:window.fbUser.uid, buyerName:window.fbUser?.username||'comprador',
+      seller:latest.sellerName||'', ts:Date.now(), status:'paid'
+    };
+    fsAdd('orders', orderData).catch(()=>{});
+
+    // Update qty badge on viewer card
+    const qb = document.getElementById('fs-qty-badge');
+    if(qb) qb.textContent = newQty<=0 ? 'AGOTADO' : newQty+' disponible'+(newQty>1?'s':'');
+
+    if(newQty<=0){
+      document.getElementById('fixed-sale-card').style.display='none';
+      _currentFixedSaleId=null;
+    }
+
+    // Celebration
+    const card=document.getElementById('win-card');
+    document.getElementById('win-emoji').textContent='🛒';
+    document.getElementById('win-item').textContent=name;
+    document.getElementById('win-price').textContent='$'+price+' IC';
+    const overlay=document.getElementById('win-overlay');
+    if(overlay){overlay.style.display='flex';if(card)card.style.transform='translate(-50%,-50%) scale(1)';}
+    toast('🎉 ¡Compraste '+name+'!');
+
+    if(btn){ btn.textContent='¡Comprado! ✅'; btn.disabled=true; }
+  }catch(e){
+    toast('❌ Error al comprar: '+e.message);
+    if(btn){ btn.textContent='Comprar ahora 🛒'; btn.disabled=false; }
+  }
+}
+
 function startBroadcast(){
   const title=document.getElementById('gl-title').value.trim()||'Stream en vivo 🔴';
   bcProdIdx=bcSelectedProds[0]||0;
@@ -5291,7 +5596,7 @@ function startBroadcast(){
       fsSet('stores',uid,{totalStreams:(s?.totalStreams||0)+1});
     }).catch(()=>{});
   }
-  // Always auction mode — auto-open auction panel
+  // Siempre subasta — abrir panel automáticamente
   setTimeout(()=>bcShowAucPanel(),1000);
 }
 
@@ -6218,6 +6523,7 @@ async function openStreamFS(channelName){
     startChat(-1); // use channelName for real chat
     window._chatChannel=channelName;
     startTimer();
+    _startFixedSalePoll(channelName);
     svTab('chat');
     go('stream');
     // Join Agora as audience
