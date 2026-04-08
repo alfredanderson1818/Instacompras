@@ -30,11 +30,11 @@ window.fbToken=null;
 const GOOGLE_CLIENT_ID='770638350247-ev139tnoi9peqmmtjtaejfic2hqqbicv.apps.googleusercontent.com';
 
 // Guardar/recuperar sesión en localStorage
-function fbSaveSession(token,uid){
-  try{localStorage.setItem('fb_token',token);localStorage.setItem('fb_uid',uid);}catch(e){}
+function fbSaveSession(token,uid,refreshToken){
+  try{localStorage.setItem('fb_token',token);localStorage.setItem('fb_uid',uid);if(refreshToken)localStorage.setItem('fb_refresh',refreshToken);}catch(e){}
 }
 function fbClearSession(){
-  try{localStorage.removeItem('fb_token');localStorage.removeItem('fb_uid');localStorage.removeItem('fb_user');}catch(e){}
+  try{localStorage.removeItem('fb_token');localStorage.removeItem('fb_uid');localStorage.removeItem('fb_user');localStorage.removeItem('fb_refresh');}catch(e){}
 }
 function fbCacheUser(data){
   try{localStorage.setItem('fb_user',JSON.stringify(data));}catch(e){}
@@ -80,14 +80,37 @@ function fsHeaders(){
   if(window.fbToken)h['Authorization']='Bearer '+window.fbToken;
   return h;
 }
+let _refreshingToken=false;
+async function _refreshToken(){
+  if(_refreshingToken)return;
+  _refreshingToken=true;
+  try{
+    const token=localStorage.getItem('fb_token');
+    if(!token)return;
+    const r=await fetch(`https://securetoken.googleapis.com/v1/token?key=${FB.apiKey}`,{
+      method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:'grant_type=refresh_token&refresh_token='+(localStorage.getItem('fb_refresh')||'')
+    });
+    if(r.ok){
+      const d=await r.json();
+      if(d.id_token){window.fbToken=d.id_token;localStorage.setItem('fb_token',d.id_token);if(d.refresh_token)localStorage.setItem('fb_refresh',d.refresh_token);}
+    }
+  }catch(e){}
+  _refreshingToken=false;
+}
 async function fsSet(col,docId,data){
   try{
     const keys=Object.keys(data);
     const mask=keys.map(k=>'updateMask.fieldPaths='+encodeURIComponent(k)).join('&');
-    const r=await fetch(`${FB.dbUrl}/${col}/${docId}?${mask}`,{method:'PATCH',headers:fsHeaders(),body:JSON.stringify(toFS(data))});
+    let r=await fetch(`${FB.dbUrl}/${col}/${docId}?${mask}`,{method:'PATCH',headers:fsHeaders(),body:JSON.stringify(toFS(data))});
+    // If 401/403, try refreshing token once
+    if(r.status===401||r.status===403){
+      await _refreshToken();
+      r=await fetch(`${FB.dbUrl}/${col}/${docId}?${mask}`,{method:'PATCH',headers:fsHeaders(),body:JSON.stringify(toFS(data))});
+    }
     if(!r.ok)return null;
     return fromFS(await r.json());
-  }catch(e){console.warn('fsSet:',e);return null;}
+  }catch(e){return null;}
 }
 async function fsGet(col,docId){
   try{
@@ -98,7 +121,8 @@ async function fsGet(col,docId){
 }
 async function fsAdd(col,data){
   try{
-    const r=await fetch(`${FB.dbUrl}/${col}`,{method:'POST',headers:fsHeaders(),body:JSON.stringify(toFS(data))});
+    let r=await fetch(`${FB.dbUrl}/${col}`,{method:'POST',headers:fsHeaders(),body:JSON.stringify(toFS(data))});
+    if(r.status===401||r.status===403){await _refreshToken();r=await fetch(`${FB.dbUrl}/${col}`,{method:'POST',headers:fsHeaders(),body:JSON.stringify(toFS(data))});}
     if(!r.ok)return null;
     return fromFS(await r.json());
   }catch(e){return null;}
@@ -195,6 +219,8 @@ async function fbRestoreSession(){
     const token=localStorage.getItem('fb_token');
     const uid=localStorage.getItem('fb_uid');
     if(!token||!uid)return false;
+    // Try refresh token first to ensure we have a valid token
+    await _refreshToken();
     // Use cached user data for instant load
     const cached=fbGetCachedUser();
     if(cached&&cached.uid===uid){
@@ -242,8 +268,9 @@ async function fbRestoreSession(){
   --sar:env(safe-area-inset-right,0px);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;height:100%}
-#app{position:fixed;top:0;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;overflow:hidden;background:var(--dk)}
+html{height:100%;height:-webkit-fill-available}
+body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;background:var(--dk);color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px}
+#app{max-width:430px;margin:0 auto;height:var(--app-h);height:100dvh;position:relative;overflow:hidden;background:var(--dk)}
 .scr{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateX(44px) scale(.98);transition:opacity .32s cubic-bezier(.4,0,.2,1),transform .36s cubic-bezier(.34,1.10,.64,1);overflow:hidden;will-change:transform,opacity}
 .scr.on{opacity:1;pointer-events:all;transform:translateX(0) scale(1)}
 .scr.out{opacity:0;transform:translateX(-28px) scale(.98);transition:opacity .2s ease,transform .2s ease}
@@ -475,7 +502,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 @keyframes pd-heart-fly{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-90px) scale(.4);opacity:0}}
 .pd-heart{position:absolute;right:0;font-size:22px;animation:pd-heart-fly 1.8s cubic-bezier(.2,.8,.4,1) forwards}
 .pd-view-pill{background:rgba(0,0,0,.55);backdrop-filter:blur(8px);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:800;color:#fff}
-.pd-bk{position:absolute;top:max(var(--sat),13px);left:13px;z-index:2;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;border:none;color:#fff}
+.pd-bk{position:absolute;top:13px;left:13px;z-index:2;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;border:none;color:#fff}
 .pd-wish{position:absolute;top:13px;right:13px;z-index:2;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:19px;border:none;transition:transform .2s}
 .pd-body{padding:15px}
 .pd-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.4px;margin-bottom:6px}
@@ -510,7 +537,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 
 /* ═══ CART ═══ */
 #s-cart{background:var(--dk)}
-.cart-hdr{padding:max(var(--sat),14px) 16px 14px;font-family:'Bebas Neue',sans-serif;font-size:22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
+.cart-hdr{padding:14px 16px;font-family:'Bebas Neue',sans-serif;font-size:22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
 .cart-clr{font-family:'Nunito',sans-serif;font-size:12px;color:var(--rd);font-weight:700;cursor:pointer}
 .cart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--mu);padding:50px 20px;text-align:center}
 .cart-empty-ico{font-size:56px;opacity:.35}
@@ -540,7 +567,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 /* ═══ EXPLORE ═══ */
 #s-exp{background:var(--dk)}
 /* ─── EXPLORE SCREEN ─── */
-.exp-search-wrap{padding:max(var(--sat),14px) 16px 10px;flex-shrink:0}
+.exp-search-wrap{padding:14px 16px 10px;flex-shrink:0}
 .exp-search{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:11px 16px;transition:all .2s}
 .exp-search.focus{border-color:rgba(255,208,0,.5);background:rgba(255,208,0,.05)}
 .exp-search input{background:none;border:none;outline:none;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;flex:1}
@@ -643,9 +670,9 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 .sp-hero-img{width:100%;height:100%;object-fit:cover;opacity:.5}
 .sp-hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#111128,#0d1f4e)}
 .sp-hero-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,10,15,.2) 0%,rgba(10,10,15,.95) 100%)}
-.sp-hero-back{position:absolute;top:max(var(--sat),14px);left:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#fff;z-index:2}
+.sp-hero-back{position:absolute;top:14px;left:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#fff;z-index:2}
 .sp-hero-back:active{transform:scale(.88)}
-.sp-hero-share{position:absolute;top:max(var(--sat),14px);right:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#fff;z-index:2}
+.sp-hero-share{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#fff;z-index:2}
 /* Avatar overlapping hero */
 .sp-avatar-wrap{position:absolute;bottom:-34px;left:20px;z-index:3}
 .sp-avatar{width:68px;height:68px;border-radius:50%;background:var(--y);display:flex;align-items:center;justify-content:center;font-size:32px;border:3px solid var(--dk);box-shadow:0 4px 16px rgba(0,0,0,.4)}
@@ -710,7 +737,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 
 /* ═══ CHECKOUT redesigned ═══ */
 #s-co{background:var(--dk)}
-.co-hdr{padding:max(var(--sat),14px) 16px 12px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.co-hdr{padding:14px 16px 12px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .co-title{font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1}
 /* step indicator */
 .co-steps{display:flex;align-items:center;padding:0 16px 16px;gap:0;flex-shrink:0}
@@ -763,7 +790,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 
 /* ═══ NOTIFICATIONS ═══ */
 #s-notif{background:var(--dk)}
-.notif-hdr{padding:max(var(--sat),14px) 16px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.notif-hdr{padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .notif-title{font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1}
 .notif-clear{font-size:11px;font-weight:800;color:var(--y);cursor:pointer}
 .notif-item{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s;position:relative}
@@ -793,7 +820,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 
 /* ═══ ORDER TRACKING ═══ */
 #s-track{background:var(--dk)}
-.track-hdr{padding:max(var(--sat),14px) 16px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.track-hdr{padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .track-title{font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1}
 .track-order-card{margin:0 16px 16px;background:var(--dk3);border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
 .track-prod-row{display:flex;align-items:center;gap:12px;padding:14px}
@@ -839,7 +866,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 
 /* ═══ DASHBOARD VENDEDOR ═══ */
 #s-dash{background:var(--dk)}
-.dash-hdr{padding:max(var(--sat),14px) 16px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.dash-hdr{padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .dash-title{font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1}
 /* Hero revenue card */
 .dash-hero{margin:0 16px 16px;border-radius:18px;padding:20px;background:linear-gradient(135deg,#1a1a0a,#2a2200);border:1px solid rgba(255,208,0,.2);position:relative;overflow:hidden}
@@ -896,7 +923,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 
 /* ═══ WALLET ═══ */
 #s-wallet{background:var(--dk)}
-.wallet-hdr{padding:max(var(--sat),14px) 16px 6px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.wallet-hdr{padding:14px 16px 6px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .wallet-title{font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1}
 /* Balance hero card */
 .wallet-hero{margin:0 16px 16px;border-radius:20px;overflow:hidden;position:relative;padding:24px 20px;background:linear-gradient(135deg,#1a1a0a 0%,#2a2200 50%,#1a1500 100%);border:1px solid rgba(255,208,0,.2)}
@@ -951,7 +978,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 
 /* ═══ AUCTION ═══ */
 #s-auction{background:var(--dk)}
-.auc-hdr{padding:max(var(--sat),14px) 16px 0;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.auc-hdr{padding:14px 16px 0;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .auc-title{font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1}
 /* Product image */
 .auc-img{width:100%;height:220px;overflow:hidden;position:relative;flex-shrink:0}
@@ -1004,7 +1031,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 
 /* ═══ SUCCESS redesigned ═══ */
 #s-ok{background:var(--dk);overflow-y:auto}
-.ok-wrap{text-align:center;padding:max(var(--sat),32px) 24px 48px;display:flex;flex-direction:column;align-items:center}
+.ok-wrap{text-align:center;padding:32px 24px 48px;display:flex;flex-direction:column;align-items:center}
 .ok-checkmark{width:80px;height:80px;border-radius:50%;background:rgba(255,208,0,.12);border:2px solid rgba(255,208,0,.3);display:flex;align-items:center;justify-content:center;margin-bottom:20px;animation:check-pop .6s cubic-bezier(.34,1.56,.64,1)}
 @keyframes check-pop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
 .ok-check-inner{font-size:36px;animation:check-spin .5s .15s cubic-bezier(.34,1.56,.64,1) both}
@@ -1096,7 +1123,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 
 /* ═══ GO LIVE SETUP ═══ */
 #s-golive{background:var(--dk);z-index:90}
-.gl-hdr{padding:max(var(--sat),14px) 16px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.gl-hdr{padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .gl-preview{width:100%;height:220px;background:#000;position:relative;overflow:hidden;flex-shrink:0;border-radius:0}
 .gl-preview video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
 .gl-cam-off{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--mu);font-size:13px}
@@ -1168,7 +1195,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
       <div class="ob-img-bg">
         <div style="position:absolute;inset:0;background:#0a0a0f"></div>
         <!-- Logo centrado -->
-        <div style="position:absolute;top:0;left:0;right:0;bottom:55%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:max(var(--sat),6%);gap:14px">
+        <div style="position:absolute;top:0;left:0;right:0;bottom:55%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:6%;gap:14px">
           <div style="display:flex;align-items:center;gap:10px">
             <div style="width:5px;height:60px;background:var(--y);border-radius:3px"></div>
             <div>
@@ -1207,7 +1234,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
     <div class="ob-slide" id="ob-1">
       <div class="ob-img-bg">
         <div style="position:absolute;inset:0;background:#0a0a0f"></div>
-        <div style="position:absolute;top:0;left:0;right:0;bottom:55%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:max(var(--sat),6%);gap:14px">
+        <div style="position:absolute;top:0;left:0;right:0;bottom:55%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:6%;gap:14px">
           <div style="display:flex;align-items:center;gap:10px">
             <div style="width:5px;height:60px;background:var(--y);border-radius:3px"></div>
             <div>
@@ -1246,7 +1273,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
     <div class="ob-slide" id="ob-2">
       <div class="ob-img-bg">
         <div style="position:absolute;inset:0;background:#0a0a0f"></div>
-        <div style="position:absolute;top:0;left:0;right:0;bottom:55%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:max(var(--sat),6%);gap:14px">
+        <div style="position:absolute;top:0;left:0;right:0;bottom:55%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:6%;gap:14px">
           <div style="display:flex;align-items:center;gap:10px">
             <div style="width:5px;height:60px;background:var(--y);border-radius:3px"></div>
             <div>
@@ -1351,21 +1378,6 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
         <div style="font-size:12px;color:var(--mu)">Únete a miles de venezolanos 🇻🇪</div>
       </div>
 
-      <!-- Account type -->
-      <div>
-        <div style="font-size:9px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Tipo de cuenta</div>
-        <div style="display:flex;gap:8px">
-          <div id="type-buyer" onclick="setAccType('buyer')" style="flex:1;padding:12px 8px;background:var(--dk3);border-radius:12px;border:2px solid rgba(255,208,0,.5);cursor:pointer;text-align:center;transition:all .2s">
-            <div style="font-size:22px;margin-bottom:4px">🛍️</div>
-            <div style="font-size:11px;font-weight:900;color:var(--y)">Comprador</div>
-          </div>
-          <div id="type-seller" onclick="setAccType('seller')" style="flex:1;padding:12px 8px;background:var(--dk3);border-radius:12px;border:2px solid rgba(255,255,255,.06);cursor:pointer;text-align:center;transition:all .2s">
-            <div style="font-size:22px;margin-bottom:4px">📡</div>
-            <div style="font-size:11px;font-weight:900;color:var(--mu)">Vendedor</div>
-          </div>
-        </div>
-      </div>
-
       <!-- Fields -->
       <input id="reg-name" type="text" placeholder="Nombre completo" autocomplete="name"
         style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none"
@@ -1400,23 +1412,6 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
         style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none"
         onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
 
-      <!-- Seller extra -->
-      <div id="seller-fields" style="display:none;flex-direction:column;gap:12px">
-        <input id="reg-shop" type="text" placeholder="Nombre de tu tienda"
-          style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none"
-          onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
-        <div style="display:flex;align-items:center;gap:10px;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;transition:border-color .15s" id="reg-wa-wrap">
-          <span style="font-size:16px;flex-shrink:0">💬</span>
-          <input id="reg-whatsapp" type="tel" placeholder="WhatsApp: 04120000000"
-            style="background:none;border:none;outline:none;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;width:100%"
-            onfocus="document.getElementById('reg-wa-wrap').style.borderColor='rgba(255,208,0,.5)'"
-            onblur="document.getElementById('reg-wa-wrap').style.borderColor='rgba(255,255,255,.08)'">
-        </div>
-        <div style="background:rgba(255,208,0,.07);border:1px solid rgba(255,208,0,.2);border-radius:10px;padding:11px 13px;font-size:11px;color:rgba(255,255,255,.6);line-height:1.6">
-          ✅ Revisión en <strong style="color:var(--y)">24h</strong>. Tu WhatsApp será visible para compradores.
-        </div>
-      </div>
-
       <!-- Divider -->
       <div style="display:flex;align-items:center;gap:10px">
         <div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div>
@@ -1441,7 +1436,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 <!-- DEPOSIT (wallet recharge page) -->
 <div id="s-deposit" class="scr">
   <div style="flex:1;overflow-y:auto;scrollbar-width:none;padding-bottom:40px">
-    <div style="padding:max(var(--sat),14px) 16px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+    <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0">
       <button onclick="goBack()" style="width:34px;height:34px;border-radius:50%;background:var(--dk3);border:1px solid rgba(255,255,255,.07);color:var(--tx);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">←</button>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1">Recargar Créditos</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--y)" id="dep-bal-top">0 cr</div>
@@ -1557,9 +1552,6 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
     <!-- Categories -->
     <div class="cat-strip" id="cat-strip"></div>
 
-    <!-- Live Strip -->
-    <div class="live-strip" id="live-strip"></div>
-
     <!-- Products -->
     <div class="sh">
       <div class="sh-title">Populares</div>
@@ -1639,6 +1631,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
       </div>
     </div>
     <button class="spbuy" id="spbuy">🛒 Comprar</button>
+    <button class="spbuy" id="sp-shop-btn" onclick="openSellerShop()" style="background:transparent;border:1.5px solid var(--y);color:var(--y);padding:9px 12px;font-size:11px">🏪 Tienda</button>
   </div>
 
   <!-- Chat input -->
@@ -1653,7 +1646,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 
 <!-- PRODUCT -->
 <div id="s-prod" class="scr">
-  <div class="sb">
+  <div class="sb" style="padding-bottom:90px">
     <div class="pd-hero" id="pd-hero">
       <!-- Fallback imagen producto -->
       <img id="pd-img" src="" onerror="this.style.display='none'">
@@ -1671,7 +1664,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
         <!-- Corazones flotantes -->
         <div id="pd-hearts" style="position:absolute;right:14px;bottom:60px;z-index:4;width:36px;pointer-events:none"></div>
         <!-- Recording dot top-left -->
-        <div style="position:absolute;top:max(var(--sat),14px);left:14px;z-index:4;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);border-radius:20px;padding:4px 10px">
+        <div style="position:absolute;top:14px;left:14px;z-index:4;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);border-radius:20px;padding:4px 10px">
           <div style="width:7px;height:7px;border-radius:50%;background:var(--rd);animation:pulse 1.2s infinite"></div>
           <span style="font-size:10px;font-weight:900;color:#fff;letter-spacing:.5px">EN VIVO</span>
         </div>
@@ -1680,7 +1673,6 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
       <div class="pd-hero-grad"></div>
       <!-- Controles top -->
       <button class="pd-bk" onclick="goBack()" style="z-index:5">←</button>
-      <button class="pd-wish" id="pd-wish" onclick="toggleWish()" style="z-index:5">🤍</button>
       <!-- Live bar bottom -->
       <div class="pd-live-bar" id="pd-live-bar" style="display:none">
         <div class="pd-live-pill"><div class="pd-live-dot"></div>EN VIVO</div>
@@ -1698,7 +1690,26 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
         <div><div class="pd-sname" id="pd-sname"></div><div class="pd-sfoll" id="pd-sfoll"></div></div>
         <div style="margin-left:auto"><div class="lbadge" style="font-size:8px">EN VIVO</div></div>
       </div>
-      <!-- ═══ SUBASTA INLINE ═══ -->
+
+      <!-- ═══ PRECIO FIJO (solo productos NO live) ═══ -->
+      <div id="pd-buy-card" style="display:none">
+        <div class="pd-prow">
+          <div class="pd-price" id="pd-price"></div>
+          <div class="pd-cur">USD</div>
+          <div class="pd-old" id="pd-old"></div>
+        </div>
+        <div class="pd-tags">
+          <span class="ptag r">⚡ FLASH SALE</span>
+          <span class="ptag y">📦 Envío rápido</span>
+          <span class="ptag y">✅ Verificado</span>
+        </div>
+        <div class="pd-acts">
+          <button class="abuy" onclick="addCart()">🛒 Agregar al Carrito</button>
+          <button class="acart" id="pd-wish" onclick="toggleWish()">🤍</button>
+        </div>
+      </div>
+
+      <!-- ═══ SUBASTA (solo productos LIVE) ═══ -->
       <div id="auc-inline-card" style="background:linear-gradient(135deg,rgba(255,59,59,.1),rgba(255,59,59,.05));border:1.5px solid rgba(255,59,59,.3);border-radius:16px;overflow:hidden;margin-bottom:14px;transition:background .4s,border-color .4s">
 
         <!-- HEADER: título + timer -->
@@ -1762,16 +1773,6 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
         <!-- Legal -->
         <div style="padding:0 16px 10px;font-size:9px;color:rgba(255,255,255,.2);text-align:center">Al ofertar, tus InstaCreditos quedan reservados hasta el cierre.</div>
       </div>
-      <div class="pd-prow">
-        <div class="pd-price" id="pd-price"></div>
-        <div class="pd-cur">USD</div>
-        <div class="pd-old" id="pd-old"></div>
-      </div>
-      <div class="pd-tags">
-        <span class="ptag r">⚡ FLASH SALE</span>
-        <span class="ptag y">📦 Envío rápido</span>
-        <span class="ptag y">✅ Verificado</span>
-      </div>
       <div class="lbl">Descripción</div>
       <div class="pd-desc" id="pd-desc"></div>
     </div>
@@ -1806,7 +1807,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
     </div>
   </div>
 
-  <div class="sb">
+  <div class="sb" style="padding-bottom:80px">
     <div class="sp-body">
       <!-- Name + verify -->
       <div class="sp-name-row">
@@ -1906,7 +1907,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
   <!-- Category chips -->
   <div class="exp-cat-bar" id="exp-cats"></div>
 
-  <div class="sb">
+  <div class="sb" style="padding-bottom:80px">
     <!-- EN VIVO -->
     <div class="exp-sh" id="exp-sh-live">
       <div class="exp-sh-t">
@@ -1938,7 +1939,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
   <input type="file" id="prof-av-input" accept="image/*" style="display:none" onchange="profUploadAv(this)">
   <input type="file" id="prof-banner-input" accept="image/*" style="display:none" onchange="profUploadBanner(this)">
 
-  <div class="sb">
+  <div class="sb" style="padding-bottom:88px">
 
     <!-- BANNER — SVG gradient default, no external URL -->
     <div id="prof-banner-wrap" style="position:relative;height:160px;overflow:hidden;cursor:pointer" onclick="document.getElementById('prof-banner-input').click()">
@@ -1959,7 +1960,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
         <img id="prof-banner-img" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none">
       </div>
       <!-- Live badge top left -->
-      <div style="position:absolute;top:max(var(--sat),12px);left:14px;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);border-radius:20px;padding:4px 10px;border:1px solid rgba(255,255,255,.1)">
+      <div style="position:absolute;top:12px;left:14px;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);border-radius:20px;padding:4px 10px;border:1px solid rgba(255,255,255,.1)">
         <div style="width:6px;height:6px;border-radius:50%;background:var(--rd);animation:pulse-live 2s infinite"></div>
         <span style="font-size:10px;font-weight:900;color:#fff;letter-spacing:1px" id="prof-type-badge">COMPRADOR</span>
       </div>
@@ -2050,9 +2051,9 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
         <div class="pmia">›</div>
       </div>
 
-      <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-top:6px;margin-bottom:2px">Vendedor</div>
+      <div id="seller-section-label" style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-top:6px;margin-bottom:2px;display:none">Vendedor</div>
 
-      <div class="pmi" onclick="openDash()" style="border-radius:13px">
+      <div class="pmi" id="dash-vendor-btn" onclick="openDash()" style="border-radius:13px;display:none">
         <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,208,0,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--y)" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
         </div>
@@ -2066,12 +2067,11 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
         <div class="pmia">›</div>
       </div>
 
-      <div class="pmi" onclick="initGoLive()" style="border-radius:13px">
-        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,59,59,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <div style="width:10px;height:10px;border-radius:50%;background:var(--rd);animation:pulse-live 2s infinite"></div>
-        </div>
-        <div class="pmil">Iniciar Stream</div>
-        <div class="pmia">›</div>
+      <!-- Upgrade to seller — only visible for buyers -->
+      <div class="pmi" id="upgrade-seller-btn" onclick="openSellerUpgrade()" style="border-radius:13px;display:none">
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,208,0,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">📡</div>
+        <div class="pmil" style="color:var(--y)">Quiero Vender en Vivo</div>
+        <div class="pmia" style="color:var(--y)">›</div>
       </div>
 
       <!-- Admin button — only visible for admin UID -->
@@ -2101,8 +2101,6 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
       </div>
       <div style="font-size:10px;font-weight:800;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px">Nombre</div>
       <input id="prof-edit-name" type="text" maxlength="40" placeholder="Tu nombre" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 16px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;transition:border-color .15s" onfocus="this.style.borderColor='rgba(255,208,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
-      <div style="font-size:10px;font-weight:800;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px">@Username</div>
-      <input id="prof-edit-handle" type="text" maxlength="30" placeholder="@tu_usuario" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 16px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;transition:border-color .15s" onfocus="this.style.borderColor='rgba(255,208,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
       <div style="display:flex;align-items:center;gap:10px;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 16px;margin-bottom:14px;transition:border-color .15s" id="prof-edit-wa-wrap">
         <span style="font-size:16px;flex-shrink:0">💬</span>
         <input id="prof-edit-whatsapp" type="tel" placeholder="WhatsApp: 04120000000" style="background:none;border:none;outline:none;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;width:100%" onfocus="document.getElementById('prof-edit-wa-wrap').style.borderColor='rgba(255,208,0,.4)'" onblur="document.getElementById('prof-edit-wa-wrap').style.borderColor='rgba(255,255,255,.08)'">
@@ -2122,6 +2120,16 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
     <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1">Mis Pedidos</div>
     <div id="my-orders-count" style="font-size:11px;color:var(--mu);font-weight:700"></div>
   </div>
+
+  <!-- Stats -->
+  <div id="mo-stats" style="display:flex;gap:8px;padding:14px 16px 0;flex-shrink:0"></div>
+
+  <!-- Tabs -->
+  <div style="display:flex;padding:12px 16px 0;gap:0;flex-shrink:0">
+    <button id="mo-tab-buy" onclick="moTab('buy')" style="flex:1;padding:11px;background:var(--y);color:var(--dk);border:none;border-radius:10px 0 0 10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer;transition:all .2s">🛒 Mis Compras</button>
+    <button id="mo-tab-sell" onclick="moTab('sell')" style="flex:1;padding:11px;background:var(--dk3);color:var(--mu);border:1px solid rgba(255,255,255,.06);border-left:none;border-radius:0 10px 10px 0;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer;transition:all .2s">💰 Mis Ventas</button>
+  </div>
+
   <div class="sb" id="my-orders-list">
     <div style="text-align:center;padding:48px 24px;color:var(--mu)">
       <div style="font-size:40px;margin-bottom:12px">📦</div>
@@ -2138,7 +2146,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
     <div class="notif-title">Notificaciones</div>
     <div class="notif-clear" onclick="clearNotifs()">Limpiar todo</div>
   </div>
-  <div class="sb" id="notif-list"></div>
+  <div class="sb" style="padding-bottom:80px" id="notif-list"></div>
 </div>
 
 <!-- ORDER TRACKING -->
@@ -2148,7 +2156,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
     <div class="track-title">Seguimiento</div>
     <div style="font-size:11px;font-weight:800;color:var(--mu)" id="track-order-num">#IC-00000</div>
   </div>
-  <div class="sb">
+  <div class="sb" style="padding-bottom:80px">
     <!-- Product card -->
     <div class="track-order-card">
       <div class="track-prod-row">
@@ -2204,7 +2212,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
     <div style="font-size:19px;cursor:pointer" onclick="toast('⚙️ Configuración de tienda')">⚙️</div>
   </div>
 
-  <div class="sb">
+  <div class="sb" style="padding-bottom:80px">
     <!-- Revenue hero -->
     <div class="dash-hero">
       <div class="dash-hero-row">
@@ -2359,7 +2367,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
       <div class="ok-order-title">Detalles del pedido</div>
       <div id="ok-order"></div>
     </div>
-    <button class="ok-whatsapp-btn"><span style="font-size:18px">💬</span> Contactar al Vendedor</button>
+    <button class="ok-whatsapp-btn" onclick="window.open('https://wa.me/584242244622?text=Hola%2C+acabo+de+hacer+un+pedido+en+InstaCompras+y+quiero+coordinar+la+entrega+%F0%9F%93%A6','_blank')"><span style="font-size:18px">💬</span> Contactar al Vendedor</button>
     <button class="ok-back" onclick="goHome()">← Seguir Comprando</button>
   </div>
 </div>
@@ -2372,12 +2380,12 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
     <div style="font-size:11px;font-weight:800;color:var(--mu);cursor:pointer" onclick="go('wallet-history')">Historial</div>
   </div>
 
-  <div class="sb">
+  <div class="sb" style="padding-bottom:80px">
     <!-- Balance card -->
     <div class="wallet-hero">
       <div class="wallet-hero-label">InstaCreditos disponibles</div>
-      <div class="wallet-balance" id="wallet-bal">0</div>
-      <div class="wallet-balance-usd" id="wallet-bal-usd">≈ $0.00 USD</div>
+      <div class="wallet-balance" id="wallet-bal">250</div>
+      <div class="wallet-balance-usd" id="wallet-bal-usd">≈ $25.00 USD</div>
       <div class="wallet-hero-actions">
         <button class="wallet-action-btn primary" onclick="openDeposit()">+ Recargar</button>
         <button class="wallet-action-btn secondary" onclick="toast('💬 Soporte: @instacompras.ve')">? Ayuda</button>
@@ -2502,7 +2510,7 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
     </div>
   </div>
 
-  <div class="sb">
+  <div class="sb" style="padding-bottom:100px">
     <div class="gl-form">
 
       <!-- Título -->
@@ -2738,13 +2746,13 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 
 <!-- ADMIN PANEL -->
 <div id="s-admin" class="scr">
-  <div style="display:flex;align-items:center;gap:12px;padding:max(var(--sat),14px) 16px 14px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06);background:var(--dk)">
+  <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06);background:var(--dk)">
     <button class="bk" style="position:static;background:var(--dk3);border:1px solid rgba(255,255,255,.07)" onclick="goBack()">←</button>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1">⚡ Panel Admin</div>
     <div id="admin-pending-badge" style="display:none;background:var(--rd);color:#fff;font-size:11px;font-weight:900;padding:3px 10px;border-radius:20px"></div>
   </div>
 
-  <div class="sb">
+  <div class="sb" style="padding-bottom:88px">
     <!-- Stats row -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:16px 16px 0">
       <div style="background:var(--dk3);border-radius:14px;padding:14px 12px;text-align:center;border:1px solid rgba(255,255,255,.06)">
@@ -2827,6 +2835,44 @@ html,body{margin:0;padding:0;overflow:hidden;background:var(--dk);color:var(--tx
 </div>
 
 <!-- Floating notification banner -->
+<!-- Seller Upgrade Modal -->
+<div id="seller-upgrade-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center">
+  <div style="background:var(--dk2);border-radius:24px 24px 0 0;padding:32px 24px max(env(safe-area-inset-bottom),32px);width:100%;max-width:430px;border-top:1px solid rgba(255,255,255,.08)">
+    <div style="width:40px;height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin:0 auto 24px"></div>
+    <div style="font-size:42px;text-align:center;margin-bottom:12px">📡</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.5px;margin-bottom:6px;text-align:center">Empieza a Vender en Vivo</div>
+    <div style="font-size:13px;color:var(--mu);line-height:1.6;margin-bottom:20px;text-align:center">Completa estos datos para activar tu cuenta de vendedor y empezar a transmitir</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <input id="up-shop" type="text" placeholder="Nombre de tu tienda"
+        style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none"
+        onfocus="this.style.borderColor='rgba(255,208,0,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+      <div style="display:flex;align-items:center;gap:10px;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;transition:border-color .15s" id="up-wa-wrap">
+        <span style="font-size:16px;flex-shrink:0">💬</span>
+        <input id="up-whatsapp" type="tel" placeholder="WhatsApp: 04120000000"
+          style="background:none;border:none;outline:none;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;width:100%"
+          onfocus="document.getElementById('up-wa-wrap').style.borderColor='rgba(255,208,0,.5)'"
+          onblur="document.getElementById('up-wa-wrap').style.borderColor='rgba(255,255,255,.08)'">
+      </div>
+      <select id="up-category" style="width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;cursor:pointer">
+        <option value="" style="color:var(--mu)">Categoría de productos</option>
+        <option value="Moda">👗 Moda y Ropa</option>
+        <option value="Tecnología">💻 Tecnología</option>
+        <option value="Belleza">💄 Belleza</option>
+        <option value="Hogar">🏠 Hogar</option>
+        <option value="Deportes">⚽ Deportes</option>
+        <option value="Joyería">💍 Joyería</option>
+        <option value="Calzado">👟 Calzado</option>
+        <option value="Otro">📦 Otro</option>
+      </select>
+      <div style="background:rgba(255,208,0,.07);border:1px solid rgba(255,208,0,.2);border-radius:10px;padding:11px 13px;font-size:11px;color:rgba(255,255,255,.6);line-height:1.6">
+        ✅ Tu cuenta será activada como vendedor al instante. Podrás empezar a transmitir en vivo inmediatamente.
+      </div>
+      <button onclick="submitSellerUpgrade()" style="width:100%;background:var(--y);color:var(--dk);border:none;border-radius:14px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;margin-top:4px">📡 Activar cuenta vendedor</button>
+      <div onclick="closeSellerUpgrade()" style="font-size:13px;color:var(--mu);font-weight:700;cursor:pointer;padding:8px;text-align:center">Ahora no</div>
+    </div>
+  </div>
+</div>
+
 <div id="notif-banner">
   <div class="nb-icon">🔔</div>
   <div class="nb-text">Notificación</div>
@@ -3374,9 +3420,10 @@ function goHome(){
 
 // ═══ STREAM ═══
 function svTab(tab){
-  const pp=document.getElementById('sv-prods-panel');if(pp)pp.style.display=tab==='prods'?'block':'none';
-  const tc=document.getElementById('sv-tab-chat');if(tc)tc.classList.toggle('on',tab==='chat');
-  const tp=document.getElementById('sv-tab-prods');if(tp)tp.classList.toggle('on',tab==='prods');
+  // sv-chat-panel removed — chat is overlay
+  document.getElementById('sv-prods-panel').style.display=tab==='prods'?'block':'none';
+  document.getElementById('sv-tab-chat').classList.toggle('on',tab==='chat');
+  document.getElementById('sv-tab-prods').classList.toggle('on',tab==='prods');
 }
 
 let curStreamProd=0;
@@ -3403,7 +3450,13 @@ function openStream(idx){
   document.getElementById('spold').textContent=`$${prod.op}`;
   const disc=Math.round((1-prod.p/prod.op)*100);
   document.getElementById('sp-disc').textContent=`-${disc}%`;
-  document.getElementById('spbuy').onclick=()=>quickAdd(curStreamProd);
+  document.getElementById('spbuy').onclick=()=>{
+    if(requireAccount('🛒','Para comprar necesitas cuenta','Crea tu cuenta gratis.'))return;
+    quickAdd(curStreamProd);
+    const btn=document.getElementById('spbuy');
+    btn.textContent='✅ Agregado!';btn.style.background='var(--gn)';
+    setTimeout(()=>{btn.textContent='🛒 Comprar';btn.style.background='var(--y)';},1500);
+  };
   likes=Math.floor(s.v*6);
   document.getElementById('sv-like').classList.remove('liked');const _lp=document.getElementById('sv-like-path');if(_lp)_lp.setAttribute('fill','none');
   document.getElementById('sv-likes').textContent=fmt(likes);
@@ -3412,8 +3465,7 @@ function openStream(idx){
   // populate products panel
   const sellerProds=PRODS.filter(p=>p.s===idx);
   const gridProds=sellerProds.length?sellerProds:PRODS.slice(0,6);
-  const _spg=document.getElementById('sv-prods-grid');
-  if(_spg)_spg.innerHTML=gridProds.map((p,i)=>`
+  document.getElementById('sv-prods-grid').innerHTML=gridProds.map((p,i)=>`
     <div class="sv-prod-card" onclick="openProd(${PRODS.indexOf(p)})">
       <div class="sv-prod-img ${BG[i%4]}">${p.img?`<img src="${p.img}" onerror="this.style.display='none'">`:`<span>${p.e}</span>`}</div>
       <div class="sv-prod-body">
@@ -3551,24 +3603,27 @@ function openProd(idx){
   document.getElementById('pd-sfoll').textContent=`${s.f} seguidores`;
   document.getElementById('pd-seller').onclick=()=>openStream(p.s);
   document.getElementById('pd-wish').textContent=wish.has(idx)?'❤️':'🤍';
-  // Subasta solo si producto live, precio fijo si no
+  // Show auction for live, buy card for non-live
   const aucCard=document.getElementById('auc-inline-card');
-  const priceRow=document.querySelector('#s-prod .pd-prow');
-  const tagsRow=document.querySelector('#s-prod .pd-tags');
+  const buyCard=document.getElementById('pd-buy-card');
   if(p.live){
     if(aucCard)aucCard.style.display='block';
-    if(priceRow)priceRow.style.display='none';
-    if(tagsRow)tagsRow.style.display='none';
+    if(buyCard)buyCard.style.display='none';
     openAuction(idx);
   }else{
     if(aucCard)aucCard.style.display='none';
-    if(priceRow)priceRow.style.display='flex';
-    if(tagsRow)tagsRow.style.display='flex';
+    if(buyCard)buyCard.style.display='block';
   }
   go('prod');
 }
-function selSz(btn,v){curSz=v;}
 function chgQty(d){qty=Math.max(1,Math.min(10,qty+d));}
+function selSz(btn,v){curSz=v;}
+function openSellerShop(){
+  // Navigate to current stream's seller profile
+  if(curStream!==null&&curStream>=0){
+    openSeller(curStream);
+  }
+}
 function toggleWish(){
   const btn=document.getElementById('pd-wish');
   wish.has(curProd)?wish.delete(curProd):wish.add(curProd);
@@ -4214,7 +4269,7 @@ async function openAuction(prodIdx){
   // Precio base
   const basePrice=Math.floor(p.p*1.1);
   const asp=document.getElementById('auc-start-price');if(asp)asp.textContent=`$${p.p}`;
-  const awd=document.getElementById('auc-wallet-display');if(awd)awd.textContent=`${walletBalance} IC`;
+  const awd=document.getElementById('auc-wallet-display');if(awd)awd.textContent=`${window.fbUser?.wallet||window.fbUser?.credits||0} IC`;
 
   // Intentar cargar subasta existente desde Firestore
   let doc=await fsGet('auctions',aucId);
@@ -4713,7 +4768,7 @@ function doLogin(){
       window.fbToken=d.idToken;
       const userData=await fbGetUser(d.localId,d.idToken);
       window.fbUser={uid:d.localId,...(userData||{email})};
-      fbSaveSession(d.idToken,d.localId);fbCacheUser({uid:d.localId,...(window.fbUser||{})});
+      fbSaveSession(d.idToken,d.localId,d.refreshToken);fbCacheUser({uid:d.localId,...(window.fbUser||{})});
       toast('✅ ¡Bienvenido de vuelta!');setTimeout(loadProfData,500);setTimeout(_showNotifPrompt,3000);
       const reg=document.getElementById('s-register');
       if(reg)reg.classList.remove('on');
@@ -4764,7 +4819,7 @@ function regSocial(type){
           await fbSaveUser(d.localId,userData,d.idToken).catch(()=>{});
         }
         window.fbUser={uid:d.localId,...userData};
-        fbSaveSession(d.idToken,d.localId);fbCacheUser({uid:d.localId,...(window.fbUser||{})});
+        fbSaveSession(d.idToken,d.localId,d.refreshToken);fbCacheUser({uid:d.localId,...(window.fbUser||{})});
         toast('✅ Sesión iniciada con Google');
         const reg=document.getElementById('s-register');
         if(reg)reg.classList.remove('on');
@@ -4801,22 +4856,12 @@ function regSubmit(){
   fbSignUp(emailToUse,pass)
     .then(async d=>{
       window.fbToken=d.idToken;
-      const userData={name,username,cedula,phone,city,type:accType,shop,whatsapp,email:emailToUse,uid:d.localId};
+      const userData={name,username,cedula,phone,city,type:'buyer',email:emailToUse,uid:d.localId,createdAt:Date.now()};
       await fbSaveUser(d.localId,userData,d.idToken);
       window.fbUser={...userData};
-      fbSaveSession(d.idToken,d.localId);fbCacheUser({uid:d.localId,...(window.fbUser||{})});
-      // Si es vendedor, crear tienda en Firestore
-      if(accType==='seller'&&shop){
-        fsSet('stores',d.localId,{
-          uid:d.localId, shopName:shop, ownerName:name,
-          email:emailToUse, phone, whatsapp, city, cedula,
-          followers:0, totalSales:0, rating:5.0,
-          isLive:false, isVerified:false,
-          createdAt:Date.now(), category:'', description:''
-        });
-      }
+      fbSaveSession(d.idToken,d.localId,d.refreshToken);fbCacheUser({uid:d.localId,...(window.fbUser||{})});
       setTimeout(_showNotifPrompt,4000);
-      const msg=accType==='seller'?`📡 ¡Cuenta vendedor creada, ${name.split(' ')[0]}!`:`🎉 ¡Bienvenido, ${name.split(' ')[0]}!`;
+      const msg=`🎉 ¡Bienvenido, ${name.split(' ')[0]}!`;
       toast(msg);
       const reg=document.getElementById('s-register');
       if(reg)reg.classList.remove('on');
@@ -5340,17 +5385,53 @@ function endBroadcast(){
 
 // ═══ MODAL ═══
 function openModal(){
-  if(requireAccount('📡','Para transmitir en vivo necesitas una cuenta','Regístrate gratis como vendedor.'))return;
-  if(window.fbUser?.type!=='seller'){toast('⚠️ Solo sellers pueden transmitir en vivo');return;}
-  if(!window.fbUser?.isVerified){
-    // Show verification prompt
-    const confirmed=confirm('Necesitas verificar tu cuenta de seller para transmitir.\n¿Quieres solicitar verificación ahora?');
-    if(confirmed)openVerifRequest();
-    return;
-  }
+  if(requireAccount('📡','Para transmitir en vivo necesitas una cuenta','Regístrate gratis y después activa tu cuenta de vendedor.'))return;
+  if(window.fbUser?.type!=='seller'){openSellerUpgrade();return;}
   initGoLive();
 }
 function closeModal(e,force){if(force||e?.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('on');}
+
+// ═══ SELLER UPGRADE ═══
+function openSellerUpgrade(){
+  const m=document.getElementById('seller-upgrade-modal');
+  if(!m)return;
+  // Pre-fill if user has data
+  const u=window.fbUser;
+  if(u?.shopName)document.getElementById('up-shop').value=u.shopName;
+  if(u?.whatsapp)document.getElementById('up-whatsapp').value=u.whatsapp;
+  m.style.display='flex';
+}
+function closeSellerUpgrade(){document.getElementById('seller-upgrade-modal').style.display='none';}
+async function submitSellerUpgrade(){
+  const shop=document.getElementById('up-shop').value.trim();
+  const whatsapp=document.getElementById('up-whatsapp').value.trim().replace(/[^0-9]/g,'');
+  const cat=document.getElementById('up-category').value;
+  if(!shop){toast('⚠️ Escribe el nombre de tu tienda');return;}
+  if(!whatsapp||whatsapp.length<10){toast('⚠️ Ingresa un WhatsApp válido');return;}
+  if(!cat){toast('⚠️ Selecciona una categoría');return;}
+  const uid=window.fbUser?.uid;
+  if(!uid){toast('❌ Error de sesión');return;}
+  // Update user to seller
+  const update={type:'seller',shopName:shop,whatsapp,sellerCat:cat,upgradedAt:Date.now()};
+  await fsSet('users',uid,update);
+  // Create store in Firestore
+  await fsSet('stores',uid,{
+    uid, shopName:shop, ownerName:window.fbUser?.name||'',
+    email:window.fbUser?.email||'', whatsapp, city:window.fbUser?.city||'',
+    followers:0, totalSales:0, rating:5.0,
+    isLive:false, isVerified:false,
+    createdAt:Date.now(), category:cat
+  });
+  // Update local user
+  Object.assign(window.fbUser,update);
+  fbCacheUser(window.fbUser);
+  closeSellerUpgrade();
+  toast('📡 ¡Cuenta de vendedor activada!');
+  // Refresh profile
+  loadProfData();
+  // Show confetti-like effect
+  setTimeout(()=>toast('🎉 Ya puedes transmitir en vivo — toca EN VIVO'),1500);
+}
 
 // ═══ GUEST MODE ═══
 window.isGuest=false;
@@ -5468,8 +5549,20 @@ function toast(msg){const t=document.getElementById('toast-el');t.textContent=ms
 function fmt(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n);}
 
 // ═══ MOBILE VIEWPORT FIX ═══
-// Pure CSS handles height (html,body,#app all height:100%)
-
+function setAppHeight(){
+  // Use visualViewport when available (more accurate on mobile)
+  const h=(window.visualViewport?.height)||window.innerHeight;
+  document.documentElement.style.setProperty('--app-h',h+'px');
+  const app=document.getElementById('app');
+  if(app)app.style.height=h+'px';
+}
+setAppHeight();
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',setAppHeight);
+} else {
+  window.addEventListener('resize',setAppHeight);
+}
+window.addEventListener('orientationchange',()=>setTimeout(setAppHeight,200));
 
 // ═══ NOTIFICATIONS ═══
 let notifData=[
@@ -5581,6 +5674,14 @@ async function loadProfData(){
   const folEl=document.getElementById('st-fol');
   _showAdminBtn();
   _updateVerifMenuItem();
+  // Show/hide seller upgrade button
+  const upBtn=document.getElementById('upgrade-seller-btn');
+  if(upBtn) upBtn.style.display=(u.type==='seller')?'none':'flex';
+  // Show/hide seller dashboard section
+  const selLabel=document.getElementById('seller-section-label');
+  const dashBtn=document.getElementById('dash-vendor-btn');
+  if(selLabel) selLabel.style.display=(u.type==='seller')?'block':'none';
+  if(dashBtn) dashBtn.style.display=(u.type==='seller')?'flex':'none';
   if(folEl) folEl.textContent=following.size;
   // Sync wallet balance from user profile
   if(u.wallet!==undefined) walletBalance=Number(u.wallet)||0;
@@ -5631,7 +5732,7 @@ async function loadProfData(){
   if(coName) coName.textContent=u.name||u.displayName||'—';
   // Wallet badge
   const wbal=document.getElementById('wallet-prof-badge');
-  if(wbal) wbal.textContent=(u.wallet!=null?u.wallet:u.credits!=null?u.credits:0)+' IC';
+  if(wbal) wbal.textContent=(u.wallet||u.credits||500)+' IC';
 
   // Fetch real order stats from Firestore
   if(u.uid){
@@ -5656,6 +5757,7 @@ async function loadProfData(){
 }
 
 // ── Historial de pedidos del comprador ───────────────────────────────────────
+let _moTab='buy',_buyOrders=[],_sellOrders=[];
 async function openMyOrders(){
   go('my-orders');
   const list=document.getElementById('my-orders-list');
@@ -5665,43 +5767,122 @@ async function openMyOrders(){
     list.innerHTML='<div style="text-align:center;padding:40px;color:var(--mu)"><div style="font-size:36px;margin-bottom:10px">🔒</div><div>Inicia sesión para ver tus pedidos</div></div>';
     return;
   }
-  let orders=window._buyerOrders||[];
-  if(!orders.length){
-    orders=await fsQuery('orders',[{field:'buyerId',value:uid}]);
-    window._buyerOrders=orders;
+  // Fetch both buyer and seller orders
+  const [buyO,sellO]=await Promise.all([
+    fsQuery('orders',[{field:'buyerId',value:uid}]),
+    window.fbUser?.type==='seller'?fsQuery('orders',[{field:'sellerId',value:uid}]):Promise.resolve([])
+  ]);
+  _buyOrders=buyO.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  _sellOrders=sellO.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  window._buyerOrders=_buyOrders;
+
+  // Stats
+  const totalSpent=_buyOrders.reduce((s,o)=>s+(o.amt||0),0);
+  const totalEarned=_sellOrders.filter(o=>o.status==='delivered').reduce((s,o)=>s+(o.amt||0),0);
+  const pendingSales=_sellOrders.filter(o=>o.status==='pending').length;
+  document.getElementById('mo-stats').innerHTML=`
+    <div style="flex:1;background:var(--dk3);border-radius:12px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,.04)">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y)">${_buyOrders.length}</div>
+      <div style="font-size:9px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Compras</div>
+    </div>
+    <div style="flex:1;background:var(--dk3);border-radius:12px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,.04)">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y)">$${totalSpent}</div>
+      <div style="font-size:9px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Gastado</div>
+    </div>
+    ${window.fbUser?.type==='seller'?`
+    <div style="flex:1;background:var(--dk3);border-radius:12px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,.04)">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#2ED573">${_sellOrders.length}</div>
+      <div style="font-size:9px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Ventas</div>
+    </div>
+    <div style="flex:1;background:var(--dk3);border-radius:12px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,.04)">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#2ED573">$${totalEarned}</div>
+      <div style="font-size:9px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Ganado</div>
+    </div>`:''}`;
+
+  // Show/hide sell tab for non-sellers
+  const sellTab=document.getElementById('mo-tab-sell');
+  if(sellTab)sellTab.style.display=window.fbUser?.type==='seller'?'':'none';
+  if(window.fbUser?.type!=='seller'){
+    document.getElementById('mo-tab-buy').style.borderRadius='10px';
+  }else{
+    document.getElementById('mo-tab-buy').style.borderRadius='10px 0 0 10px';
   }
-  // Sort newest first
-  orders.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+
   const countEl=document.getElementById('my-orders-count');
-  if(countEl) countEl.textContent=orders.length+' pedido'+(orders.length!==1?'s':'');
-  if(!orders.length){
-    list.innerHTML='<div style="text-align:center;padding:56px 24px;color:var(--mu)"><div style="font-size:48px;margin-bottom:14px">📦</div><div style="font-size:14px;font-weight:800;color:var(--tx);margin-bottom:6px">Sin pedidos aún</div><div style="font-size:12px">Tus compras aparecerán aquí</div></div>';
-    return;
+  if(countEl)countEl.textContent=(_buyOrders.length+_sellOrders.length)+' total';
+
+  moTab(_moTab);
+}
+function moTab(tab){
+  _moTab=tab;
+  const buyBtn=document.getElementById('mo-tab-buy');
+  const sellBtn=document.getElementById('mo-tab-sell');
+  if(tab==='buy'){
+    buyBtn.style.background='var(--y)';buyBtn.style.color='var(--dk)';buyBtn.style.border='none';
+    sellBtn.style.background='var(--dk3)';sellBtn.style.color='var(--mu)';sellBtn.style.border='1px solid rgba(255,255,255,.06)';sellBtn.style.borderLeft='none';
+    renderOrderList(_buyOrders,'buy');
+  }else{
+    sellBtn.style.background='var(--y)';sellBtn.style.color='var(--dk)';sellBtn.style.border='none';
+    buyBtn.style.background='var(--dk3)';buyBtn.style.color='var(--mu)';buyBtn.style.border='1px solid rgba(255,255,255,.06)';
+    renderOrderList(_sellOrders,'sell');
   }
-  const statusLabel={pending:'⏳ Pendiente',processing:'🚀 En camino',transit:'🏍️ En ruta',delivered:'✅ Entregado'};
+}
+function renderOrderList(orders,mode){
+  const list=document.getElementById('my-orders-list');
+  const statusLabel={pending:'⏳ Pendiente',processing:'🚀 Procesando',transit:'🏍️ En ruta',delivered:'✅ Entregado'};
   const statusColor={pending:'rgba(255,208,0,.15)',processing:'rgba(33,150,243,.12)',transit:'rgba(255,152,0,.12)',delivered:'rgba(76,175,80,.1)'};
   const statusTxt={pending:'var(--y)',processing:'#2196F3',transit:'#FF9800',delivered:'#4CAF50'};
+  const emptyIcon=mode==='buy'?'🛒':'💰';
+  const emptyTitle=mode==='buy'?'Sin compras aún':'Sin ventas aún';
+  const emptySub=mode==='buy'?'Tus compras aparecerán aquí':'Las ventas de tu tienda aparecerán aquí';
+
+  if(!orders.length){
+    list.innerHTML=`<div style="text-align:center;padding:56px 24px;color:var(--mu)"><div style="font-size:48px;margin-bottom:14px">${emptyIcon}</div><div style="font-size:14px;font-weight:800;color:var(--tx);margin-bottom:6px">${emptyTitle}</div><div style="font-size:12px">${emptySub}</div></div>`;
+    return;
+  }
   list.innerHTML=orders.map(o=>{
     const st=o.status||'pending';
     const date=o.date||new Date(o.createdAt||Date.now()).toLocaleDateString('es-VE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-    return `<div style="margin:12px 16px 0;background:var(--dk3);border-radius:16px;border:1px solid rgba(255,255,255,.06);overflow:hidden;cursor:pointer" onclick="openTrack('${o._id||''}')">
+    const personLabel=mode==='buy'?o.sellerName||'Vendedor':o.buyerName||'Comprador';
+    const personIcon=mode==='buy'?'🏪':'👤';
+    return `<div style="margin:10px 16px 0;background:var(--dk3);border-radius:16px;border:1px solid rgba(255,255,255,.06);overflow:hidden;cursor:pointer" onclick="${mode==='buy'?`openTrack('${o._id||''}')`:`moShowSaleDetail('${o._id||''}')`}">
       <div style="display:flex;align-items:center;gap:12px;padding:13px 14px">
         <div style="width:52px;height:52px;border-radius:12px;background:var(--dk4);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">
           ${o.img?`<img src="${o.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:''}
           ${o.e||'📦'}
         </div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">${o.prod||'Producto'}</div>
-          <div style="font-size:11px;color:var(--mu);margin-bottom:6px">${o.sellerName||'Vendedor'} · ${date}</div>
-          <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px">${o.prod||'Producto'}</div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:2px">${personIcon} ${personLabel} · ${o.qty||1}x · ${date}</div>
+          ${mode==='sell'?`<div style="font-size:10px;color:var(--mu)">${o.buyerPhone||o.buyerCity||''}</div>`:''}
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
             <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--y)">$${o.amt||0}</span>
             <span style="font-size:10px;font-weight:900;padding:3px 9px;border-radius:20px;background:${statusColor[st]||statusColor.pending};color:${statusTxt[st]||statusTxt.pending}">${statusLabel[st]||statusLabel.pending}</span>
           </div>
         </div>
+        ${mode==='sell'&&st!=='delivered'?`<div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+          ${st==='pending'?`<button onclick="event.stopPropagation();moUpdateStatus('${o._id}','processing')" style="padding:6px 10px;border-radius:8px;background:rgba(33,150,243,.12);color:#2196F3;border:none;font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;cursor:pointer">🚀 Despachar</button>`:''}
+          ${st==='processing'?`<button onclick="event.stopPropagation();moUpdateStatus('${o._id}','transit')" style="padding:6px 10px;border-radius:8px;background:rgba(255,152,0,.12);color:#FF9800;border:none;font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;cursor:pointer">🏍️ En ruta</button>`:''}
+          ${st==='transit'?`<button onclick="event.stopPropagation();moUpdateStatus('${o._id}','delivered')" style="padding:6px 10px;border-radius:8px;background:rgba(76,175,80,.12);color:#4CAF50;border:none;font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;cursor:pointer">✅ Entregado</button>`:''}
+        </div>`:''}
       </div>
       ${st!=='delivered'?`<div style="height:3px;background:var(--dk4);position:relative"><div style="position:absolute;left:0;top:0;height:100%;background:var(--y);border-radius:2px;width:${{pending:'25%',processing:'55%',transit:'80%',delivered:'100%'}[st]||'25%'};transition:width .5s ease"></div></div>`:''}
     </div>`;
   }).join('');
+}
+async function moUpdateStatus(id,status){
+  await fsSet('orders',id,{status});
+  const o=_sellOrders.find(x=>x._id===id);
+  if(o)o.status=status;
+  toast('✅ Orden → '+{processing:'Procesando',transit:'En ruta',delivered:'Entregado'}[status]);
+  renderOrderList(_sellOrders,'sell');
+}
+function moShowSaleDetail(id){
+  const o=_sellOrders.find(x=>x._id===id);
+  if(!o)return;
+  const st=o.status||'pending';
+  const date=o.date||new Date(o.createdAt||Date.now()).toLocaleDateString('es-VE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+  toast(`📦 ${o.prod||'Producto'} · ${o.buyerName||'Comprador'} · $${o.amt||0}`);
 }
 
 function openProfEdit(){
@@ -5869,6 +6050,10 @@ async function openTrack(orderOrIdx){
 }
 
 // ═══ INIT ═══
+// Reorder PRODS for maximum visual impact (investor demo)
+const _ORDER=[0,1,16,29,40,41,42,43,44,45,11,6,35,31,34,10,3,36,22,4,37,18,2,5,7,8,9,12,13,14,15,17,19,20,21,23,24,25,26,27,28,30,32,33,38,39];
+const _origProds=[...PRODS];
+_ORDER.forEach((idx,i)=>{if(i<PRODS.length&&idx<_origProds.length)PRODS[i]=_origProds[idx];});
 
 
 
@@ -5978,9 +6163,6 @@ async function loadHomeFeed(){
   _homePollIv=setInterval(_refreshLiveStrip, 30000);
   const prods=await fsQuery('products');
   if(prods.length>0){
-    // Cache FS products for openProdFS/quickAddFS
-    window._fsProdCache={};
-    prods.forEach(p=>{if(p._id)window._fsProdCache[p._id]=p;});
     const grid=document.getElementById('pgrid');
     if(!grid)return;
     const render=(list,offset=0)=>list.map((p,i)=>`
@@ -5989,7 +6171,7 @@ async function loadHomeFeed(){
           <img src="${p.img||''}" onerror="this.style.display='none'" loading="lazy">
           ${(p.origPrice>p.price)?`<div class="pcard-disc">-${Math.round((1-p.price/p.origPrice)*100)}%</div>`:''}
           ${p.live?`<div class="pcard-live-dot"><div class="lbadge" style="font-size:7px;padding:2px 5px">LIVE</div></div>`:''}
-          <button class="pcard-qadd" onclick="event.stopPropagation();quickAddFS('${p._id}')">🛒</button>
+          <button class="pcard-qadd" onclick="event.stopPropagation();toast('🛒 Agregado!')">🛒</button>
         </div>
         <div class="pcard-body">
           <div class="pcard-name">${p.name||'Producto'}</div>
@@ -6071,26 +6253,7 @@ async function openStreamFS(channelName){
     openStream(0); // fallback
   }
 }
-function openProdFS(id){
-  const p=window._fsProdCache?.[id];
-  if(!p){openProd(0);return;}
-  // Map FS product into PRODS slot so all existing cart/detail logic works
-  const fsIdx=PRODS.length;
-  const sellerIdx=SELLERS.length;
-  SELLERS.push({n:p.sellerName||'Vendedor',e:p.sellerEmoji||'🛍️',v:0,f:'0',p:p.price||0,logo:'',cat:p.cat||'General'});
-  PRODS.push({n:p.name||'Producto',s:sellerIdx,p:p.price||0,op:p.origPrice||p.price||0,img:p.img||'',e:p.emoji||'📦',sz:p.sizes||['Único'],d:p.desc||'',live:!!p.live});
-  openProd(fsIdx);
-}
-function quickAddFS(id){
-  if(requireAccount('🛒','Para comprar necesitas cuenta','Crea tu cuenta gratis y compra en vivo al instante.'))return;
-  const p=window._fsProdCache?.[id];
-  if(!p){toast('❌ Producto no disponible');return;}
-  const fsIdx=PRODS.length;
-  const sellerIdx=SELLERS.length;
-  SELLERS.push({n:p.sellerName||'Vendedor',e:p.sellerEmoji||'🛍️',v:0,f:'0',p:p.price||0,logo:'',cat:p.cat||'General'});
-  PRODS.push({n:p.name||'Producto',s:sellerIdx,p:p.price||0,op:p.origPrice||p.price||0,img:p.img||'',e:p.emoji||'📦',sz:p.sizes||['Único'],d:p.desc||'',live:!!p.live});
-  addItem(fsIdx,PRODS[fsIdx].sz[0],1);animateCartBadge();toast(`✅ ${p.name||'Producto'} al carrito`);
-}
+function openProdFS(id){openProd(0);}
 
 // Fetch live streams from Firestore and update the strip
 async function _refreshLiveStrip(){
@@ -6529,27 +6692,16 @@ if('serviceWorker' in navigator){
     window.addEventListener('load', ()=>{
       navigator.serviceWorker.register('/Instacompras/sw.js')
         .then(reg=>{
-          // Force check for updates
-          reg.update().catch(()=>{});
           reg.addEventListener('updatefound',()=>{
             const newSW=reg.installing;
             newSW.addEventListener('statechange',()=>{
-              if(newSW.state==='installed'){
-                // Auto-activate new SW immediately
-                if(newSW.postMessage) newSW.postMessage({type:'SKIP_WAITING'});
-                if(navigator.serviceWorker.controller){
-                  location.reload();
-                }
+              if(newSW.state==='installed'&&navigator.serviceWorker.controller){
+                toast('🔄 App actualizada — recarga para ver cambios');
               }
             });
           });
         })
         .catch(()=>{});
-    });
-  } else {
-    // Not on GH Pages — unregister any stale SW
-    navigator.serviceWorker.getRegistrations().then(regs=>{
-      regs.forEach(r=>r.unregister());
     });
   }
 }
