@@ -13,6 +13,7 @@
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes pulse-live{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes draw{from{stroke-dashoffset:1000}to{stroke-dashoffset:0}}
 .fu{animation:fadeUp .5s ease both}.fu1{animation-delay:.05s}.fu2{animation-delay:.1s}.fu3{animation-delay:.15s}.fu4{animation-delay:.2s}.fu5{animation-delay:.25s}
 
 /* LOGIN */
@@ -28,89 +29,72 @@
 .lc-tag{font-size:9px;font-weight:800;color:var(--rd);letter-spacing:3px}
 .lc-sub{font-size:12px;color:var(--mu);margin-bottom:32px;font-weight:600;letter-spacing:.5px}
 .li{width:100%;background:var(--dk3);border:1.5px solid rgba(255,255,255,.06);border-radius:12px;padding:14px 18px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;outline:none;margin-bottom:14px;transition:all .25s}
-.li:focus{border-color:rgba(255,208,0,.35);box-shadow:0 0 0 3px rgba(255,208,0,.06)}
-.li::placeholder{color:var(--mu)}
+.li:focus{border-color:rgba(255,208,0,.35);box-shadow:0 0 0 3px rgba(255,208,0,.06)}.li::placeholder{color:var(--mu)}
 .lb{width:100%;background:linear-gradient(135deg,var(--y),var(--y2));color:var(--dk);border:none;border-radius:12px;padding:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .2s;margin-top:4px}
-.lb:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,208,0,.25)}
-.lb:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.lb:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,208,0,.25)}.lb:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .le{font-size:12px;color:var(--rd);margin-top:12px;min-height:18px;font-weight:600}
 
 /* LAYOUT */
 #app{display:none;height:100%;width:100%}
 .sb{position:fixed;left:0;top:0;bottom:0;width:var(--sbw);background:linear-gradient(180deg,var(--dk2),var(--dk));border-right:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;z-index:100;transition:transform .35s cubic-bezier(.4,0,.2,1)}
-.sb-hd{padding:26px 22px 22px}
-.sb-br{display:flex;align-items:center;gap:9px}
-.sb-br-b{width:3px;height:28px;background:var(--y);border-radius:2px}
-.sb-br-n{font-family:system-ui,sans-serif;font-size:17px;font-weight:900;color:#fff;letter-spacing:-.3px;line-height:1}
-.sb-br-r{display:flex;align-items:center;gap:4px;margin-top:3px}
-.sb-br-d{width:5px;height:5px;border-radius:50%;background:var(--rd);animation:pulse-live 2s infinite}
-.sb-br-l{font-size:7px;font-weight:800;color:var(--rd);letter-spacing:2px}
-.sb-br-a{font-size:7px;font-weight:900;color:var(--y);letter-spacing:1px;background:var(--yg);border:1px solid rgba(255,208,0,.2);border-radius:3px;padding:1px 5px;margin-left:3px}
+.sb-hd{padding:26px 22px 22px}.sb-br{display:flex;align-items:center;gap:9px}.sb-br-b{width:3px;height:28px;background:var(--y);border-radius:2px}.sb-br-n{font-family:system-ui,sans-serif;font-size:17px;font-weight:900;color:#fff;letter-spacing:-.3px;line-height:1}.sb-br-r{display:flex;align-items:center;gap:4px;margin-top:3px}.sb-br-d{width:5px;height:5px;border-radius:50%;background:var(--rd);animation:pulse-live 2s infinite}.sb-br-l{font-size:7px;font-weight:800;color:var(--rd);letter-spacing:2px}.sb-br-a{font-size:7px;font-weight:900;color:var(--y);letter-spacing:1px;background:var(--yg);border:1px solid rgba(255,208,0,.2);border-radius:3px;padding:1px 5px;margin-left:3px}
 .sb-nav{flex:1;padding:8px 12px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
 .sb-sep{font-size:9px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:1.5px;padding:16px 12px 6px}
 .sb-i{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:700;color:var(--mu);transition:all .2s;position:relative;overflow:hidden}
-.sb-i:hover{background:rgba(255,255,255,.03);color:var(--tx2)}
-.sb-i.on{background:var(--yg);color:var(--y)}
-.sb-i.on::before{content:'';position:absolute;left:0;top:25%;bottom:25%;width:3px;background:var(--y);border-radius:0 3px 3px 0}
-.sb-ic{width:20px;text-align:center;font-size:15px;flex-shrink:0}
-.sb-bg{position:absolute;right:12px;background:var(--rd);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;min-width:18px;text-align:center}
-.sb-ft{padding:16px 22px;border-top:1px solid rgba(255,255,255,.04)}
-.sb-ft-u{display:flex;align-items:center;gap:10px}
-.sb-ft-av{width:32px;height:32px;border-radius:10px;background:var(--yb);display:flex;align-items:center;justify-content:center;font-size:14px}
+.sb-i:hover{background:rgba(255,255,255,.03);color:var(--tx2)}.sb-i.on{background:var(--yg);color:var(--y)}.sb-i.on::before{content:'';position:absolute;left:0;top:25%;bottom:25%;width:3px;background:var(--y);border-radius:0 3px 3px 0}
+.sb-ic{width:20px;text-align:center;font-size:15px;flex-shrink:0}.sb-bg{position:absolute;right:12px;background:var(--rd);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;min-width:18px;text-align:center}
+.sb-ft{padding:16px 22px;border-top:1px solid rgba(255,255,255,.04)}.sb-ft-u{display:flex;align-items:center;gap:10px}.sb-ft-av{width:32px;height:32px;border-radius:10px;background:var(--yb);display:flex;align-items:center;justify-content:center;font-size:14px}
 
 .mn{margin-left:var(--sbw);height:100%;overflow-y:auto;background:var(--dk)}
 .tb{padding:20px 32px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:rgba(7,7,12,.8);backdrop-filter:blur(20px);z-index:50;border-bottom:1px solid rgba(255,255,255,.03)}
-.tb-t{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.8px}
-.tb-s{font-size:11px;color:var(--mu);font-weight:600}
+.tb-t{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.8px}.tb-s{font-size:11px;color:var(--mu);font-weight:600}
 .tb-btn{background:var(--dk3);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:9px 14px;color:var(--tx2);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s}
-.tb-btn:hover{border-color:rgba(255,208,0,.2);color:var(--y);background:var(--yg)}
-.tb-btn-d:hover{border-color:rgba(255,71,87,.2);color:var(--rd);background:rgba(255,71,87,.06)}
-.mbtn{display:none;background:none;border:none;color:var(--tx);font-size:22px;cursor:pointer}
-.ct{padding:4px 32px 40px}
+.tb-btn:hover{border-color:rgba(255,208,0,.2);color:var(--y);background:var(--yg)}.tb-btn-d:hover{border-color:rgba(255,71,87,.2);color:var(--rd);background:rgba(255,71,87,.06)}
+.mbtn{display:none;background:none;border:none;color:var(--tx);font-size:22px;cursor:pointer}.ct{padding:4px 32px 40px}
 
 /* STATS */
-.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}
-.st{background:var(--dk2);border:var(--card);border-radius:16px;padding:20px;position:relative;overflow:hidden;transition:all .25s;cursor:default}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
+.st{background:var(--dk2);border:var(--card);border-radius:16px;padding:18px;position:relative;overflow:hidden;transition:all .25s;cursor:default}
 .st:hover{border-color:rgba(255,255,255,.08);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
 .st-gl{position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.07;filter:blur(20px)}
-.st-v{font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:1;letter-spacing:1px;margin:10px 0 2px}
-.st-l{font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:1px}
-.cy{color:var(--y)}.cg{color:var(--gn)}.cb{color:var(--bl)}.cr{color:var(--rd)}.cp{color:var(--pu)}.co{color:var(--or)}
+.st-v{font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1;letter-spacing:1px;margin:8px 0 2px}.st-l{font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:1px}
+.cy{color:var(--y)}.cg{color:var(--gn)}.cb{color:var(--bl)}.cr{color:var(--rd)}.cp{color:var(--pu)}.co{color:var(--or)}.cc{color:var(--cy)}
 .gy{background:var(--y)}.gg{background:var(--gn)}.gb{background:var(--bl)}.gr{background:var(--rd)}.gp{background:var(--pu)}.go{background:var(--or)}
 
 /* SECTIONS */
 .sec{display:none}.sec.on{display:block}
-.sh{display:flex;align-items:center;justify-content:space-between;margin:20px 0 14px}
-.sht{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.5px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sh{display:flex;align-items:center;justify-content:space-between;margin:20px 0 14px}.sht{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.5px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 
 /* CARD */
 .cd{background:var(--dk2);border:var(--card);border-radius:16px;overflow:hidden}
 .cd-h{padding:16px 18px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.5px;border-bottom:1px solid rgba(255,255,255,.03);display:flex;align-items:center;justify-content:space-between}
 .cd-b{padding:16px 18px}.cd-bn{padding:0}
 
-/* CHART */
+/* CHART BARS */
 .cr-r{display:flex;align-items:center;gap:10px;margin-bottom:7px}
-.cr-l{width:40px;font-size:11px;color:var(--mu);text-align:right;font-weight:700;flex-shrink:0}
-.cr-t{flex:1;height:26px;background:var(--dk4);border-radius:8px;overflow:hidden}
-.cr-f{height:100%;border-radius:8px;transition:width 1s cubic-bezier(.25,1,.5,1);display:flex;align-items:center;justify-content:flex-end;padding-right:8px}
-.cr-v{font-size:10px;font-weight:800;color:var(--dk)}
-.cr-fy{background:linear-gradient(90deg,rgba(255,208,0,.5),var(--y))}
-.cr-fb{background:linear-gradient(90deg,rgba(30,144,255,.4),var(--bl))}
+.cr-l{width:50px;font-size:11px;color:var(--mu);text-align:right;font-weight:700;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cr-t{flex:1;height:24px;background:var(--dk4);border-radius:7px;overflow:hidden}.cr-f{height:100%;border-radius:7px;transition:width 1s cubic-bezier(.25,1,.5,1);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;min-width:28px}
+.cr-v{font-size:10px;font-weight:800;color:var(--dk);white-space:nowrap}
+.cr-fy{background:linear-gradient(90deg,rgba(255,208,0,.5),var(--y))}.cr-fb{background:linear-gradient(90deg,rgba(30,144,255,.4),var(--bl))}.cr-fg{background:linear-gradient(90deg,rgba(46,213,115,.4),var(--gn))}.cr-fp{background:linear-gradient(90deg,rgba(165,94,234,.4),var(--pu))}.cr-fo{background:linear-gradient(90deg,rgba(255,159,67,.4),var(--or))}.cr-fr{background:linear-gradient(90deg,rgba(255,71,87,.4),var(--rd))}
+
+/* DONUT CHART */
+.donut-wrap{display:flex;align-items:center;gap:20px;padding:8px 0}
+.donut-legend{display:flex;flex-direction:column;gap:8px;flex:1}
+.donut-item{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700}
+.donut-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.donut-val{margin-left:auto;font-family:'Bebas Neue',sans-serif;font-size:16px}
 
 /* TABLE */
-.tl{border-radius:16px;overflow:hidden;background:var(--dk2);border:var(--card)}
-.tl-b{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.03);flex-wrap:wrap}
+.tl{border-radius:16px;overflow:hidden;background:var(--dk2);border:var(--card)}.tl-b{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.03);flex-wrap:wrap}
 .tl-s{flex:1;min-width:200px;background:var(--dk4);border:1.5px solid rgba(255,255,255,.05);border-radius:10px;padding:9px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;outline:none;transition:all .2s}
-.tl-s:focus{border-color:rgba(255,208,0,.25);box-shadow:0 0 0 3px rgba(255,208,0,.04)}
-.tl-s::placeholder{color:var(--mu)}
+.tl-s:focus{border-color:rgba(255,208,0,.25)}.tl-s::placeholder{color:var(--mu)}
 .tl-f{background:var(--dk4);border:1.5px solid rgba(255,255,255,.05);border-radius:10px;padding:9px 14px;color:var(--tx2);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;outline:none}
-.tl-sc{max-height:62vh;overflow-y:auto}
+.tl-sc{max-height:60vh;overflow-y:auto}
 table{width:100%;border-collapse:collapse}
 th{text-align:left;padding:10px 16px;font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid rgba(255,255,255,.04);position:sticky;top:0;background:var(--dk2);z-index:1}
-td{padding:12px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.02);vertical-align:middle}
-tr:hover td{background:rgba(255,255,255,.015)}
-.te{padding:48px;text-align:center;color:var(--mu);font-size:13px;font-weight:600}
+td{padding:11px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.02);vertical-align:middle}tr:hover td{background:rgba(255,255,255,.015)}
+.te{padding:44px;text-align:center;color:var(--mu);font-size:13px;font-weight:600}
 
 /* BADGES */
 .b{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:7px;font-size:10px;font-weight:800;letter-spacing:.3px}
@@ -121,37 +105,34 @@ tr:hover td{background:rgba(255,255,255,.015)}
 .a:hover{transform:translateY(-1px);filter:brightness(1.15)}
 .a-ok{background:rgba(46,213,115,.12);color:var(--gn)}.a-no{background:rgba(255,71,87,.1);color:var(--rd)}.a-ed{background:rgba(30,144,255,.1);color:var(--bl)}.a-del{background:rgba(255,71,87,.06);color:rgba(255,71,87,.7)}
 .a-main{background:linear-gradient(135deg,var(--y),var(--y2));color:var(--dk);font-weight:800;padding:10px 20px;border-radius:11px;font-size:13px;box-shadow:0 4px 12px rgba(255,208,0,.15)}
-
-/* AVATAR */
-.av{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0}
-.av-b{background:rgba(30,144,255,.12);color:var(--bl)}.av-s{background:var(--yg);color:var(--y)}
+.av{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0}.av-b{background:rgba(30,144,255,.12);color:var(--bl)}.av-s{background:var(--yg);color:var(--y)}
 
 /* MODAL */
-.mo{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(10px);z-index:500;display:none;align-items:center;justify-content:center}
-.mo.on{display:flex}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(10px);z-index:500;display:none;align-items:center;justify-content:center}.mo.on{display:flex}
 .mx{background:linear-gradient(145deg,var(--dk2),var(--dk3));border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:30px;width:460px;max-width:92vw;max-height:85vh;overflow-y:auto;animation:fadeUp .3s ease;box-shadow:0 24px 64px rgba(0,0,0,.5)}
 .mx-t{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
 .mx-x{background:var(--dk4);border:1px solid rgba(255,255,255,.06);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--mu);font-size:14px}
 .fg{margin-bottom:14px}.fl{font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
 .fi{width:100%;background:var(--dk4);border:1.5px solid rgba(255,255,255,.06);border-radius:10px;padding:11px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;outline:none;transition:all .2s}
-.fi:focus{border-color:rgba(255,208,0,.3);box-shadow:0 0 0 3px rgba(255,208,0,.04)}
-.fs{width:100%;background:var(--dk4);border:1.5px solid rgba(255,255,255,.06);border-radius:10px;padding:11px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;cursor:pointer}
-.fr{display:flex;gap:10px}.fr>*{flex:1}
-.mf{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+.fi:focus{border-color:rgba(255,208,0,.3)}.fs{width:100%;background:var(--dk4);border:1.5px solid rgba(255,255,255,.06);border-radius:10px;padding:11px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;cursor:pointer}
+.fr{display:flex;gap:10px}.fr>*{flex:1}.mf{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
 
 /* PUSH */
 .pu-m{background:var(--dk4);border-radius:12px;padding:14px;display:flex;gap:12px;align-items:flex-start;margin-top:12px}
 .pu-ic{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--y),var(--y2));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 
 /* ACTIVITY */
-.ac{display:flex;flex-direction:column}.ac-i{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.03)}.ac-i:last-child{border:none}
+.ac{display:flex;flex-direction:column}.ac-i{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.03)}.ac-i:last-child{border:none}
 .ac-d{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}.ac-t{font-size:12px;color:var(--tx2);line-height:1.5}.ac-t strong{color:var(--tx)}.ac-tm{font-size:10px;color:var(--mu);margin-top:2px}
 
-/* TOAST */
-.toast{position:fixed;bottom:28px;right:28px;background:linear-gradient(135deg,var(--dk3),var(--dk4));border:1px solid rgba(255,255,255,.08);color:var(--tx);padding:14px 22px;border-radius:14px;font-weight:700;font-size:13px;z-index:9999;opacity:0;transform:translateY(12px) scale(.95);transition:all .35s cubic-bezier(.34,1.3,.64,1);pointer-events:none;box-shadow:0 12px 40px rgba(0,0,0,.4)}
-.toast.on{opacity:1;transform:none}
+/* AUTO-REFRESH */
+.ar{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mu);font-weight:600}
+.ar-dot{width:6px;height:6px;border-radius:50%;background:var(--gn);animation:pulse-live 3s infinite}
 
-@media(max-width:900px){.sb{transform:translateX(-100%)}.sb.open{transform:none;box-shadow:16px 0 48px rgba(0,0,0,.5)}.mn{margin-left:0}.mbtn{display:block}.tb{padding:16px 18px 14px}.ct{padding:4px 18px 32px}.sg{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}}
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;background:linear-gradient(135deg,var(--dk3),var(--dk4));border:1px solid rgba(255,255,255,.08);color:var(--tx);padding:14px 22px;border-radius:14px;font-weight:700;font-size:13px;z-index:9999;opacity:0;transform:translateY(12px) scale(.95);transition:all .35s cubic-bezier(.34,1.3,.64,1);pointer-events:none;box-shadow:0 12px 40px rgba(0,0,0,.4)}.toast.on{opacity:1;transform:none}
+
+@media(max-width:900px){.sb{transform:translateX(-100%)}.sb.open{transform:none;box-shadow:16px 0 48px rgba(0,0,0,.5)}.mn{margin-left:0}.mbtn{display:block}.tb{padding:16px 18px 14px}.ct{padding:4px 18px 32px}.sg{grid-template-columns:1fr 1fr}.g2,.g3{grid-template-columns:1fr}}
 @media(max-width:480px){.sg{grid-template-columns:1fr}}
 </style>
 </head>
@@ -161,24 +142,53 @@ tr:hover td{background:rgba(255,255,255,.015)}
 <div class="sb" id="sidebar"><div class="sb-hd"><div class="sb-br"><div class="sb-br-b"></div><div><div class="sb-br-n">InstaCompras</div><div class="sb-br-r"><div class="sb-br-d"></div><div class="sb-br-l">EN VIVO</div><div class="sb-br-a">ADMIN</div></div></div></div></div>
 <div class="sb-nav"><div class="sb-sep">Principal</div><div class="sb-i on" data-s="overview"><span class="sb-ic">📊</span>Overview</div><div class="sb-i" data-s="users"><span class="sb-ic">👥</span>Usuarios<span class="sb-bg" id="bg-u" style="display:none"></span></div><div class="sb-i" data-s="products"><span class="sb-ic">📦</span>Productos</div><div class="sb-i" data-s="orders"><span class="sb-ic">🛒</span>Órdenes<span class="sb-bg" id="bg-o" style="display:none"></span></div><div class="sb-sep">Finanzas</div><div class="sb-i" data-s="deposits"><span class="sb-ic">💰</span>Depósitos<span class="sb-bg" id="bg-d" style="display:none"></span></div><div class="sb-i" data-s="wallets"><span class="sb-ic">💳</span>Wallets</div><div class="sb-sep">Gestión</div><div class="sb-i" data-s="sellers"><span class="sb-ic">🏪</span>Sellers</div><div class="sb-i" data-s="streams"><span class="sb-ic">📡</span>Streams</div><div class="sb-i" data-s="push"><span class="sb-ic">🔔</span>Notificaciones</div></div>
 <div class="sb-ft"><div class="sb-ft-u"><div class="sb-ft-av">⚡</div><div><div style="font-size:12px;font-weight:800" id="sb-user">Admin</div><div style="font-size:10px;color:var(--mu)">Administrador</div></div></div></div></div>
-<div class="mn" id="main"><div class="tb"><div style="display:flex;align-items:center;gap:14px"><button class="mbtn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button><div><div class="tb-t" id="tb-t">Overview</div><div class="tb-s" id="tb-s">Panel de control en tiempo real</div></div></div><div style="display:flex;gap:10px"><button class="tb-btn" onclick="refreshAll()">🔄 Refrescar</button><button class="tb-btn tb-btn-d" onclick="doLogout()">Salir</button></div></div>
-<div class="ct" id="ct">
-<div class="sec on" id="sec-overview"><div class="sg" id="ov-sg"></div><div class="g2"><div class="cd"><div class="cd-h">💰 Revenue Semanal</div><div class="cd-b" id="ov-cr"></div></div><div class="cd"><div class="cd-h">📈 Actividad Reciente</div><div class="cd-b" id="ov-ac"></div></div></div><div class="sh"><div class="sht">🕐 Últimas Órdenes</div></div><div class="tl"><div class="tl-sc" id="ov-o"></div></div><div class="sh"><div class="sht">⏳ Depósitos Pendientes</div></div><div class="tl"><div class="tl-sc" id="ov-d"></div></div></div>
-<div class="sec" id="sec-users"><div class="tl"><div class="tl-b"><input class="tl-s" placeholder="🔍 Buscar nombre, email, username..." oninput="fU(this.value)"><select class="tl-f" onchange="fUT(this.value)"><option value="">Todos</option><option value="buyer">Buyers</option><option value="seller">Sellers</option></select></div><div class="tl-sc" id="t-u"></div></div></div>
-<div class="sec" id="sec-products"><div class="sh"><div class="sht">Inventario</div><button class="a a-main" onclick="oPM()">+ Nuevo Producto</button></div><div class="tl"><div class="tl-b"><input class="tl-s" placeholder="🔍 Buscar producto..." oninput="fP(this.value)"></div><div class="tl-sc" id="t-p"></div></div></div>
-<div class="sec" id="sec-orders"><div class="tl"><div class="tl-b"><input class="tl-s" placeholder="🔍 Buscar orden..." oninput="fO(this.value)"><select class="tl-f" onchange="fOS(this.value)"><option value="">Todos</option><option value="pending">Pendiente</option><option value="processing">Procesando</option><option value="transit">En tránsito</option><option value="delivered">Entregado</option></select></div><div class="tl-sc" id="t-o"></div></div></div>
-<div class="sec" id="sec-deposits"><div class="tl"><div class="tl-b"><input class="tl-s" placeholder="🔍 Buscar depósito..." oninput="fD(this.value)"><select class="tl-f" onchange="fDS(this.value)"><option value="">Todos</option><option value="pending">Pendiente</option><option value="approved">Aprobado</option><option value="rejected">Rechazado</option></select></div><div class="tl-sc" id="t-d"></div></div></div>
-<div class="sec" id="sec-wallets"><div class="sg" id="w-sg"></div><div class="tl"><div class="tl-b"><input class="tl-s" placeholder="🔍 Buscar usuario..." oninput="fW(this.value)"></div><div class="tl-sc" id="t-w"></div></div></div>
-<div class="sec" id="sec-sellers"><div class="tl"><div class="tl-b"><input class="tl-s" placeholder="🔍 Buscar seller..." oninput="fSe(this.value)"></div><div class="tl-sc" id="t-se"></div></div></div>
+<div class="mn"><div class="tb"><div style="display:flex;align-items:center;gap:14px"><button class="mbtn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button><div><div class="tb-t" id="tb-t">Overview</div><div class="tb-s" id="tb-s">Panel de control en tiempo real</div></div></div><div style="display:flex;gap:10px;align-items:center"><div class="ar"><div class="ar-dot"></div><span id="ar-timer">Auto-refresh 60s</span></div><button class="tb-btn" onclick="refreshAll()">🔄 Refrescar</button><button class="tb-btn tb-btn-d" onclick="doLogout()">Salir</button></div></div>
+<div class="ct">
+<!-- OVERVIEW -->
+<div class="sec on" id="sec-overview">
+<div class="sg" id="ov-sg"></div>
+<div class="g3" id="ov-charts-row">
+<div class="cd"><div class="cd-h">💰 Revenue 7 días</div><div class="cd-b" id="ov-rev"></div></div>
+<div class="cd"><div class="cd-h">📦 Órdenes por Estado</div><div class="cd-b" id="ov-donut"></div></div>
+<div class="cd"><div class="cd-h">📈 Actividad</div><div class="cd-b" id="ov-ac"></div></div>
+</div>
+<div class="g2" style="margin-top:14px">
+<div class="cd"><div class="cd-h">🏆 Top Productos</div><div class="cd-b" id="ov-top-prods"></div></div>
+<div class="cd"><div class="cd-h">🌎 Usuarios por Ciudad</div><div class="cd-b" id="ov-cities"></div></div>
+</div>
+<div class="g2" style="margin-top:14px">
+<div class="cd"><div class="cd-h">👥 Registro de Usuarios (7d)</div><div class="cd-b" id="ov-user-chart"></div></div>
+<div class="cd"><div class="cd-h">🏪 Top Sellers por Revenue</div><div class="cd-b" id="ov-top-sellers"></div></div>
+</div>
+<div class="sh"><div class="sht">🕐 Últimas Órdenes</div></div>
+<div class="tl"><div class="tl-sc" id="ov-o"></div></div>
+<div class="sh"><div class="sht">⏳ Depósitos Pendientes</div></div>
+<div class="tl"><div class="tl-sc" id="ov-d"></div></div>
+</div>
+<!-- USERS -->
+<div class="sec" id="sec-users"><div class="tl"><div class="tl-b"><input class="tl-s" placeholder="🔍 Buscar..." oninput="fU(this.value)"><select class="tl-f" onchange="fUT(this.value)"><option value="">Todos</option><option value="buyer">Buyers</option><option value="seller">Sellers</option></select></div><div class="tl-sc" id="t-u"></div></div></div>
+<!-- PRODUCTS -->
+<div class="sec" id="sec-products"><div class="sh"><div class="sht">Inventario</div><button class="a a-main" onclick="oPM()">+ Nuevo</button></div><div class="tl"><div class="tl-b"><input class="tl-s" placeholder="🔍 Buscar..." oninput="fP(this.value)"></div><div class="tl-sc" id="t-p"></div></div></div>
+<!-- ORDERS -->
+<div class="sec" id="sec-orders"><div class="tl"><div class="tl-b"><input class="tl-s" placeholder="🔍 Buscar..." oninput="fO(this.value)"><select class="tl-f" onchange="fOS(this.value)"><option value="">Todos</option><option value="pending">Pendiente</option><option value="processing">Procesando</option><option value="transit">Tránsito</option><option value="delivered">Entregado</option></select></div><div class="tl-sc" id="t-o"></div></div></div>
+<!-- DEPOSITS -->
+<div class="sec" id="sec-deposits"><div class="tl"><div class="tl-b"><input class="tl-s" placeholder="🔍 Buscar..." oninput="fD(this.value)"><select class="tl-f" onchange="fDS(this.value)"><option value="">Todos</option><option value="pending">Pendiente</option><option value="approved">Aprobado</option><option value="rejected">Rechazado</option></select></div><div class="tl-sc" id="t-d"></div></div></div>
+<!-- WALLETS -->
+<div class="sec" id="sec-wallets"><div class="sg" id="w-sg"></div><div class="tl"><div class="tl-b"><input class="tl-s" placeholder="🔍 Buscar..." oninput="fW(this.value)"></div><div class="tl-sc" id="t-w"></div></div></div>
+<!-- SELLERS -->
+<div class="sec" id="sec-sellers"><div class="tl"><div class="tl-b"><input class="tl-s" placeholder="🔍 Buscar..." oninput="fSe(this.value)"></div><div class="tl-sc" id="t-se"></div></div></div>
+<!-- STREAMS -->
 <div class="sec" id="sec-streams"><div class="tl"><div class="tl-sc" id="t-st"></div></div></div>
-<div class="sec" id="sec-push"><div class="g2"><div class="cd"><div class="cd-h">✏️ Componer</div><div class="cd-b"><div class="fg"><div class="fl">Título</div><input class="fi" id="p-t" placeholder="Ej: ¡Oferta Flash! 🔥" oninput="uPP()"></div><div class="fg"><div class="fl">Mensaje</div><input class="fi" id="p-b" placeholder="Ej: 50% off por 1 hora" oninput="uPP()"></div><div class="fg"><div class="fl">Audiencia</div><select class="fs" id="p-tg"><option value="all">👥 Todos</option><option value="buyers">🛒 Compradores</option><option value="sellers">🏪 Vendedores</option></select></div><button class="a a-main" style="width:100%;justify-content:center;margin-top:8px" onclick="sP()">🔔 Enviar</button><div style="background:var(--dk3);border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,.04);margin-top:14px"><div class="fl" style="margin-bottom:8px">Vista previa</div><div class="pu-m"><div class="pu-ic">🛍️</div><div><div style="font-size:13px;font-weight:800" id="pp-t">InstaCompras</div><div style="font-size:12px;color:var(--tx2)" id="pp-b">Tu mensaje aquí...</div></div></div></div></div></div><div class="cd"><div class="cd-h">📜 Historial</div><div class="cd-bn"><div class="tl-sc" id="t-pu"></div></div></div></div></div>
+<!-- PUSH -->
+<div class="sec" id="sec-push"><div class="g2"><div class="cd"><div class="cd-h">✏️ Componer</div><div class="cd-b"><div class="fg"><div class="fl">Título</div><input class="fi" id="p-t" placeholder="Ej: ¡Oferta Flash! 🔥" oninput="uPP()"></div><div class="fg"><div class="fl">Mensaje</div><input class="fi" id="p-b" placeholder="Ej: 50% off" oninput="uPP()"></div><div class="fg"><div class="fl">Audiencia</div><select class="fs" id="p-tg"><option value="all">👥 Todos</option><option value="buyers">🛒 Buyers</option><option value="sellers">🏪 Sellers</option></select></div><button class="a a-main" style="width:100%;justify-content:center;margin-top:8px" onclick="sP()">🔔 Enviar</button><div style="background:var(--dk3);border-radius:14px;padding:14px;border:var(--card);margin-top:14px"><div class="fl" style="margin-bottom:8px">Vista previa</div><div class="pu-m"><div class="pu-ic">🛍️</div><div><div style="font-size:13px;font-weight:800" id="pp-t">InstaCompras</div><div style="font-size:12px;color:var(--tx2)" id="pp-b">Tu mensaje...</div></div></div></div></div></div><div class="cd"><div class="cd-h">📜 Historial</div><div class="cd-bn"><div class="tl-sc" id="t-pu"></div></div></div></div></div>
 </div></div></div>
+<!-- MODALS -->
 <div class="mo" id="m-p" onclick="if(event.target===this)this.classList.remove('on')"><div class="mx"><div class="mx-t"><span id="m-pt">Nuevo Producto</span><div class="mx-x" onclick="document.getElementById('m-p').classList.remove('on')">✕</div></div><div class="fg"><div class="fl">Nombre</div><input class="fi" id="mp-n"></div><div class="fr"><div class="fg"><div class="fl">Precio ($)</div><input class="fi" id="mp-p" type="number"></div><div class="fg"><div class="fl">Original ($)</div><input class="fi" id="mp-o" type="number"></div></div><div class="fg"><div class="fl">Imagen URL</div><input class="fi" id="mp-i"></div><div class="fr"><div class="fg"><div class="fl">Categoría</div><input class="fi" id="mp-c"></div><div class="fg"><div class="fl">Seller</div><input class="fi" id="mp-s"></div></div><div class="fg"><div class="fl">Descripción</div><input class="fi" id="mp-d"></div><div class="fg"><div class="fl">Emoji</div><input class="fi" id="mp-e" placeholder="📦" style="width:70px"></div><input type="hidden" id="mp-id"><div class="mf"><button class="a a-ed" onclick="document.getElementById('m-p').classList.remove('on')">Cancelar</button><button class="a a-main" onclick="saProd()">Guardar</button></div></div></div>
 <div class="mo" id="m-u" onclick="if(event.target===this)this.classList.remove('on')"><div class="mx"><div class="mx-t"><span>Detalle Usuario</span><div class="mx-x" onclick="document.getElementById('m-u').classList.remove('on')">✕</div></div><div id="m-ub"></div></div></div>
 <div class="toast" id="toast"></div>
 <script>
 const FB={apiKey:"AIzaSyDG2IUweNwWifE75MFr9mk90Eon1Qo9qPs",projectId:"instacompras-fe791",authUrl:"https://identitytoolkit.googleapis.com/v1/accounts",dbUrl:"https://firestore.googleapis.com/v1/projects/instacompras-fe791/databases/(default)/documents"};
-let tk=null,uid=null;
+let tk=null,uid=null,_arIv=null,_arSec=60;
 function tv(v){if(v===null||v===undefined)return{nullValue:null};if(typeof v==='boolean')return{booleanValue:v};if(typeof v==='number')return Number.isInteger(v)?{integerValue:String(v)}:{doubleValue:v};if(typeof v==='string')return{stringValue:v};if(Array.isArray(v))return{arrayValue:{values:v.map(tv)}};if(typeof v==='object')return{mapValue:{fields:Object.fromEntries(Object.entries(v).map(([k,x])=>[k,tv(x)]))}};return{stringValue:String(v)};}
 function tf(o){const f={};for(const[k,v]of Object.entries(o))f[k]=tv(v);return{fields:f};}
 function fv(v){if(!v)return null;if('stringValue'in v)return v.stringValue;if('integerValue'in v)return parseInt(v.integerValue);if('doubleValue'in v)return v.doubleValue;if('booleanValue'in v)return v.booleanValue;if('nullValue'in v)return null;if('arrayValue'in v)return(v.arrayValue.values||[]).map(fv);if('mapValue'in v)return Object.fromEntries(Object.entries(v.mapValue.fields||{}).map(([k,x])=>[k,fv(x)]));return null;}
@@ -190,66 +200,140 @@ async function fA(c,d){try{const r=await fetch(`${FB.dbUrl}/${c}`,{method:'POST'
 async function fDl(c,i){try{await fetch(`${FB.dbUrl}/${c}/${i}`,{method:'DELETE',headers:hd()});return true;}catch(e){return false;}}
 async function fQ(c){try{const r=await fetch(`https://firestore.googleapis.com/v1/projects/${FB.projectId}/databases/(default)/documents:runQuery`,{method:'POST',headers:hd(),body:JSON.stringify({structuredQuery:{from:[{collectionId:c}]}})});const d=await r.json();return d.filter(x=>x.document).map(x=>fd(x.document));}catch(e){return[];}}
 
-async function doLogin(){const e=document.getElementById('l-e').value.trim(),p=document.getElementById('l-p').value,b=document.getElementById('l-b'),er=document.getElementById('l-err');if(!e||!p){er.textContent='Ingresa usuario y contraseña';return;}b.disabled=true;b.textContent='Verificando...';er.textContent='';if(e==='admin'&&p==='admin'){uid='admin';try{const r=await fetch(`${FB.authUrl}:signUp?key=${FB.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({returnSecureToken:true})});const d=await r.json();if(d.idToken)tk=d.idToken;}catch(e){}localStorage.setItem('adm','1');document.getElementById('login').style.display='none';document.getElementById('app').style.display='flex';refreshAll();}else{er.textContent='❌ Credenciales incorrectas';b.disabled=false;b.textContent='Iniciar Sesión';}}
+async function doLogin(){const e=document.getElementById('l-e').value.trim(),p=document.getElementById('l-p').value,b=document.getElementById('l-b'),er=document.getElementById('l-err');if(!e||!p){er.textContent='Ingresa usuario y contraseña';return;}b.disabled=true;b.textContent='Verificando...';er.textContent='';if(e==='admin'&&p==='admin'){uid='admin';try{const r=await fetch(`${FB.authUrl}:signUp?key=${FB.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({returnSecureToken:true})});const d=await r.json();if(d.idToken)tk=d.idToken;}catch(e){}localStorage.setItem('adm','1');document.getElementById('login').style.display='none';document.getElementById('app').style.display='flex';refreshAll();startAR();}else{er.textContent='❌ Credenciales incorrectas';b.disabled=false;b.textContent='Iniciar Sesión';}}
 function doLogout(){localStorage.removeItem('adm');location.reload();}
-function tryR(){if(localStorage.getItem('adm')==='1'){uid='admin';document.getElementById('login').style.display='none';document.getElementById('app').style.display='flex';fetch(`${FB.authUrl}:signUp?key=${FB.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({returnSecureToken:true})}).then(r=>r.json()).then(d=>{if(d.idToken)tk=d.idToken;refreshAll();}).catch(()=>refreshAll());return true;}return false;}
+function tryR(){if(localStorage.getItem('adm')==='1'){uid='admin';document.getElementById('login').style.display='none';document.getElementById('app').style.display='flex';fetch(`${FB.authUrl}:signUp?key=${FB.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({returnSecureToken:true})}).then(r=>r.json()).then(d=>{if(d.idToken)tk=d.idToken;refreshAll();startAR();}).catch(()=>refreshAll());return true;}return false;}
 
-document.querySelectorAll('.sb-i').forEach(el=>{el.addEventListener('click',()=>{const s=el.dataset.s;if(!s)return;document.querySelectorAll('.sec').forEach(x=>x.classList.remove('on'));document.querySelectorAll('.sb-i').forEach(x=>x.classList.remove('on'));const sec=document.getElementById('sec-'+s);if(sec)sec.classList.add('on');el.classList.add('on');const t={overview:['Overview','Panel de control en tiempo real'],users:['Usuarios','Gestión de cuentas'],products:['Productos','Inventario'],orders:['Órdenes','Seguimiento de pedidos'],deposits:['Depósitos','Solicitudes de recarga'],wallets:['Wallets','Saldos de usuarios'],sellers:['Sellers','Vendedores'],streams:['Streams','Transmisiones'],push:['Notificaciones','Push masivas']};const tt=t[s]||[s,''];document.getElementById('tb-t').textContent=tt[0];document.getElementById('tb-s').textContent=tt[1];document.getElementById('sidebar').classList.remove('open');});});
+// Auto-refresh
+function startAR(){clearInterval(_arIv);_arSec=60;_arIv=setInterval(()=>{_arSec--;const el=document.getElementById('ar-timer');if(el)el.textContent='Auto-refresh '+_arSec+'s';if(_arSec<=0){_arSec=60;refreshAll();}},1000);}
 
-let U=[],P=[],O=[],D=[],St=[];
-async function refreshAll(){toast('🔄 Cargando...');[U,P,O,D,St]=await Promise.all([fQ('users'),fQ('products'),fQ('orders'),fQ('deposit_requests'),fQ('streams')]);rOv();rU();rP();rO();rD();rW();rSe();rSt();rPH();badge('bg-d',D.filter(d=>d.status==='pending').length);badge('bg-o',O.filter(o=>o.status==='pending').length);badge('bg-u',U.length);toast('✅ Datos actualizados');}
+document.querySelectorAll('.sb-i').forEach(el=>{el.addEventListener('click',()=>{const s=el.dataset.s;if(!s)return;document.querySelectorAll('.sec').forEach(x=>x.classList.remove('on'));document.querySelectorAll('.sb-i').forEach(x=>x.classList.remove('on'));const sec=document.getElementById('sec-'+s);if(sec)sec.classList.add('on');el.classList.add('on');const t={overview:['Overview','Panel de control en tiempo real'],users:['Usuarios','Gestión de cuentas'],products:['Productos','Inventario'],orders:['Órdenes','Seguimiento'],deposits:['Depósitos','Solicitudes de recarga'],wallets:['Wallets','Saldos'],sellers:['Sellers','Vendedores'],streams:['Streams','Transmisiones'],push:['Notificaciones','Push masivas']};const tt=t[s]||[s,''];document.getElementById('tb-t').textContent=tt[0];document.getElementById('tb-s').textContent=tt[1];document.getElementById('sidebar').classList.remove('open');});});
+
+let U=[],P=[],O=[],D=[],St=[],Tx=[];
+async function refreshAll(){toast('🔄 Cargando...');[U,P,O,D,St,Tx]=await Promise.all([fQ('users'),fQ('products'),fQ('orders'),fQ('deposit_requests'),fQ('streams'),fQ('wallet_txs')]);rOv();rU();rP();rO();rD();rW();rSe();rSt();rPH();badge('bg-d',D.filter(d=>d.status==='pending').length);badge('bg-o',O.filter(o=>o.status==='pending').length);badge('bg-u',U.length);_arSec=60;toast('✅ Datos actualizados · '+U.length+' usuarios · '+O.length+' órdenes');}
 function badge(i,n){const b=document.getElementById(i);if(!b)return;n>0?(b.textContent=n,b.style.display=''):b.style.display='none';}
 function ta(ts){if(!ts)return'—';const s=Math.floor((Date.now()-ts)/1000);if(s<60)return'Ahora';if(s<3600)return Math.floor(s/60)+'m';if(s<86400)return Math.floor(s/3600)+'h';return Math.floor(s/86400)+'d';}
 
-function rOv(){const rev=O.filter(o=>o.status==='delivered').reduce((s,o)=>s+(o.amt||0),0);const pend=O.filter(o=>o.status==='pending').length;const sellers=U.filter(u=>u.type==='seller').length;const depP=D.filter(d=>d.status==='pending').length;const lv=St.filter(s=>s.isLive).length;const wt=U.reduce((s,u)=>s+(u.wallet||u.credits||0),0);
-document.getElementById('ov-sg').innerHTML=[{i:'💰',v:'$'+rev,l:'Revenue',c:'cy',g:'gy'},{i:'👥',v:U.length,l:'Usuarios',c:'cb',g:'gb'},{i:'🛒',v:O.length,l:'Órdenes',c:'cg',g:'gg',s:pend+' pendientes'},{i:'💳',v:wt+' IC',l:'Circulante',c:'co',g:'go'},{i:'🏪',v:sellers,l:'Sellers',c:'cp',g:'gp'},{i:'📡',v:lv,l:'Live',c:'cr',g:'gr'}].map((s,i)=>`<div class="st fu fu${i+1}"><div class="st-gl ${s.g}"></div><div style="font-size:20px">${s.i}</div><div class="st-v ${s.c}">${s.v}</div><div class="st-l">${s.l}</div></div>`).join('');
-const days=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],now=Date.now(),dm=864e5,td=new Date().getDay();const rd=Array(7).fill(0);O.forEach(o=>{if(!o.createdAt)return;const d=Math.floor((now-o.createdAt)/dm);if(d<7)rd[6-d]+=(o.amt||0);});const mx=Math.max(...rd,1);
-document.getElementById('ov-cr').innerHTML=rd.map((v,i)=>`<div class="cr-r"><div class="cr-l">${days[(td-6+i+7)%7]}</div><div class="cr-t"><div class="cr-f cr-fy" style="width:${Math.max((v/mx)*100,3)}%"><span class="cr-v">$${v}</span></div></div></div>`).join('');
-const acts=[];O.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,4).forEach(o=>acts.push({d:'var(--gn)',t:`<strong>${o.buyerName||'Usuario'}</strong> compró <strong>${o.prod||'producto'}</strong> por $${o.amt||0}`,tm:ta(o.createdAt)}));D.filter(d=>d.status==='pending').slice(0,3).forEach(d=>acts.push({d:'var(--or)',t:`<strong>${d.userName||'Usuario'}</strong> solicitó <strong>${d.amount||0} IC</strong>`,tm:ta(d.createdAt)}));
-document.getElementById('ov-ac').innerHTML=acts.length?`<div class="ac">${acts.map(a=>`<div class="ac-i"><div class="ac-d" style="background:${a.d}"></div><div><div class="ac-t">${a.t}</div><div class="ac-tm">${a.tm}</div></div></div>`).join('')}</div>`:'<div class="te">Sin actividad</div>';
-document.getElementById('ov-o').innerHTML=mkOT(O.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,5));
-document.getElementById('ov-d').innerHTML=mkDT(D.filter(d=>d.status==='pending'));}
+// ═══ DONUT CHART SVG ═══
+function donut(data,size=120){
+  const total=data.reduce((s,d)=>s+d.val,0);if(!total)return'<div class="te">Sin datos</div>';
+  const r=size/2-8,cx=size/2,cy=size/2,circ=2*Math.PI*r;
+  let offset=0;
+  const arcs=data.map(d=>{const pct=d.val/total;const dash=pct*circ;const gap=circ-dash;const arc=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.color}" stroke-width="14" stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${-offset}" stroke-linecap="round" style="transition:stroke-dashoffset .8s ease"/>`;offset+=dash;return arc;}).join('');
+  const legend=data.map(d=>`<div class="donut-item"><div class="donut-dot" style="background:${d.color}"></div>${d.label}<div class="donut-val">${d.val}</div></div>`).join('');
+  return`<div class="donut-wrap"><svg width="${size}" height="${size}" style="transform:rotate(-90deg);flex-shrink:0">${arcs}<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" fill="var(--tx)" font-family="Bebas Neue" font-size="22" style="transform:rotate(90deg);transform-origin:center" letter-spacing="1">${total}</text></svg><div class="donut-legend">${legend}</div></div>`;
+}
 
+function rOv(){
+  const rev=O.filter(o=>o.status==='delivered').reduce((s,o)=>s+(o.amt||0),0);
+  const pendO=O.filter(o=>o.status==='pending').length;
+  const sellers=U.filter(u=>u.type==='seller').length;
+  const depP=D.filter(d=>d.status==='pending').length;
+  const lv=St.filter(s=>s.isLive).length;
+  const wt=U.reduce((s,u)=>s+(u.wallet||u.credits||0),0);
+  const todayOrders=O.filter(o=>o.createdAt&&Date.now()-o.createdAt<864e5).length;
+  const todayRev=O.filter(o=>o.createdAt&&Date.now()-o.createdAt<864e5&&o.status==='delivered').reduce((s,o)=>s+(o.amt||0),0);
+  document.getElementById('ov-sg').innerHTML=[
+    {i:'💰',v:'$'+rev,l:'Revenue Total',c:'cy',g:'gy'},{i:'📊',v:'$'+todayRev,l:'Revenue Hoy',c:'cg',g:'gg'},
+    {i:'👥',v:U.length,l:'Usuarios',c:'cb',g:'gb'},{i:'🛒',v:O.length,l:'Órdenes',c:'cp',g:'gp'},
+    {i:'⏳',v:pendO,l:'Pendientes',c:'co',g:'go'},{i:'💰',v:depP,l:'Depósitos Pend.',c:'cr',g:'gr'},
+    {i:'💳',v:wt,l:'IC Circulante',c:'cy',g:'gy'},{i:'📡',v:lv,l:'Streams Live',c:'cr',g:'gr'}
+  ].map((s,i)=>`<div class="st fu fu${Math.min(i+1,5)}"><div class="st-gl ${s.g}"></div><div style="font-size:18px">${s.i}</div><div class="st-v ${s.c}">${s.v}</div><div class="st-l">${s.l}</div></div>`).join('');
+
+  // Revenue chart 7 days
+  const days=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],now=Date.now(),dm=864e5,td=new Date().getDay();
+  const rd=Array(7).fill(0);O.forEach(o=>{if(!o.createdAt)return;const d=Math.floor((now-o.createdAt)/dm);if(d<7)rd[6-d]+=(o.amt||0);});const mx=Math.max(...rd,1);
+  document.getElementById('ov-rev').innerHTML=rd.map((v,i)=>`<div class="cr-r"><div class="cr-l">${days[(td-6+i+7)%7]}</div><div class="cr-t"><div class="cr-f cr-fy" style="width:${Math.max((v/mx)*100,4)}%"><span class="cr-v">$${v}</span></div></div></div>`).join('');
+
+  // Donut: orders by status
+  const stCounts={pending:0,processing:0,transit:0,delivered:0};O.forEach(o=>stCounts[o.status]=(stCounts[o.status]||0)+1);
+  document.getElementById('ov-donut').innerHTML=donut([
+    {label:'Pendiente',val:stCounts.pending,color:'#FF9F43'},
+    {label:'Procesando',val:stCounts.processing,color:'#A55EEA'},
+    {label:'Tránsito',val:stCounts.transit,color:'#1E90FF'},
+    {label:'Entregado',val:stCounts.delivered,color:'#2ED573'}
+  ]);
+
+  // Activity
+  const acts=[];O.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,5).forEach(o=>acts.push({d:'var(--gn)',t:`<strong>${o.buyerName||'—'}</strong> compró <strong>${o.prod||'—'}</strong> · $${o.amt||0}`,tm:ta(o.createdAt)}));
+  D.filter(d=>d.status==='pending').slice(0,3).forEach(d=>acts.push({d:'var(--or)',t:`<strong>${d.userName||'—'}</strong> solicitó <strong>${d.amount||0} IC</strong>`,tm:ta(d.createdAt)}));
+  document.getElementById('ov-ac').innerHTML=acts.length?`<div class="ac">${acts.map(a=>`<div class="ac-i"><div class="ac-d" style="background:${a.d}"></div><div><div class="ac-t">${a.t}</div><div class="ac-tm">${a.tm}</div></div></div>`).join('')}</div>`:'<div class="te">Sin actividad</div>';
+
+  // Top products by orders
+  const prodCount={};O.forEach(o=>{const k=o.prod||'—';prodCount[k]=(prodCount[k]||0)+1;});
+  const topP=Object.entries(prodCount).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const mxP=topP[0]?topP[0][1]:1;
+  const cls=['cr-fy','cr-fb','cr-fg','cr-fp','cr-fo','cr-fr'];
+  document.getElementById('ov-top-prods').innerHTML=topP.length?topP.map((p,i)=>`<div class="cr-r"><div class="cr-l">${p[0].slice(0,12)}</div><div class="cr-t"><div class="cr-f ${cls[i%6]}" style="width:${Math.max((p[1]/mxP)*100,8)}%"><span class="cr-v">${p[1]}</span></div></div></div>`).join(''):'<div class="te">Sin ventas</div>';
+
+  // Users by city
+  const cityCnt={};U.forEach(u=>{const c=u.city||'Sin ciudad';cityCnt[c]=(cityCnt[c]||0)+1;});
+  const topC=Object.entries(cityCnt).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const mxC=topC[0]?topC[0][1]:1;
+  document.getElementById('ov-cities').innerHTML=topC.length?topC.map((c,i)=>`<div class="cr-r"><div class="cr-l">${c[0].slice(0,12)}</div><div class="cr-t"><div class="cr-f ${cls[i%6]}" style="width:${Math.max((c[1]/mxC)*100,8)}%"><span class="cr-v">${c[1]}</span></div></div></div>`).join(''):'<div class="te">Sin datos</div>';
+
+  // User registrations 7 days
+  const ud=Array(7).fill(0);U.forEach(u=>{if(!u.createdAt)return;const d=Math.floor((now-u.createdAt)/dm);if(d<7)ud[6-d]++;});const mxU=Math.max(...ud,1);
+  document.getElementById('ov-user-chart').innerHTML=ud.map((v,i)=>`<div class="cr-r"><div class="cr-l">${days[(td-6+i+7)%7]}</div><div class="cr-t"><div class="cr-f cr-fb" style="width:${Math.max((v/mxU)*100,4)}%"><span class="cr-v">${v}</span></div></div></div>`).join('');
+
+  // Top sellers by revenue
+  const selRev={};O.filter(o=>o.status==='delivered').forEach(o=>{const s=o.sellerName||'—';selRev[s]=(selRev[s]||0)+(o.amt||0);});
+  const topS=Object.entries(selRev).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const mxS=topS[0]?topS[0][1]:1;
+  document.getElementById('ov-top-sellers').innerHTML=topS.length?topS.map((s,i)=>`<div class="cr-r"><div class="cr-l">${s[0].slice(0,12)}</div><div class="cr-t"><div class="cr-f ${cls[i%6]}" style="width:${Math.max((s[1]/mxS)*100,8)}%"><span class="cr-v">$${s[1]}</span></div></div></div>`).join(''):'<div class="te">Sin ventas</div>';
+
+  document.getElementById('ov-o').innerHTML=mkOT(O.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,8));
+  document.getElementById('ov-d').innerHTML=mkDT(D.filter(d=>d.status==='pending'));
+}
+
+// ═══ USERS ═══
 let _uf='',_ut='';
 function rU(l){const d=l||U.filter(u=>(!_ut||u.type===_ut)&&(!_uf||(u.name||'').toLowerCase().includes(_uf)||(u.email||'').toLowerCase().includes(_uf)||(u.username||'').toLowerCase().includes(_uf)));document.getElementById('t-u').innerHTML=`<table><thead><tr><th>Usuario</th><th>Email</th><th>Tipo</th><th>Ciudad</th><th>Wallet</th><th>Registro</th><th></th></tr></thead><tbody>${d.length?d.map(u=>`<tr><td><div style="display:flex;align-items:center;gap:10px"><div class="av av-${u.type==='seller'?'s':'b'}">${(u.name||u.displayName||'?')[0].toUpperCase()}</div><div><div style="font-weight:800">${u.name||u.displayName||'—'}</div><div style="font-size:11px;color:var(--mu)">@${u.username||u.handle||'—'}</div></div></div></td><td style="font-size:12px;color:var(--tx2)">${u.email||'—'}</td><td><span class="b b-${u.type||'buyer'}">${u.type||'buyer'}</span></td><td style="font-size:12px">${u.city||'—'}</td><td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--y)">${u.wallet||u.credits||0}</span></td><td style="font-size:11px;color:var(--mu)">${u.createdAt?new Date(u.createdAt).toLocaleDateString('es'):'—'}</td><td><button class="a a-ed" onclick="vU('${u._id}')">👁</button> <button class="a a-ok" onclick="eW('${u._id}',${u.wallet||u.credits||0})">💳</button></td></tr>`).join(''):'<tr><td colspan="7" class="te">Sin usuarios</td></tr>'}</tbody></table>`;}
 function fU(q){_uf=q.toLowerCase();rU();}function fUT(v){_ut=v;rU();}
-function vU(id){const u=U.find(x=>x._id===id);if(!u)return;const os=O.filter(o=>o.buyerId===id||o.sellerId===id);const sp=os.reduce((s,o)=>s+(o.amt||0),0);document.getElementById('m-ub').innerHTML=`<div style="display:flex;align-items:center;gap:14px;margin-bottom:22px"><div class="av av-${u.type==='seller'?'s':'b'}" style="width:52px;height:52px;font-size:22px;border-radius:14px">${(u.name||'?')[0].toUpperCase()}</div><div><div style="font-size:18px;font-weight:900">${u.name||u.displayName||'—'}</div><div style="color:var(--mu);font-size:12px">@${u.username||'—'} · ${u.email||'—'}</div></div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px"><div style="background:var(--dk4);border-radius:12px;padding:14px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--y)">${u.wallet||u.credits||0}</div><div style="font-size:9px;color:var(--mu);font-weight:800;letter-spacing:.5px;margin-top:2px">WALLET IC</div></div><div style="background:var(--dk4);border-radius:12px;padding:14px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--bl)">${os.length}</div><div style="font-size:9px;color:var(--mu);font-weight:800;letter-spacing:.5px;margin-top:2px">ÓRDENES</div></div><div style="background:var(--dk4);border-radius:12px;padding:14px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--gn)">$${sp}</div><div style="font-size:9px;color:var(--mu);font-weight:800;letter-spacing:.5px;margin-top:2px">TOTAL</div></div></div><div style="font-size:12px;color:var(--tx2);line-height:2"><strong style="color:var(--tx)">UID:</strong> <span style="font-size:10px;color:var(--mu)">${u._id}</span><br><strong style="color:var(--tx)">Ciudad:</strong> ${u.city||'—'}<br><strong style="color:var(--tx)">Cédula:</strong> ${u.cedula||'—'}<br><strong style="color:var(--tx)">WhatsApp:</strong> ${u.whatsapp||u.phone||'—'}<br><strong style="color:var(--tx)">Tienda:</strong> ${u.shopName||'—'}<br><strong style="color:var(--tx)">Verificado:</strong> ${u.verified?'✅':'❌'}</div>`;document.getElementById('m-u').classList.add('on');}
-async function eW(id,c){const v=prompt('Wallet actual: '+c+' IC\nNuevo saldo:',c);if(v===null)return;const n=parseInt(v);if(isNaN(n)||n<0){toast('❌ Inválido');return;}await fS('users',id,{wallet:n});toast('✅ Wallet → '+n+' IC');refreshAll();}
+function vU(id){const u=U.find(x=>x._id===id);if(!u)return;const os=O.filter(o=>o.buyerId===id||o.sellerId===id);const sp=os.reduce((s,o)=>s+(o.amt||0),0);document.getElementById('m-ub').innerHTML=`<div style="display:flex;align-items:center;gap:14px;margin-bottom:22px"><div class="av av-${u.type==='seller'?'s':'b'}" style="width:52px;height:52px;font-size:22px;border-radius:14px">${(u.name||'?')[0].toUpperCase()}</div><div><div style="font-size:18px;font-weight:900">${u.name||u.displayName||'—'}</div><div style="color:var(--mu);font-size:12px">@${u.username||'—'} · ${u.email||'—'}</div></div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px"><div style="background:var(--dk4);border-radius:12px;padding:14px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--y)">${u.wallet||u.credits||0}</div><div style="font-size:9px;color:var(--mu);font-weight:800;margin-top:2px">WALLET</div></div><div style="background:var(--dk4);border-radius:12px;padding:14px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--bl)">${os.length}</div><div style="font-size:9px;color:var(--mu);font-weight:800;margin-top:2px">ÓRDENES</div></div><div style="background:var(--dk4);border-radius:12px;padding:14px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--gn)">$${sp}</div><div style="font-size:9px;color:var(--mu);font-weight:800;margin-top:2px">TOTAL</div></div></div><div style="font-size:12px;color:var(--tx2);line-height:2"><strong style="color:var(--tx)">UID:</strong> <span style="font-size:10px;color:var(--mu)">${u._id}</span><br><strong style="color:var(--tx)">Ciudad:</strong> ${u.city||'—'}<br><strong style="color:var(--tx)">Cédula:</strong> ${u.cedula||'—'}<br><strong style="color:var(--tx)">WhatsApp:</strong> ${u.whatsapp||u.phone||'—'}<br><strong style="color:var(--tx)">Tienda:</strong> ${u.shopName||'—'}<br><strong style="color:var(--tx)">Verificado:</strong> ${u.verified?'✅':'❌'}</div>`;document.getElementById('m-u').classList.add('on');}
+async function eW(id,c){const v=prompt('Wallet actual: '+c+' IC\\nNuevo saldo:',c);if(v===null)return;const n=parseInt(v);if(isNaN(n)||n<0){toast('❌ Inválido');return;}await fS('users',id,{wallet:n});toast('✅ Wallet → '+n+' IC');refreshAll();}
 
-function rP(l){const d=l||P;document.getElementById('t-p').innerHTML=`<table><thead><tr><th>Producto</th><th>Precio</th><th>Original</th><th>Seller</th><th>Cat</th><th>Live</th><th></th></tr></thead><tbody>${d.length?d.map(p=>`<tr><td><div style="display:flex;align-items:center;gap:10px">${p.img?`<img src="${p.img}" style="width:38px;height:38px;border-radius:10px;object-fit:cover">`:`<div style="width:38px;height:38px;border-radius:10px;background:var(--dk4);display:flex;align-items:center;justify-content:center;font-size:18px">${p.emoji||'📦'}</div>`}<div style="font-weight:700;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name||'—'}</div></div></td><td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gn)">$${p.price||0}</span></td><td style="color:var(--mu);text-decoration:line-through;font-size:12px">$${p.origPrice||0}</td><td style="font-size:12px">${p.sellerName||'—'}</td><td style="font-size:12px">${p.cat||'—'}</td><td>${p.live?'<span class="b b-live">🔴 LIVE</span>':'<span class="b b-offline">—</span>'}</td><td><button class="a a-ed" onclick="eP('${p._id}')">✏️</button> <button class="a a-del" onclick="dP('${p._id}','${(p.name||'').replace(/'/g,"\\'")}')">🗑</button></td></tr>`).join(''):'<tr><td colspan="7" class="te">Sin productos</td></tr>'}</tbody></table>`;}
+// ═══ PRODUCTS ═══
+function rP(l){const d=l||P;document.getElementById('t-p').innerHTML=`<table><thead><tr><th>Producto</th><th>Precio</th><th>Original</th><th>Seller</th><th>Cat</th><th>Live</th><th></th></tr></thead><tbody>${d.length?d.map(p=>`<tr><td><div style="display:flex;align-items:center;gap:10px">${p.img?`<img src="${p.img}" style="width:38px;height:38px;border-radius:10px;object-fit:cover">`:`<div style="width:38px;height:38px;border-radius:10px;background:var(--dk4);display:flex;align-items:center;justify-content:center;font-size:18px">${p.emoji||'📦'}</div>`}<div style="font-weight:700;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name||'—'}</div></div></td><td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gn)">$${p.price||0}</span></td><td style="color:var(--mu);text-decoration:line-through;font-size:12px">$${p.origPrice||0}</td><td style="font-size:12px">${p.sellerName||'—'}</td><td style="font-size:12px">${p.cat||'—'}</td><td>${p.live?'<span class="b b-live">🔴</span>':'—'}</td><td><button class="a a-ed" onclick="eP('${p._id}')">✏️</button> <button class="a a-del" onclick="dP('${p._id}','${(p.name||'').replace(/'/g,"\\\\'")}')">🗑</button></td></tr>`).join(''):'<tr><td colspan="7" class="te">Sin productos</td></tr>'}</tbody></table>`;}
 function fP(q){q=q.toLowerCase();rP(P.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.sellerName||'').toLowerCase().includes(q)));}
-function oPM(p){['n','p','o','i','c','s','d','e'].forEach((k,j)=>{const ids=['name','price','origPrice','img','cat','sellerName','desc','emoji'];document.getElementById('mp-'+k).value=p?.[ids[j]]||'';});document.getElementById('mp-id').value=p?._id||'';document.getElementById('m-pt').textContent=p?'Editar Producto':'Nuevo Producto';document.getElementById('m-p').classList.add('on');}
+function oPM(p){['n','p','o','i','c','s','d','e'].forEach((k,j)=>{const ids=['name','price','origPrice','img','cat','sellerName','desc','emoji'];document.getElementById('mp-'+k).value=p?.[ids[j]]||'';});document.getElementById('mp-id').value=p?._id||'';document.getElementById('m-pt').textContent=p?'Editar':'Nuevo Producto';document.getElementById('m-p').classList.add('on');}
 function eP(id){const p=P.find(x=>x._id===id);if(p)oPM(p);}
 async function saProd(){const d={name:document.getElementById('mp-n').value.trim(),price:parseFloat(document.getElementById('mp-p').value)||0,origPrice:parseFloat(document.getElementById('mp-o').value)||0,img:document.getElementById('mp-i').value.trim(),cat:document.getElementById('mp-c').value.trim(),sellerName:document.getElementById('mp-s').value.trim(),desc:document.getElementById('mp-d').value.trim(),emoji:document.getElementById('mp-e').value.trim()||'📦',sellerEmoji:'🛍️',live:false};if(!d.name){toast('❌ Nombre requerido');return;}const id=document.getElementById('mp-id').value;if(id)await fS('products',id,d);else{d.createdAt=Date.now();await fA('products',d);}document.getElementById('m-p').classList.remove('on');toast(id?'✅ Actualizado':'✅ Creado');refreshAll();}
 async function dP(id,n){if(!confirm('¿Eliminar "'+n+'"?'))return;await fDl('products',id);toast('🗑 Eliminado');refreshAll();}
 
-function mkOT(d){return`<table><thead><tr><th>N°</th><th>Producto</th><th>Comprador</th><th>Monto</th><th>Estado</th><th>Fecha</th><th></th></tr></thead><tbody>${d.length?d.map(o=>`<tr><td style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--tx2)">${o.num||'—'}</td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">${o.e||'📦'}</span><span style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700">${o.prod||'—'}</span></div></td><td style="font-size:12px">${o.buyerName||'—'}</td><td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--y)">$${o.amt||0}</span></td><td><span class="b b-${o.status||'pending'}">${{pending:'⏳ Pendiente',processing:'⚙️ Procesando',transit:'🚚 Tránsito',delivered:'✅ Entregado'}[o.status]||o.status}</span></td><td style="font-size:11px;color:var(--mu)">${o.date||'—'}</td><td><select class="tl-f" style="font-size:11px;padding:5px 8px" onchange="uO('${o._id}',this.value)"><option value="pending" ${o.status==='pending'?'selected':''}>Pendiente</option><option value="processing" ${o.status==='processing'?'selected':''}>Procesando</option><option value="transit" ${o.status==='transit'?'selected':''}>En tránsito</option><option value="delivered" ${o.status==='delivered'?'selected':''}>Entregado</option></select></td></tr>`).join(''):'<tr><td colspan="7" class="te">Sin órdenes</td></tr>'}</tbody></table>`;}
+// ═══ ORDERS ═══
+function mkOT(d){return`<table><thead><tr><th>N°</th><th>Producto</th><th>Comprador</th><th>Monto</th><th>Estado</th><th>Fecha</th><th></th></tr></thead><tbody>${d.length?d.map(o=>`<tr><td style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--tx2)">${o.num||'—'}</td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">${o.e||'📦'}</span><span style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700">${o.prod||'—'}</span></div></td><td style="font-size:12px">${o.buyerName||'—'}</td><td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--y)">$${o.amt||0}</span></td><td><span class="b b-${o.status||'pending'}">${{pending:'⏳ Pendiente',processing:'⚙️ Procesando',transit:'🚚 Tránsito',delivered:'✅ Entregado'}[o.status]||o.status}</span></td><td style="font-size:11px;color:var(--mu)">${o.date||'—'}</td><td><select class="tl-f" style="font-size:11px;padding:5px 8px" onchange="uO('${o._id}',this.value)"><option value="pending" ${o.status==='pending'?'selected':''}>Pendiente</option><option value="processing" ${o.status==='processing'?'selected':''}>Procesando</option><option value="transit" ${o.status==='transit'?'selected':''}>En tránsito</option><option value="delivered" ${o.status==='delivered'?'selected':''}>Entregado</option></select></td></tr>`).join(''):'<tr><td colspan="7" class="te">Sin órdenes</td></tr>'}</tbody></table>`;}
 function rO(l){document.getElementById('t-o').innerHTML=mkOT(l||O);}
 function fO(q){q=q.toLowerCase();rO(O.filter(o=>(o.prod||'').toLowerCase().includes(q)||(o.buyerName||'').toLowerCase().includes(q)||(o.num||'').toLowerCase().includes(q)));}
 function fOS(s){rO(s?O.filter(o=>o.status===s):O);}
 async function uO(id,st){await fS('orders',id,{status:st});const o=O.find(x=>x._id===id);if(o)o.status=st;toast('✅ → '+st);rO();rOv();}
 
-function mkDT(d){return`<table><thead><tr><th>Usuario</th><th>Monto</th><th>Método</th><th>Ref</th><th>Estado</th><th>Fecha</th><th></th></tr></thead><tbody>${d.length?d.map(x=>`<tr><td style="font-weight:700">${x.userName||x.uid||'—'}</td><td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--y)">${x.amount||0}</span> <span style="font-size:10px;color:var(--mu)">IC</span></td><td style="font-size:12px">${x.method||'—'}</td><td style="font-size:11px;color:var(--mu);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.reference||'—'}</td><td><span class="b b-${x.status||'pending'}">${x.status||'pending'}</span></td><td style="font-size:11px;color:var(--mu)">${x.createdAt?new Date(x.createdAt).toLocaleDateString('es'):'—'}</td><td>${x.status==='pending'?`<button class="a a-ok" onclick="aD('${x._id}')">✅</button> <button class="a a-no" onclick="rjD('${x._id}')">❌</button>`:'—'}</td></tr>`).join(''):'<tr><td colspan="7" class="te">Sin depósitos</td></tr>'}</tbody></table>`;}
+// ═══ DEPOSITS ═══
+function mkDT(d){return`<table><thead><tr><th>Usuario</th><th>Monto</th><th>Método</th><th>Ref</th><th>Estado</th><th>Fecha</th><th></th></tr></thead><tbody>${d.length?d.map(x=>`<tr><td style="font-weight:700">${x.userName||x.uid||'—'}</td><td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--y)">${x.amount||0}</span> IC</td><td style="font-size:12px">${x.method||'—'}</td><td style="font-size:11px;color:var(--mu);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.reference||'—'}</td><td><span class="b b-${x.status||'pending'}">${x.status||'pending'}</span></td><td style="font-size:11px;color:var(--mu)">${x.createdAt?new Date(x.createdAt).toLocaleDateString('es'):'—'}</td><td>${x.status==='pending'?`<button class="a a-ok" onclick="aD('${x._id}')">✅</button> <button class="a a-no" onclick="rjD('${x._id}')">❌</button>`:'—'}</td></tr>`).join(''):'<tr><td colspan="7" class="te">Sin depósitos</td></tr>'}</tbody></table>`;}
 function rD(l){document.getElementById('t-d').innerHTML=mkDT(l||D);}
 function fD(q){q=q.toLowerCase();rD(D.filter(d=>(d.userName||'').toLowerCase().includes(q)||(d.reference||'').toLowerCase().includes(q)));}
 function fDS(s){rD(s?D.filter(d=>d.status===s):D);}
 async function aD(id){const dep=D.find(d=>d._id===id);if(!dep)return;await fS('deposit_requests',id,{status:'approved',approvedAt:Date.now()});if(dep.uid){const u=await fG('users',dep.uid);const b=(u?.wallet||u?.credits||0);await fS('users',dep.uid,{wallet:b+(dep.amount||0)});await fA('wallet_txs',{uid:dep.uid,type:'in',description:'Depósito: '+dep.method,amount:dep.amount||0,balanceAfter:b+(dep.amount||0),createdAt:Date.now()});}toast('✅ Aprobado — '+(dep.amount||0)+' IC');refreshAll();}
 async function rjD(id){if(!confirm('¿Rechazar?'))return;await fS('deposit_requests',id,{status:'rejected',rejectedAt:Date.now()});toast('❌ Rechazado');refreshAll();}
 
+// ═══ WALLETS ═══
 function rW(l){const d=(l||U).filter(u=>(u.wallet||u.credits||0)>0).sort((a,b)=>(b.wallet||b.credits||0)-(a.wallet||a.credits||0));const tot=U.reduce((s,u)=>s+(u.wallet||u.credits||0),0);const avg=U.length?Math.round(tot/U.length):0;
-document.getElementById('w-sg').innerHTML=`<div class="st fu"><div class="st-gl gy"></div><div style="font-size:20px">💰</div><div class="st-v cy">${tot} IC</div><div class="st-l">Total Circulante</div></div><div class="st fu fu1"><div class="st-gl gb"></div><div style="font-size:20px">📊</div><div class="st-v cb">${avg} IC</div><div class="st-l">Promedio</div></div><div class="st fu fu2"><div class="st-gl gg"></div><div style="font-size:20px">👛</div><div class="st-v cg">${d.length}</div><div class="st-l">Con Saldo</div></div>`;
+document.getElementById('w-sg').innerHTML=`<div class="st fu"><div class="st-gl gy"></div><div style="font-size:18px">💰</div><div class="st-v cy">${tot} IC</div><div class="st-l">Circulante</div></div><div class="st fu fu1"><div class="st-gl gb"></div><div style="font-size:18px">📊</div><div class="st-v cb">${avg} IC</div><div class="st-l">Promedio</div></div><div class="st fu fu2"><div class="st-gl gg"></div><div style="font-size:18px">👛</div><div class="st-v cg">${d.length}</div><div class="st-l">Con Saldo</div></div><div class="st fu fu3"><div class="st-gl go"></div><div style="font-size:18px">📥</div><div class="st-v co">${Tx.filter(t=>t.type==='in').length}</div><div class="st-l">Recargas</div></div>`;
 document.getElementById('t-w').innerHTML=`<table><thead><tr><th>Usuario</th><th>Tipo</th><th>Saldo</th><th></th></tr></thead><tbody>${d.length?d.map(u=>`<tr><td><div style="display:flex;align-items:center;gap:10px"><div class="av av-${u.type==='seller'?'s':'b'}">${(u.name||'?')[0].toUpperCase()}</div><div><div style="font-weight:700">${u.name||'—'}</div><div style="font-size:11px;color:var(--mu)">${u.email||'—'}</div></div></div></td><td><span class="b b-${u.type||'buyer'}">${u.type||'buyer'}</span></td><td><span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y)">${u.wallet||u.credits||0}</span></td><td><button class="a a-ok" onclick="eW('${u._id}',${u.wallet||u.credits||0})">✏️</button></td></tr>`).join(''):'<tr><td colspan="4" class="te">Sin wallets</td></tr>'}</tbody></table>`;}
 function fW(q){q=q.toLowerCase();rW(U.filter(u=>(u.name||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q)));}
 
-function rSe(l){const d=(l||U).filter(u=>u.type==='seller');document.getElementById('t-se').innerHTML=`<table><thead><tr><th>Tienda</th><th>Dueño</th><th>WhatsApp</th><th>Ciudad</th><th>Estado</th><th>Wallet</th><th></th></tr></thead><tbody>${d.length?d.map(s=>`<tr><td style="font-weight:800">${s.shopName||'—'}</td><td>${s.name||'—'}</td><td style="font-size:12px">${s.whatsapp||s.phone||'—'}</td><td>${s.city||'—'}</td><td>${s.verified?'<span class="b b-approved">✅ Verificado</span>':'<span class="b b-pending">⏳ Sin verificar</span>'}</td><td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--y)">${s.wallet||0}</span></td><td>${!s.verified?`<button class="a a-ok" onclick="vS('${s._id}')">✅</button>`:''} <button class="a a-no" onclick="uvS('${s._id}')">🚫</button></td></tr>`).join(''):'<tr><td colspan="7" class="te">Sin sellers</td></tr>'}</tbody></table>`;}
+// ═══ SELLERS ═══
+function rSe(l){const d=(l||U).filter(u=>u.type==='seller');document.getElementById('t-se').innerHTML=`<table><thead><tr><th>Tienda</th><th>Dueño</th><th>WhatsApp</th><th>Ciudad</th><th>Estado</th><th>Wallet</th><th></th></tr></thead><tbody>${d.length?d.map(s=>`<tr><td style="font-weight:800">${s.shopName||'—'}</td><td>${s.name||'—'}</td><td style="font-size:12px">${s.whatsapp||s.phone||'—'}</td><td>${s.city||'—'}</td><td>${s.verified?'<span class="b b-approved">✅ Verificado</span>':'<span class="b b-pending">⏳ Pendiente</span>'}</td><td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--y)">${s.wallet||0}</span></td><td>${!s.verified?`<button class="a a-ok" onclick="vS('${s._id}')">✅</button>`:''} <button class="a a-no" onclick="uvS('${s._id}')">🚫</button></td></tr>`).join(''):'<tr><td colspan="7" class="te">Sin sellers</td></tr>'}</tbody></table>`;}
 function fSe(q){q=q.toLowerCase();rSe(U.filter(u=>u.type==='seller'&&((u.shopName||'').toLowerCase().includes(q)||(u.name||'').toLowerCase().includes(q))));}
 async function vS(id){await fS('users',id,{verified:true,verifiedAt:Date.now()});toast('✅ Verificado');refreshAll();}
 async function uvS(id){if(!confirm('¿Revocar?'))return;await fS('users',id,{verified:false});toast('🚫 Revocado');refreshAll();}
 
+// ═══ STREAMS ═══
 function rSt(){document.getElementById('t-st').innerHTML=`<table><thead><tr><th>Canal</th><th>Seller</th><th>Viewers</th><th>Estado</th><th>Inicio</th><th></th></tr></thead><tbody>${St.length?St.map(s=>`<tr><td style="font-weight:700">${s.channelName||s._id||'—'}</td><td>${s.sellerName||s.shopName||'—'}</td><td style="font-family:'Bebas Neue',sans-serif;font-size:18px">${s.viewerCount||0}</td><td>${s.isLive?'<span class="b b-live">🔴 EN VIVO</span>':'<span class="b b-offline">Offline</span>'}</td><td style="font-size:11px;color:var(--mu)">${s.startedAt?new Date(s.startedAt).toLocaleString('es'):'—'}</td><td>${s.isLive?`<button class="a a-no" onclick="eSt('${s._id}')">⏹</button>`:''}</td></tr>`).join(''):'<tr><td colspan="6" class="te">Sin streams</td></tr>'}</tbody></table>`;}
 async function eSt(id){if(!confirm('¿Terminar?'))return;await fS('streams',id,{isLive:false,endedAt:Date.now()});toast('⏹ Terminado');refreshAll();}
 
-function uPP(){document.getElementById('pp-t').textContent=document.getElementById('p-t').value||'InstaCompras';document.getElementById('pp-b').textContent=document.getElementById('p-b').value||'Tu mensaje aquí...';}
+// ═══ PUSH ═══
+function uPP(){document.getElementById('pp-t').textContent=document.getElementById('p-t').value||'InstaCompras';document.getElementById('pp-b').textContent=document.getElementById('p-b').value||'Tu mensaje...';}
 async function sP(){const t=document.getElementById('p-t').value.trim(),b=document.getElementById('p-b').value.trim(),tg=document.getElementById('p-tg').value;if(!t||!b){toast('❌ Completa todo');return;}await fA('push_jobs',{title:t,body:b,target:tg,status:'queued',createdAt:Date.now()});await fA('push_history',{title:t,body:b,target:tg,createdAt:Date.now()});document.getElementById('p-t').value='';document.getElementById('p-b').value='';uPP();toast('✅ Push enviada');rPH();}
 async function rPH(){const h=await fQ('push_history');h.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));document.getElementById('t-pu').innerHTML=`<table><thead><tr><th>Notificación</th><th>Audiencia</th><th>Fecha</th></tr></thead><tbody>${h.length?h.slice(0,15).map(x=>`<tr><td><div style="font-weight:700">${x.title||'—'}</div><div style="font-size:11px;color:var(--mu)">${x.body||''}</div></td><td><span class="b b-${x.target==='sellers'?'seller':'buyer'}">${{all:'👥 Todos',buyers:'🛒 Buyers',sellers:'🏪 Sellers'}[x.target]||x.target}</span></td><td style="font-size:11px;color:var(--mu)">${x.createdAt?new Date(x.createdAt).toLocaleString('es'):'—'}</td></tr>`).join(''):'<tr><td colspan="3" class="te">Sin historial</td></tr>'}</tbody></table>`;}
 
