@@ -16,7 +16,7 @@
 <meta name="description" content="Marketplace de live shopping venezolano — compra y subasta en tiempo real">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.0.js" defer></script>
+<script src="https://meet.jit.si/external_api.js" async defer></script>
 <script>
 // ═══ FIREBASE REST API — sin SDK externo ═══
 const FB={
@@ -666,74 +666,163 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 /* ═══ SELLER PROFILE ═══ */
 #s-seller{background:var(--dk)}
-.sp-hero{position:relative;height:180px;overflow:hidden;flex-shrink:0}
-.sp-hero-img{width:100%;height:100%;object-fit:cover;opacity:.5}
-.sp-hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#111128,#0d1f4e)}
-.sp-hero-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,10,15,.2) 0%,rgba(10,10,15,.95) 100%)}
-.sp-hero-back{position:absolute;top:14px;left:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#fff;z-index:2}
-.sp-hero-back:active{transform:scale(.88)}
-.sp-hero-share{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#fff;z-index:2}
-/* Avatar overlapping hero */
-.sp-avatar-wrap{position:absolute;bottom:-34px;left:20px;z-index:3}
-.sp-avatar{width:68px;height:68px;border-radius:50%;background:var(--y);display:flex;align-items:center;justify-content:center;font-size:32px;border:3px solid var(--dk);box-shadow:0 4px 16px rgba(0,0,0,.4)}
-.sp-live-ring{position:absolute;inset:-4px;border-radius:50%;border:2.5px solid var(--rd);animation:pulse2 1.8s infinite}
-.sp-body{padding:46px 16px 16px}
-/* Name row */
-.sp-name-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
-.sp-name{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.3px;line-height:1}
-.sp-verified{font-size:16px;margin-top:2px}
-.sp-handle{font-size:12px;color:var(--mu);margin-bottom:6px}
-.sp-location{font-size:11px;color:var(--mu);display:flex;align-items:center;gap:4px;margin-bottom:14px}
-/* Action buttons */
-.sp-actions{display:flex;gap:9px;margin-bottom:18px}
-.sp-follow-btn{flex:2;background:var(--y);color:var(--dk);border:none;border-radius:11px;padding:11px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer;transition:all .2s cubic-bezier(.34,1.3,.64,1)}
-.sp-follow-btn:active{transform:scale(.96)}
-.sp-follow-btn.on{background:transparent;color:var(--y);border:1.5px solid var(--y)}
-.sp-chat-btn{flex:1;background:var(--dk3);border:1.5px solid rgba(255,255,255,.09);border-radius:11px;padding:11px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:var(--tx);cursor:pointer;transition:all .15s}
-.sp-chat-btn:active{transform:scale(.96)}
-.sp-live-btn{flex:1;background:var(--rd);color:#fff;border:none;border-radius:11px;padding:11px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px}
-.sp-live-btn:active{transform:scale(.96)}
-/* Stats bar */
-.sp-stats{display:flex;background:var(--dk3);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.05);margin-bottom:18px}
-.sp-stat{flex:1;padding:12px 6px;text-align:center;border-right:1px solid rgba(255,255,255,.05);cursor:pointer;transition:background .15s}
-.sp-stat:last-child{border-right:none}
-.sp-stat:hover{background:var(--dk4)}
+/* ═══ SELLER PAGE — NUEVO DISEÑO ═══ */
+#s-seller{background:var(--dk)}
+/* ═══ SELLER PAGE ═══ */
+#s-seller{background:var(--dk)}
+/* Cover — overflow:visible so avatar can overlap safely */
+.sp-cover{position:relative;height:160px;flex-shrink:0;overflow:visible}
+.sp-cover-inner{position:absolute;inset:0;overflow:hidden}
+.sp-cover-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0d0d1a,#1a1200,#0a0a0f)}
+.sp-cover-mesh{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 30%,rgba(255,208,0,.2),transparent),radial-gradient(ellipse 50% 50% at 20% 80%,rgba(255,59,59,.12),transparent)}
+.sp-cover-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.1) 0%,var(--dk) 100%)}
+.sp-cover-back{position:absolute;top:max(var(--sat),14px);left:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#fff;z-index:5;transition:transform .15s}
+.sp-cover-back:active{transform:scale(.88)}
+.sp-cover-share{position:absolute;top:max(var(--sat),14px);right:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:#fff;z-index:5}
+.sp-live-cover-badge{position:absolute;top:max(var(--sat),14px);left:50%;transform:translateX(-50%);display:none;align-items:center;gap:5px;background:var(--rd);border-radius:20px;padding:4px 12px;font-size:10px;font-weight:900;color:#fff;letter-spacing:.8px;z-index:5;white-space:nowrap;box-shadow:0 0 16px rgba(255,59,59,.45)}
+.sp-live-cover-badge.on{display:flex}
+/* TOP ROW — avatar + buttons, sits BELOW cover in DOM, pulls up with margin */
+.sp-top-row{display:flex;align-items:flex-end;justify-content:space-between;padding:0 16px;margin-top:-30px;margin-bottom:10px;position:relative;z-index:4}
+.sp-av-wrap{position:relative;flex-shrink:0}
+.sp-avatar{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--y),#e6a800);display:flex;align-items:center;justify-content:center;font-size:32px;border:3px solid var(--dk);box-shadow:0 4px 18px rgba(0,0,0,.55)}
+.sp-live-ring{display:none;position:absolute;inset:-5px;border-radius:50%;border:2.5px solid var(--rd);animation:pulse2 1.8s infinite;pointer-events:none}
+.sp-live-ring.on{display:block}
+/* Buttons */
+.sp-follow-btn{background:var(--y);color:var(--dk);border:none;border-radius:20px;padding:8px 16px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer;transition:all .2s cubic-bezier(.34,1.3,.64,1);box-shadow:0 3px 12px rgba(255,208,0,.25)}
+.sp-follow-btn:active{transform:scale(.94)}
+.sp-follow-btn.on{background:transparent;color:var(--y);border:1.5px solid var(--y);box-shadow:none}
+.sp-wa-btn{width:34px;height:34px;border-radius:50%;background:rgba(37,211,102,.14);border:1.5px solid rgba(37,211,102,.35);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:transform .15s}
+.sp-wa-btn:active{transform:scale(.9)}
+.sp-live-btn{background:var(--rd);color:#fff;border:none;border-radius:20px;padding:8px 13px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;cursor:pointer;display:none;align-items:center;gap:5px;transition:all .15s;box-shadow:0 3px 12px rgba(255,59,59,.28)}
+.sp-live-btn.on{display:flex}
+.sp-live-btn:active{transform:scale(.95)}
+/* Info */
+.sp-name{font-family:'Bebas Neue',sans-serif;font-size:25px;letter-spacing:.4px;line-height:1;color:#fff}
+.sp-verified{display:inline-block;background:rgba(76,175,80,.18);border:1px solid rgba(76,175,80,.35);border-radius:20px;padding:2px 7px;font-size:9px;font-weight:900;color:#4CAF50;letter-spacing:.4px}
+.sp-handle{font-size:11px;color:var(--mu);margin-bottom:2px}
+.sp-location{font-size:11px;color:rgba(255,255,255,.32)}
+/* Stats */
+.sp-stats{display:grid;grid-template-columns:repeat(4,1fr);margin:10px 16px;border-radius:13px;overflow:hidden;border:1px solid rgba(255,255,255,.07)}
+.sp-stat{padding:10px 4px;text-align:center;background:rgba(255,255,255,.03)}
+.sp-stat+.sp-stat{border-left:1px solid rgba(255,255,255,.07)}
 .sp-stat-n{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--y);line-height:1}
-.sp-stat-l{font-size:9px;color:var(--mu);font-weight:700;margin-top:2px}
-/* Bio */
-.sp-bio{font-size:13px;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:18px;padding:12px 14px;background:var(--dk3);border-radius:11px;border:1px solid rgba(255,255,255,.05)}
-/* Rating */
-.sp-rating-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;padding:12px 14px;background:var(--dk3);border-radius:11px;border:1px solid rgba(255,255,255,.05)}
-.sp-stars{font-size:18px;letter-spacing:2px}
-.sp-rating-num{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--y);line-height:1}
+.sp-stat-l{font-size:9px;color:var(--mu);font-weight:700;margin-top:1px}
+/* Bio — 2 lines max, no box */
+.sp-bio{font-size:12px;color:rgba(255,255,255,.5);line-height:1.55;margin:0 16px 12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* Mode tabs — slim pill, not big cards */
+.sp-mode-bar{display:flex;margin:0 16px 14px;background:rgba(255,255,255,.05);border-radius:11px;padding:3px;border:1px solid rgba(255,255,255,.07)}
+.sp-mode-tab{flex:1;padding:8px 10px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;font-size:13px;font-weight:900;color:var(--mu)}
+.sp-mode-tab-tienda.active{background:rgba(255,208,0,.14);color:var(--y)}
+.sp-mode-tab-subasta.active{background:rgba(255,59,59,.14);color:var(--rd)}
+.sp-mode-badge{font-size:10px;font-weight:900;padding:1px 6px;border-radius:20px;line-height:1.4}
+.sp-mode-tab-tienda .sp-mode-badge{background:rgba(255,208,0,.18);color:var(--y)}
+.sp-mode-tab-subasta .sp-mode-badge{background:rgba(255,59,59,.18);color:var(--rd)}
+/* Panels */
+.sp-panel{display:none;padding:0 16px}
+.sp-panel.on{display:block}
+/* Product cards 2-col */
+.sp2-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding-bottom:14px}
+.sp2-card{background:var(--dk3);border-radius:13px;overflow:hidden;border:1px solid rgba(255,255,255,.07);transition:transform .18s;cursor:pointer}
+.sp2-card:active{transform:scale(.97)}
+.sp2-img{width:100%;height:126px;overflow:hidden;background:var(--dk4);display:flex;align-items:center;justify-content:center;font-size:38px;position:relative}
+.sp2-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sp2-badge{position:absolute;top:6px;left:6px;border-radius:5px;padding:2px 6px;font-size:8px;font-weight:900;letter-spacing:.3px;z-index:1}
+.sp2-badge-fixed{background:var(--y);color:#0a0a0f}
+.sp2-badge-sold{background:rgba(255,255,255,.1);color:rgba(255,255,255,.5)}
+.sp2-body{padding:9px 10px 10px}
+.sp2-name{font-size:11px;font-weight:800;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
+.sp2-price{font-family:'Bebas Neue',sans-serif;font-size:21px;color:var(--y);line-height:1;margin-bottom:7px}
+.sp2-buy-btn{width:100%;background:var(--y);color:var(--dk);border:none;border-radius:8px;padding:7px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:900;cursor:pointer;transition:all .15s}
+.sp2-buy-btn:active{transform:scale(.95)}
+.sp2-buy-btn:disabled{background:rgba(255,255,255,.08);color:var(--mu);cursor:default}
+/* Auction cards */
+.spa-list{display:flex;flex-direction:column;gap:9px;padding-bottom:14px}
+.spa-card{background:var(--dk3);border-radius:13px;overflow:hidden;border:1px solid rgba(255,59,59,.16);transition:transform .18s}
+.spa-card:active{transform:scale(.985)}
+.spa-card.ended{border-color:rgba(255,255,255,.06);opacity:.6}
+.spa-img-row{position:relative;height:130px;overflow:hidden;background:var(--dk4);display:flex;align-items:center;justify-content:center;font-size:48px}
+.spa-img-row img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.spa-img-grad{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,.9) 100%)}
+.spa-timer-pill{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border-radius:20px;padding:4px 10px;border:1px solid rgba(255,59,59,.4);display:flex;align-items:center;gap:4px}
+.spa-timer-dot{width:5px;height:5px;border-radius:50%;background:var(--rd);animation:pulse-live 1s infinite}
+.spa-timer-txt{font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff;letter-spacing:.8px}
+.spa-over-pill{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);border-radius:20px;padding:4px 10px;font-size:9px;font-weight:900;color:var(--mu)}
+.spa-name-over{position:absolute;bottom:8px;left:12px;right:12px;font-size:13px;font-weight:900;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.9)}
+.spa-body{padding:11px 13px}
+.spa-bid-amt{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--rd);line-height:1}
+.spa-bid-inp{flex:1;background:rgba(0,0,0,.35);border:1.5px solid rgba(255,59,59,.3);border-radius:10px;padding:8px 12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;outline:none;transition:border-color .2s}
+.spa-bid-inp:focus{border-color:rgba(255,59,59,.7)}
+.spa-bid-inp::placeholder{color:rgba(255,255,255,.2)}
+.spa-bid-btn{background:var(--rd);color:#fff;border:none;border-radius:10px;padding:8px 15px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;transition:all .15s;box-shadow:0 3px 12px rgba(255,59,59,.25)}
+.spa-bid-btn:active{transform:scale(.94)}
+.spa-bid-btn:disabled{background:rgba(255,255,255,.08);color:var(--mu);box-shadow:none;cursor:default}
+/* Reviews — compact */
+.sp-review{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.sp-review:last-child{border-bottom:none}
+.sp-rev-header{display:flex;align-items:center;gap:7px;margin-bottom:3px}
+.sp-rev-av{width:26px;height:26px;border-radius:50%;background:var(--dk4);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.sp-rev-name{font-size:11px;font-weight:800;flex:1;color:#fff}
+.sp-rev-stars{font-size:10px}
+.sp-rev-date{font-size:9px;color:var(--mu)}
+.sp-rev-text{font-size:11px;color:rgba(255,255,255,.5);line-height:1.5}
+/* FAB */
+.sp-fab{position:fixed;bottom:calc(82px + var(--sab));right:16px;z-index:30;width:48px;height:48px;border-radius:50%;background:var(--y);border:none;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:22px;box-shadow:0 5px 20px rgba(255,208,0,.4),0 2px 8px rgba(0,0,0,.3);transition:all .2s cubic-bezier(.34,1.56,.64,1)}
+.sp-fab.on{display:flex}
+.sp-fab:active{transform:scale(.9)}
+/* Add sheet */
+.sp-add-sheet{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);align-items:flex-end}
+.sp-add-sheet.on{display:flex}
+.sp-add-inner{width:100%;max-width:430px;margin:0 auto;background:var(--dk2);border-radius:20px 20px 0 0;padding:16px 16px calc(22px + var(--sab));border-top:1px solid rgba(255,255,255,.08);max-height:88vh;overflow-y:auto}
+.sp-add-handle{width:30px;height:3px;background:rgba(255,255,255,.18);border-radius:2px;margin:0 auto 14px}
+.sp-add-type-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px}
+.sp-add-type{padding:12px;border-radius:11px;border:1.5px solid;text-align:center;cursor:pointer;transition:all .2s}
+.sp-add-type-sell{border-color:rgba(255,208,0,.2);background:rgba(255,208,0,.04)}
+.sp-add-type-sell.sel{border-color:rgba(255,208,0,.55);background:rgba(255,208,0,.1)}
+.sp-add-type-auc{border-color:rgba(255,59,59,.18);background:rgba(255,59,59,.04)}
+.sp-add-type-auc.sel{border-color:rgba(255,59,59,.5);background:rgba(255,59,59,.1)}
+.sp-add-inp{width:100%;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.09);border-radius:11px;padding:12px 13px;color:#fff;font-family:'Nunito',sans-serif;font-size:14px;outline:none;margin-bottom:10px;box-sizing:border-box;transition:border-color .2s}
+.sp-add-inp:focus{border-color:rgba(255,208,0,.45)}
+.sp-add-inp::placeholder{color:var(--mu)}
+.sp-add-price-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px}
+.sp-add-dur-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:16px}
+.sp-add-dur{padding:9px 5px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.08);border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--mu)}
+.sp-add-dur.sel{background:rgba(255,59,59,.12);border-color:rgba(255,59,59,.5);color:var(--rd)}
+.sp-add-dur small{display:block;font-family:'Nunito',sans-serif;font-size:8px;font-weight:800;opacity:.7}
+.sp-add-submit{width:100%;background:var(--y);color:var(--dk);border:none;border-radius:12px;padding:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .2s}
+.sp-add-submit.rd{background:var(--rd);color:#fff}
+/* compat aliases */
+.sp-hero{position:relative;height:160px;overflow:hidden;flex-shrink:0}
+.sp-hero-img{width:100%;height:100%;object-fit:cover;opacity:.45}
+.sp-hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0d0d1a,#1a1200,#0a0a0f)}
+.sp-hero-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.1),var(--dk) 100%)}
+.sp-hero-back{position:absolute;top:max(var(--sat),14px);left:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#fff;z-index:5}
+.sp-hero-share{position:absolute;top:max(var(--sat),14px);right:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:#fff;z-index:5}
+.sp-avatar-wrap{display:inline-block;position:relative}
+.sp-live-ring{display:none;position:absolute;inset:-5px;border-radius:50%;border:2.5px solid var(--rd);animation:pulse2 1.8s infinite}
+.sp-body{padding:0}
+.sp-name-row{display:flex;align-items:center;gap:7px;margin-bottom:2px}
+.sp-handle{font-size:11px;color:var(--mu);margin-bottom:2px}
+.sp-location{font-size:11px;color:rgba(255,255,255,.35)}
+.sp-actions{display:flex;gap:8px}
+.sp-rating-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 13px;background:var(--dk3);border-radius:11px;border:1px solid rgba(255,255,255,.05)}
+.sp-stars{font-size:15px;letter-spacing:1px}
+.sp-rating-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y);line-height:1}
 .sp-rating-sub{font-size:10px;color:var(--mu)}
 .sp-rating-bar-wrap{flex:1;display:flex;flex-direction:column;gap:3px}
 .sp-bar-row{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--mu)}
-.sp-bar-track{flex:1;height:4px;background:var(--dk4);border-radius:2px;overflow:hidden}
+.sp-bar-track{flex:1;height:3px;background:var(--dk4);border-radius:2px;overflow:hidden}
 .sp-bar-fill{height:100%;background:var(--y);border-radius:2px;transition:width .6s cubic-bezier(.4,0,.2,1)}
-/* Section tabs */
-.sp-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:14px}
-.sp-tab{flex:1;padding:9px 0;text-align:center;font-size:12px;font-weight:800;color:var(--mu);cursor:pointer;position:relative;transition:color .15s}
+.sp-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:12px}
+.sp-tab{flex:1;padding:8px 0;text-align:center;font-size:12px;font-weight:800;color:var(--mu);cursor:pointer;position:relative;transition:color .15s}
 .sp-tab.on{color:var(--y)}
 .sp-tab.on::after{content:'';position:absolute;bottom:-1px;left:20%;right:20%;height:2px;background:var(--y);border-radius:2px}
-/* Products mini grid */
-.sp-pgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 0 8px}
-.sp-pcard{border-radius:10px;overflow:hidden;cursor:pointer;aspect-ratio:1;position:relative;background:var(--dk4);transition:transform .18s}
-.sp-pcard:active{transform:scale(.95)}
-.sp-pcard img{width:100%;height:100%;object-fit:cover}
-.sp-pcard-price{position:absolute;bottom:0;left:0;right:0;padding:6px 7px;background:linear-gradient(to top,rgba(0,0,0,.85),transparent);font-size:11px;font-weight:900;color:var(--y);font-family:'Bebas Neue',sans-serif}
-.sp-pcard-live{position:absolute;top:5px;left:5px}
-/* Reviews */
-.sp-review{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)}
-.sp-review:last-child{border-bottom:none}
-.sp-rev-header{display:flex;align-items:center;gap:8px;margin-bottom:5px}
-.sp-rev-av{width:30px;height:30px;border-radius:50%;background:var(--dk4);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.sp-rev-name{font-size:12px;font-weight:800;flex:1}
-.sp-rev-stars{font-size:11px}
-.sp-rev-date{font-size:10px;color:var(--mu)}
-.sp-rev-text{font-size:12px;color:rgba(255,255,255,.7);line-height:1.5}
-/* Payments accepted */
-.sp-pays{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
+.sp-pgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 0 8px}
+.sp-pcard{border-radius:13px;overflow:hidden;cursor:pointer;position:relative;background:var(--dk4);transition:transform .18s;border:1px solid rgba(255,255,255,.07)}
+.sp-pcard:active{transform:scale(.97)}
+.sp-pcard img{width:100%;height:126px;object-fit:cover;display:block}
+.sp-pcard-price{padding:7px 9px;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--y)}
+.sp-pcard-live{position:absolute;top:6px;left:6px}
+.sp-pays{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 
 /* ═══ CHECKOUT redesigned ═══ */
 #s-co{background:var(--dk)}
@@ -1815,105 +1904,174 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
   </div>
 </div>
 
-<!-- SELLER PROFILE -->
+<!-- SELLER PROFILE — NUEVO -->
 <div id="s-seller" class="scr">
-  <!-- Hero + avatar en wrapper relativo para evitar clip por overflow:hidden -->
-  <div style="position:relative;flex-shrink:0">
-    <div class="sp-hero" id="sp-hero">
-      <div class="sp-hero-bg"></div>
-      <img class="sp-hero-img" id="sp-hero-img" src="" onerror="this.style.display='none'">
-      <div class="sp-hero-grad"></div>
-      <button class="sp-hero-back" onclick="goBack()">←</button>
-      <button class="sp-hero-share" onclick="toast('🔗 Link copiado')">↗</button>
+
+  <!-- COVER — inner wrapper maneja el overflow, sp-cover no lo hace -->
+  <div class="sp-cover" id="sp-cover">
+    <div class="sp-cover-inner">
+      <div class="sp-cover-bg" id="sp-cover-bg"></div>
+      <div class="sp-cover-mesh"></div>
+      <img id="sp-hero-img" src="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.45;display:none" onerror="this.style.display='none'">
+      <div class="sp-cover-grad"></div>
     </div>
-    <div class="sp-avatar-wrap">
-      <div class="sp-avatar" id="sp-av-emoji">🛍️</div>
-      <div class="sp-live-ring" id="sp-live-ring"></div>
+    <button class="sp-cover-back" onclick="goBack()">←</button>
+    <button class="sp-cover-share" onclick="spShare()">↗</button>
+    <div class="sp-live-cover-badge" id="sp-live-cover-badge">
+      <div style="width:6px;height:6px;border-radius:50%;background:#fff;animation:pulse-live 1s infinite"></div>
+      EN VIVO AHORA
     </div>
   </div>
 
-  <div class="sb" style="padding-bottom:80px">
-    <div class="sp-body">
-      <!-- Name + verify -->
-      <div class="sp-name-row">
-        <div>
-          <div style="display:flex;align-items:center;gap:7px">
-            <div class="sp-name" id="sp-name">MarisolShop</div>
-            <div class="sp-verified">✅</div>
-          </div>
-          <div class="sp-handle" id="sp-handle">@marisolshop.ve</div>
-        </div>
-      </div>
-      <div class="sp-location" id="sp-location">📍 Caracas, Venezuela</div>
+  <!-- SCROLLABLE BODY -->
+  <div class="sb" style="padding-bottom:calc(90px + var(--sab))">
 
-      <!-- Actions -->
-      <div class="sp-actions">
+    <!-- TOP ROW: avatar + action buttons -->
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:0 16px;margin-top:-44px;margin-bottom:14px;position:relative;z-index:2">
+      <div class="sp-av-wrap">
+        <div class="sp-avatar" id="sp-av-emoji">🛍️</div>
+        <div class="sp-live-ring" id="sp-live-ring"></div>
+      </div>
+      <div style="display:flex;gap:8px;padding-bottom:3px" id="sp-top-actions">
         <button class="sp-follow-btn" id="sp-fol-btn" onclick="spToggleFollow()">+ Seguir</button>
-        <button class="sp-chat-btn" onclick="toast('💬 Chat próximamente')">💬 Chat</button>
+        <div class="sp-wa-btn" id="sp-wa-btn" onclick="spWhatsApp()" style="display:none">💬</div>
         <button class="sp-live-btn" id="sp-live-btn" onclick="spOpenStream()">🔴 Ver Live</button>
       </div>
+    </div>
 
-      <!-- Stats -->
-      <div class="sp-stats">
-        <div class="sp-stat"><div class="sp-stat-n" id="sp-stat-v">0</div><div class="sp-stat-l">Viendo</div></div>
-        <div class="sp-stat"><div class="sp-stat-n" id="sp-stat-s">0</div><div class="sp-stat-l">Ventas</div></div>
-        <div class="sp-stat"><div class="sp-stat-n" id="sp-stat-f">0k</div><div class="sp-stat-l">Seguidores</div></div>
-        <div class="sp-stat"><div class="sp-stat-n" id="sp-stat-r">4.9</div><div class="sp-stat-l">Rating</div></div>
+    <!-- NAME + INFO -->
+    <div style="padding:0 16px 4px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+        <div class="sp-name" id="sp-name">Tienda</div>
+        <div class="sp-verified" id="sp-verified-badge" style="display:none">✅ Verificado</div>
       </div>
+      <div class="sp-handle" id="sp-handle">@tienda</div>
+      <div class="sp-location" id="sp-location">📍 Venezuela 🇻🇪</div>
+    </div>
 
-      <!-- Bio -->
-      <div class="sp-bio" id="sp-bio">
-        Vendedora verificada con más de 2 años en la plataforma. Especialista en calzado deportivo importado. Envíos a todo el país. 🇻🇪
+    <!-- STATS -->
+    <div class="sp-stats">
+      <div class="sp-stat"><div class="sp-stat-n" id="sp-stat-v">0</div><div class="sp-stat-l">Viendo</div></div>
+      <div class="sp-stat"><div class="sp-stat-n" id="sp-stat-s">0</div><div class="sp-stat-l">Ventas</div></div>
+      <div class="sp-stat"><div class="sp-stat-n" id="sp-stat-f">0</div><div class="sp-stat-l">Seguidores</div></div>
+      <div class="sp-stat"><div class="sp-stat-n" id="sp-stat-r">—</div><div class="sp-stat-l">Rating</div></div>
+    </div>
+
+    <!-- BIO -->
+    <div class="sp-bio" id="sp-bio">Vendedor en InstaCompras 🛍️</div>
+
+    <!-- MODE TABS — slim, clean -->
+    <div class="sp-mode-bar">
+      <div class="sp-mode-tab sp-mode-tab-tienda active" id="sp-mode-tienda" onclick="spMode('tienda')">
+        🏷️ Tienda <span class="sp-mode-badge" id="sp-count-tienda">0</span>
       </div>
-
-      <!-- Rating breakdown -->
-      <div class="sp-rating-row">
-        <div>
-          <div class="sp-rating-num" id="sp-rating">4.9</div>
-          <div class="sp-stars">⭐⭐⭐⭐⭐</div>
-          <div class="sp-rating-sub" id="sp-reviews-count">128 reseñas</div>
-        </div>
-        <div class="sp-rating-bar-wrap" id="sp-bars"></div>
+      <div class="sp-mode-tab sp-mode-tab-subasta" id="sp-mode-subasta" onclick="spMode('subasta')">
+        🔨 Subastas <span class="sp-mode-badge" id="sp-count-subasta">0</span>
       </div>
+    </div>
 
-      <!-- Payments accepted -->
-      <div class="lbl" style="margin-bottom:8px">Acepta pagos</div>
-      <div class="sp-pays">
-        <span class="ptag y">💜 Zelle</span>
-        <span class="ptag y">🏦 Pago Móvil</span>
-        <span class="ptag y">₿ Binance</span>
-        <span class="ptag y">⬡ Reserve</span>
-        <span class="ptag y">💵 Efectivo</span>
-      </div>
-
-      <!-- Tabs: Productos / Reseñas -->
-      <div class="sp-tabs">
-        <div class="sp-tab on" id="sp-tab-prods" onclick="spTab('prods')">🛍️ Productos</div>
-        <div class="sp-tab" id="sp-tab-revs" onclick="spTab('revs')">⭐ Reseñas</div>
-        <div class="sp-tab" id="sp-tab-info" onclick="spTab('info')">ℹ️ Info</div>
-      </div>
-
-      <!-- Products tab -->
-      <div id="sp-prods-panel">
-        <div class="sp-pgrid" id="sp-pgrid"></div>
-      </div>
-
-      <!-- Reviews tab -->
-      <div id="sp-revs-panel" style="display:none">
-        <div id="sp-revs-list"></div>
-      </div>
-
-      <!-- Info tab -->
-      <div id="sp-info-panel" style="display:none">
-        <div class="co-card" style="margin-bottom:0">
-          <div class="co-row"><span class="co-l">Miembro desde</span><span class="co-v">Marzo 2022</span></div>
-          <div class="co-row"><span class="co-l">Responde en</span><span class="co-v">~15 minutos</span></div>
-          <div class="co-row"><span class="co-l">Entregas</span><span class="co-v">Todo Venezuela</span></div>
-          <div class="co-row"><span class="co-l">Devoluciones</span><span class="co-v">48h con foto</span></div>
-          <div class="co-row"><span class="co-l">Streams por semana</span><span class="co-v" id="sp-info-streams">3-4</span></div>
+    <!-- TIENDA PANEL -->
+    <div class="sp-panel on" id="sp-panel-tienda">
+      <div class="sp2-grid" id="sp2-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:48px 24px;color:var(--mu)">
+          <div style="font-size:40px;margin-bottom:10px">🛍️</div>
+          <div style="font-size:13px;font-weight:800;color:var(--tx);margin-bottom:4px">Sin productos aún</div>
+          <div style="font-size:11px">Vuelve pronto</div>
         </div>
       </div>
     </div>
+
+    <!-- SUBASTAS PANEL -->
+    <div class="sp-panel" id="sp-panel-subasta">
+      <div class="spa-list" id="spa-list">
+        <div style="text-align:center;padding:48px 24px;color:var(--mu)">
+          <div style="font-size:40px;margin-bottom:10px">🔨</div>
+          <div style="font-size:13px;font-weight:800;color:var(--tx);margin-bottom:4px">Sin subastas activas</div>
+          <div style="font-size:11px">El vendedor creará subastas pronto</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESEÑAS — compact, max 2 -->
+    <div style="padding:0 16px 16px;margin-top:4px" id="sp-reviews-block">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:900;color:rgba(255,255,255,.7)">⭐ Reseñas</div>
+        <div style="font-size:11px;color:var(--mu)" id="sp-reviews-count"></div>
+      </div>
+      <div id="sp-revs-list"></div>
+    </div>
+
+  </div><!-- /sb -->
+
+  <!-- FAB: añadir item (solo mi tienda) -->
+  <button class="sp-fab" id="sp-fab" onclick="spOpenAddSheet()">＋</button>
+
+</div><!-- /s-seller -->
+
+<!-- ADD ITEM SHEET -->
+<div class="sp-add-sheet" id="sp-add-sheet" onclick="if(event.target===this)spCloseAddSheet()">
+  <div class="sp-add-inner">
+    <div class="sp-add-handle"></div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;margin-bottom:4px">Publicar en mi tienda</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:20px">Elige cómo quieres vender</div>
+
+    <!-- Type selector -->
+    <div class="sp-add-type-row" id="sp-add-type-row">
+      <div class="sp-add-type sp-add-type-sell sel" id="sp-add-t-sell" onclick="spAddType('sell')">
+        <div style="font-size:24px;margin-bottom:6px">🏷️</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--y)">Precio Fijo</div>
+        <div style="font-size:10px;color:var(--mu)">Compra inmediata</div>
+      </div>
+      <div class="sp-add-type sp-add-type-auc" id="sp-add-t-auc" onclick="spAddType('auction')">
+        <div style="font-size:24px;margin-bottom:6px">🔨</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--rd)">Subasta</div>
+        <div style="font-size:10px;color:var(--mu)">Mejor oferta gana</div>
+      </div>
+    </div>
+
+    <!-- Fields -->
+    <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Nombre del artículo</div>
+    <input class="sp-add-inp" id="sp-add-name" type="text" placeholder="Ej: iPhone 14 Pro 256GB, Zapatos Nike Air Max…">
+
+    <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Descripción (opcional)</div>
+    <input class="sp-add-inp" id="sp-add-desc" type="text" placeholder="Estado, talla, color, detalles…">
+
+    <!-- Price / start bid row -->
+    <div class="sp-add-price-row">
+      <div>
+        <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px" id="sp-add-price-lbl">Precio ($)</div>
+        <div style="display:flex;align-items:center;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;transition:border-color .2s" onfocusin="this.style.borderColor='rgba(255,208,0,.5)'" onfocusout="this.style.borderColor='rgba(255,255,255,.1)'">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y);margin-right:5px">$</span>
+          <input id="sp-add-price" type="number" placeholder="0" min="0" style="background:none;border:none;outline:none;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:22px;width:100%">
+        </div>
+      </div>
+      <div id="sp-add-qty-block">
+        <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Cantidad</div>
+        <div style="display:flex;align-items:center;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:rgba(255,255,255,.3);margin-right:5px">✕</span>
+          <input id="sp-add-qty" type="number" placeholder="1" min="1" value="1" style="background:none;border:none;outline:none;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:22px;width:100%">
+        </div>
+      </div>
+    </div>
+
+    <!-- Duration (auction only) -->
+    <div id="sp-add-dur-block" style="display:none;margin-bottom:4px">
+      <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Duración de la subasta</div>
+      <div class="sp-add-dur-grid">
+        <div class="sp-add-dur sel" onclick="spAddDur(this,3600000)">1<small>HORA</small></div>
+        <div class="sp-add-dur" onclick="spAddDur(this,21600000)">6<small>HORAS</small></div>
+        <div class="sp-add-dur" onclick="spAddDur(this,86400000)">24<small>HORAS</small></div>
+        <div class="sp-add-dur" onclick="spAddDur(this,172800000)">2<small>DÍAS</small></div>
+        <div class="sp-add-dur" onclick="spAddDur(this,259200000)">3<small>DÍAS</small></div>
+        <div class="sp-add-dur" onclick="spAddDur(this,604800000)">7<small>DÍAS</small></div>
+      </div>
+    </div>
+
+    <!-- Photo URL (optional) -->
+    <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Foto (URL opcional)</div>
+    <input class="sp-add-inp" id="sp-add-img" type="url" placeholder="https://… o deja vacío" style="margin-bottom:20px">
+
+    <button class="sp-add-submit" id="sp-add-submit" onclick="spSubmitItem()">🏷️ Publicar en mi tienda</button>
   </div>
 </div>
 
@@ -2831,6 +2989,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <button class="bk" style="position:static;background:var(--dk3);border:1px solid rgba(255,255,255,.07)" onclick="goBack()">←</button>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1">⚡ Panel Admin</div>
     <div id="admin-pending-badge" style="display:none;background:var(--rd);color:#fff;font-size:11px;font-weight:900;padding:3px 10px;border-radius:20px"></div>
+    <button onclick="_adminLoadDeps()" style="background:var(--dk3);border:1px solid rgba(255,255,255,.07);border-radius:50%;width:34px;height:34px;color:var(--mu);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">🔄</button>
   </div>
 
   <div class="sb" style="padding-bottom:88px">
@@ -4170,26 +4329,391 @@ function openSeller(idx){
   go('seller');
 }
 
-function spTab(tab){
-  ['prods','revs','info'].forEach(t=>{
-    document.getElementById('sp-tab-'+t).classList.toggle('on',t===tab);
-    document.getElementById('sp-'+t+'-panel').style.display=t===tab?'':'none';
+// ═══ SELLER PAGE — NUEVA LÓGICA ═══
+let _spCurrentSellerId = null; // Firestore UID of current seller
+let _spIsOwnStore = false;
+let _spCurrentMode = 'tienda';
+let _spAddDurMs = 3600000; // default 1h
+let _spAddSaleType = 'sell';
+let _spStoreAuctions = []; // cache
+let _spStoreProducts = []; // cache
+let _spAucPollIvs = {}; // timers per auction
+
+function spMode(mode){
+  _spCurrentMode = mode;
+  ['tienda','subasta'].forEach(m=>{
+    document.getElementById('sp-mode-'+m)?.classList.toggle('active', m===mode);
+    document.getElementById('sp-panel-'+m)?.classList.toggle('on', m===mode);
   });
 }
 
+function spShare(){
+  const name = document.getElementById('sp-name')?.textContent||'Tienda';
+  if(navigator.share){navigator.share({title:name,url:location.href}).catch(()=>{});}
+  else{toast('🔗 Link copiado');}
+}
+
+function spWhatsApp(){
+  const waBtn = document.getElementById('sp-wa-btn');
+  const waNum = waBtn?.dataset?.wa;
+  if(!waNum){toast('💬 Sin WhatsApp registrado');return;}
+  const msg = encodeURIComponent('Hola, te vi en InstaCompras y me interesan tus productos 🛍️');
+  window.open('https://wa.me/'+waNum+'?text='+msg,'_blank');
+}
+
 function spToggleFollow(){
-  if(curSeller===null)return;
-  following.has(curSeller)?following.delete(curSeller):following.add(curSeller);
-  const fb=document.getElementById('sp-fol-btn');
-  fb.textContent=following.has(curSeller)?'✓ Siguiendo':'+ Seguir';
-  fb.className='sp-follow-btn'+(following.has(curSeller)?' on':'');
-  fb.classList.remove('heart-burst');void fb.offsetWidth;fb.classList.add('heart-burst');
-  document.getElementById('st-fol').textContent=following.size;
-  toast(following.has(curSeller)?`✅ Sigues a ${SELLERS[curSeller].n}`:`👋 Dejaste de seguir`);
+  if(!_spCurrentSellerId)return;
+  const isFollowing = following.has(_spCurrentSellerId);
+  isFollowing ? following.delete(_spCurrentSellerId) : following.add(_spCurrentSellerId);
+  const fb = document.getElementById('sp-fol-btn');
+  if(fb){
+    fb.textContent = following.has(_spCurrentSellerId)?'✓ Siguiendo':'+ Seguir';
+    fb.className = 'sp-follow-btn'+(following.has(_spCurrentSellerId)?' on':'');
+  }
+  toast(following.has(_spCurrentSellerId)?'✅ ¡Siguiendo!':'👋 Dejaste de seguir');
 }
 
 function spOpenStream(){
-  if(curSeller!==null)openStream(curSeller);
+  const ch = document.getElementById('sp-live-btn')?.dataset?.channel;
+  if(ch) openStreamFS(ch);
+  else if(curSeller!==null) openStream(curSeller);
+}
+
+function spTab(tab){
+  ['prods','revs','info'].forEach(t=>{
+    const te=document.getElementById('sp-tab-'+t);
+    const pe=document.getElementById('sp-'+t+'-panel');
+    if(te) te.classList.toggle('on',t===tab);
+    if(pe) pe.style.display=t===tab?'':'none';
+  });
+}
+
+// ── Render product grid ────────────────────────────────────────────────────
+function _spRenderProducts(prods){
+  const grid = document.getElementById('sp2-grid');
+  if(!grid) return;
+  document.getElementById('sp-count-tienda').textContent = prods.length;
+  if(!prods.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:48px 24px;color:var(--mu)"><div style="font-size:40px;margin-bottom:10px">🛍️</div><div style="font-size:13px;font-weight:800;color:var(--tx);margin-bottom:4px">Sin productos aún</div><div style="font-size:11px">El vendedor añadirá productos pronto</div></div>';
+    return;
+  }
+  grid.innerHTML = prods.map(p=>{
+    const sold = (p.qty||1) <= 0;
+    const imgHtml = p.img
+      ? `<img src="${p.img}" style="width:100%;height:140px;object-fit:cover;display:block" onerror="this.parentNode.innerHTML='<div style=width:100%;height:140px;display:flex;align-items:center;justify-content:center;font-size:44px;background:var(--dk4)>📦</div>'">`
+      : `<div style="width:100%;height:140px;display:flex;align-items:center;justify-content:center;font-size:44px;background:var(--dk4)">${p.emoji||'📦'}</div>`;
+    return `
+    <div class="sp2-card">
+      <div class="sp2-img" style="position:relative;overflow:hidden">
+        ${imgHtml}
+        <div class="sp2-badge ${sold?'sp2-badge-sold':'sp2-badge-fixed'}" style="position:absolute;top:8px;left:8px">${sold?'AGOTADO':'PRECIO FIJO'}</div>
+      </div>
+      <div class="sp2-body">
+        <div class="sp2-name">${p.name||p.n||'Artículo'}</div>
+        <div class="sp2-price">$${p.price||p.p||0}</div>
+        ${p.desc||p.description?`<div style="font-size:10px;color:var(--mu);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.desc||p.description}</div>`:''}
+        ${!sold
+          ? `<button class="sp2-buy-btn" onclick="spBuyProduct('${p._id||''}',${p.price||p.p||0},'${(p.name||p.n||'').replace(/'/g,"\\'")}',${p.qty||1})">Comprar $${p.price||p.p||0} IC 🛒</button>`
+          : `<button class="sp2-buy-btn" disabled>Agotado</button>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Render auction list ────────────────────────────────────────────────────
+function _spRenderAuctions(aucs){
+  const list = document.getElementById('spa-list');
+  if(!list) return;
+  const active = aucs.filter(a=>a.status==='active'&&(a.endsAt||0)>Date.now());
+  document.getElementById('sp-count-subasta').textContent = active.length;
+  if(!aucs.length){
+    list.innerHTML='<div style="text-align:center;padding:48px 24px;color:var(--mu)"><div style="font-size:40px;margin-bottom:10px">🔨</div><div style="font-size:13px;font-weight:800;color:var(--tx);margin-bottom:4px">Sin subastas activas</div><div style="font-size:11px">El vendedor creará subastas pronto</div></div>';
+    return;
+  }
+  aucs.sort((a,b)=>(a.endsAt||0)-(b.endsAt||0));
+  list.innerHTML = aucs.map(a=>{
+    const ended = (a.endsAt||0) <= Date.now() || a.status==='ended';
+    const imgHtml = a.img
+      ? `<img src="${a.img}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`
+      : '';
+    return `
+    <div class="spa-card ${ended?'ended':''}" id="spa-card-${a._id}">
+      <div class="spa-img-row" style="position:relative">
+        ${imgHtml}
+        <div style="font-size:60px;position:relative;z-index:1">${a.emoji||'📦'}</div>
+        <div class="spa-img-grad" style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,.85) 100%)"></div>
+        ${!ended
+          ? `<div class="spa-timer-pill"><div class="spa-timer-dot"></div><div class="spa-timer-txt" id="spa-t-${a._id}">--:--</div></div>`
+          : `<div class="spa-over-pill">FINALIZADA</div>`
+        }
+        <div class="spa-name-over">${a.prodName||a.name||'Artículo'}</div>
+      </div>
+      <div class="spa-body">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:12px">
+          <div>
+            <div style="font-size:9px;font-weight:800;color:var(--mu);letter-spacing:.5px;margin-bottom:2px">${ended?'OFERTA GANADORA':'OFERTA MÁS ALTA'}</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:${ended?'var(--mu)':'var(--rd)'};line-height:1" id="spa-bid-${a._id}">$${a.currentBid||a.startPrice||0}</div>
+            <div style="font-size:10px;color:var(--mu);margin-top:2px">Base: $${a.startPrice||0}</div>
+          </div>
+          ${a.currentWinner?`<div style="text-align:right"><div style="font-size:9px;font-weight:800;color:var(--mu);margin-bottom:2px">${ended?'GANADOR':'LIDERA'}</div><div style="font-size:13px;font-weight:900;color:var(--y)">@${a.currentWinner}</div></div>`:''}
+        </div>
+        ${!ended?`
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;display:flex;align-items:center;background:rgba(0,0,0,.4);border:1.5px solid rgba(255,59,59,.35);border-radius:11px;padding:10px 14px">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--rd);margin-right:4px">$</span>
+            <input class="spa-bid-inp" id="spa-inp-${a._id}" type="number" placeholder="${(a.currentBid||a.startPrice||0)+1}" min="${(a.currentBid||a.startPrice||0)+1}" style="flex:1;background:none;border:none;outline:none;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px">
+          </div>
+          <button class="spa-bid-btn" onclick="spPlaceBid('${a._id}',${a.startPrice||0})" style="background:var(--rd);color:#fff;border:none;border-radius:11px;padding:10px 16px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(255,59,59,.3);transition:all .15s">🔨 Ofertar</button>
+        </div>`
+        :`<div style="text-align:center;padding:10px;font-size:12px;color:var(--mu)">${a.currentWinner?`🏆 Ganada por @${a.currentWinner} con $${a.currentBid}`:'Sin ofertas — subasta cerrada'}</div>`}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Start timers
+  Object.values(_spAucPollIvs).forEach(clearInterval);
+  _spAucPollIvs = {};
+  aucs.filter(a=>a.status==='active'&&(a.endsAt||0)>Date.now()).forEach(a=>{
+    _spAucPollIvs[a._id] = setInterval(()=>{
+      const el = document.getElementById('spa-t-'+a._id);
+      if(!el){clearInterval(_spAucPollIvs[a._id]);return;}
+      const left = Math.max(0, (a.endsAt||0) - Date.now());
+      if(left<=0){el.textContent='CERRADA';clearInterval(_spAucPollIvs[a._id]);return;}
+      const h=~~(left/3600000);const m=~~((left%3600000)/60000);const s=~~((left%60000)/1000);
+      el.textContent=h?`${h}h ${String(m).padStart(2,'0')}m`:`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    },1000);
+  });
+}
+
+// ── Load seller page ───────────────────────────────────────────────────────
+async function openSellerFS(storeData){
+  _spCurrentSellerId = storeData._id||storeData.uid||'';
+  _spIsOwnStore = window.fbUser?.uid === _spCurrentSellerId;
+  const isLive = storeData.isLive||false;
+  const channelName = storeData.channelName||'';
+
+  // Cover / hero
+  const heroImg = document.getElementById('sp-hero-img');
+  if(heroImg){ heroImg.src=storeData.coverImg||storeData.avatar||''; heroImg.style.display='block'; }
+
+  // Avatar
+  const avEl = document.getElementById('sp-av-emoji');
+  if(avEl){
+    if(storeData.avatar){ avEl.innerHTML=`<img src="${storeData.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`; avEl.style.background='#000'; avEl.style.overflow='hidden'; }
+    else { avEl.textContent='🛍️'; avEl.style.background=''; avEl.style.overflow=''; }
+  }
+
+  // Live indicators
+  document.getElementById('sp-live-ring').classList.toggle('on', isLive);
+  document.getElementById('sp-live-cover-badge').classList.toggle('on', isLive);
+  const liveBtn = document.getElementById('sp-live-btn');
+  if(liveBtn){ liveBtn.classList.toggle('on', isLive); if(channelName) liveBtn.dataset.channel=channelName; }
+
+  // Info
+  document.getElementById('sp-name').textContent = storeData.shopName||storeData.ownerName||'Vendedor';
+  document.getElementById('sp-handle').textContent = '@'+(storeData.shopName||'tienda').toLowerCase().replace(/\s+/g,'');
+  document.getElementById('sp-location').innerHTML = `📍 ${storeData.city||'Venezuela'} 🇻🇪`;
+  document.getElementById('sp-bio').textContent = storeData.description||storeData.bio||'Vendedor en InstaCompras 🛍️';
+
+  // Verified badge
+  const vb = document.getElementById('sp-verified-badge');
+  if(vb) vb.style.display = storeData.isVerified ? '' : 'none';
+
+  // WhatsApp
+  const waBtn = document.getElementById('sp-wa-btn');
+  if(waBtn){ waBtn.dataset.wa=storeData.whatsapp||''; waBtn.style.display=storeData.whatsapp?'flex':'none'; }
+
+  // Follow btn
+  const fb = document.getElementById('sp-fol-btn');
+  if(fb){ fb.textContent=_spIsOwnStore?'Mi Tienda':following.has(_spCurrentSellerId)?'✓ Siguiendo':'+ Seguir'; fb.className='sp-follow-btn'+(following.has(_spCurrentSellerId)?' on':''); }
+
+  // Stats
+  const viewerCount = isLive?(await fsGet('streams',channelName).catch(()=>null))?.viewerCount||0 : 0;
+  document.getElementById('sp-stat-v').textContent = viewerCount||'0';
+  document.getElementById('sp-stat-s').textContent = storeData.totalSales||'0';
+  document.getElementById('sp-stat-f').textContent = (storeData.followers||0)>999?((storeData.followers/1000).toFixed(1)+'k'):(storeData.followers||0);
+  document.getElementById('sp-stat-r').textContent = storeData.rating||'—';
+
+  // FAB (own store)
+  const fab = document.getElementById('sp-fab');
+  if(fab) fab.classList.toggle('on', _spIsOwnStore);
+
+  // Default mode
+  spMode('tienda');
+  go('seller');
+
+  // Load products + auctions from Firestore
+  _spLoadStoreItems();
+  _spLoadStoreAuctions();
+
+  // Reviews placeholder
+  document.getElementById('sp-revs-list').innerHTML = '<div style="text-align:center;padding:32px;color:var(--mu);font-size:12px">Sin reseñas aún</div>';
+}
+
+async function _spLoadStoreItems(){
+  if(!_spCurrentSellerId) return;
+  try{
+    const prods = await fsQuery('storeProducts',[{field:'sellerId',value:_spCurrentSellerId}]);
+    _spStoreProducts = prods;
+    _spRenderProducts(prods);
+  }catch(e){ console.warn('store prods:',e); }
+}
+
+async function _spLoadStoreAuctions(){
+  if(!_spCurrentSellerId) return;
+  try{
+    const aucs = await fsQuery('storeAuctions',[{field:'sellerId',value:_spCurrentSellerId}]);
+    _spStoreAuctions = aucs;
+    _spRenderAuctions(aucs);
+  }catch(e){ console.warn('store aucs:',e); }
+}
+
+// ── Buy fixed-price product ────────────────────────────────────────────────
+async function spBuyProduct(prodId, price, name, qty){
+  if(requireAccount('🛒','Para comprar necesitas cuenta','Regístrate gratis y empieza a comprar.')) return;
+  if(!prodId){ toast('⚠️ Artículo no disponible'); return; }
+  if(walletBalance < price){ toast('❌ Saldo insuficiente — recarga InstaCreditos'); openDeposit(); return; }
+  const prod = await fsGet('storeProducts', prodId);
+  if(!prod || (prod.qty||0)<=0){ toast('❌ Artículo agotado'); _spLoadStoreItems(); return; }
+  // Deduct wallet
+  walletBalance = Math.max(0, walletBalance - price);
+  await fsSet('users', window.fbUser.uid, {wallet: walletBalance});
+  updateWalletDisplay();
+  // Reduce qty
+  const newQty = (prod.qty||1) - 1;
+  await fsSet('storeProducts', prodId, {qty: newQty, status: newQty<=0?'sold':'active'});
+  // Save order
+  fsAdd('orders',{type:'store_fixed',item:name,price,prodId,buyerId:window.fbUser.uid,buyerName:window.fbUser?.username||'comprador',sellerId:_spCurrentSellerId,ts:Date.now(),status:'paid'}).catch(()=>{});
+  // Win overlay
+  document.getElementById('win-emoji').textContent='🛒';
+  document.getElementById('win-item').textContent=name;
+  document.getElementById('win-price').textContent='$'+price+' IC';
+  const ov=document.getElementById('win-overlay');const wc=document.getElementById('win-card');
+  if(ov){ov.style.display='flex';if(wc)wc.style.transform='translate(-50%,-50%) scale(1)';}
+  toast('🎉 ¡Compraste '+name+'!');
+  _spLoadStoreItems();
+}
+
+// ── Bid on store auction ──────────────────────────────────────────────────
+async function spPlaceBid(aucId, startPrice){
+  if(requireAccount('🔨','Para ofertar necesitas cuenta','Regístrate y empieza a ganar subastas.')) return;
+  const inp = document.getElementById('spa-inp-'+aucId);
+  const bid = parseFloat(inp?.value)||0;
+  const auc = await fsGet('storeAuctions', aucId);
+  if(!auc){ toast('⚠️ Subasta no encontrada'); return; }
+  if(auc.status!=='active'||(auc.endsAt||0)<=Date.now()){ toast('⏱ Esta subasta ya terminó'); return; }
+  const minBid = (auc.currentBid||auc.startPrice||0)+1;
+  if(bid < minBid){ toast(`⚠️ Mínimo $${minBid}`); return; }
+  if(walletBalance < bid){ toast('❌ Saldo insuficiente'); openDeposit(); return; }
+  const me = window.fbUser?.username||window.fbUser?.name||'usuario';
+  await fsSet('storeAuctions', aucId, {currentBid:bid, currentWinner:me, lastBidAt:Date.now()});
+  toast(`🔨 ¡Oferta de $${bid} IC registrada!`);
+  if(inp) inp.value='';
+  document.getElementById('spa-bid-'+aucId).textContent='$'+bid;
+  _spLoadStoreAuctions();
+}
+
+// ── Add item sheet ─────────────────────────────────────────────────────────
+function spOpenAddSheet(){
+  if(!_spIsOwnStore){ toast('Solo puedes editar tu propia tienda'); return; }
+  document.getElementById('sp-add-sheet').classList.add('on');
+  spAddType('sell');
+  document.getElementById('sp-add-name').value='';
+  document.getElementById('sp-add-desc').value='';
+  document.getElementById('sp-add-price').value='';
+  document.getElementById('sp-add-qty').value='1';
+  document.getElementById('sp-add-img').value='';
+}
+function spCloseAddSheet(){
+  document.getElementById('sp-add-sheet').classList.remove('on');
+}
+function spAddType(type){
+  _spAddSaleType = type;
+  document.getElementById('sp-add-t-sell').classList.toggle('sel', type==='sell');
+  document.getElementById('sp-add-t-auc').classList.toggle('sel', type==='auction');
+  document.getElementById('sp-add-dur-block').style.display = type==='auction'?'block':'none';
+  document.getElementById('sp-add-qty-block').style.display = type==='sell'?'block':'none';
+  const lbl=document.getElementById('sp-add-price-lbl');if(lbl)lbl.textContent=type==='sell'?'Precio ($)':'Precio base ($)';
+  const btn=document.getElementById('sp-add-submit');
+  if(btn){btn.textContent=type==='sell'?'🏷️ Publicar en mi tienda':'🔨 Crear Subasta';btn.className='sp-add-submit'+(type==='auction'?' rd':'');}
+}
+function spAddDur(el, ms){
+  _spAddDurMs = ms;
+  document.querySelectorAll('.sp-add-dur').forEach(d=>d.classList.remove('sel'));
+  el.classList.add('sel');
+}
+async function spSubmitItem(){
+  const name=(document.getElementById('sp-add-name')?.value||'').trim();
+  const desc=(document.getElementById('sp-add-desc')?.value||'').trim();
+  const price=parseFloat(document.getElementById('sp-add-price')?.value)||0;
+  const qty=parseInt(document.getElementById('sp-add-qty')?.value)||1;
+  const img=(document.getElementById('sp-add-img')?.value||'').trim();
+  if(!name){toast('⚠️ Escribe el nombre del artículo');return;}
+  if(price<=0){toast('⚠️ Ingresa un precio');return;}
+  const btn=document.getElementById('sp-add-submit');
+  if(btn){btn.textContent='⏳ Publicando…';btn.disabled=true;}
+  try{
+    if(_spAddSaleType==='sell'){
+      await fsAdd('storeProducts',{sellerId:_spCurrentSellerId,name,desc,price,qty,img,status:'active',createdAt:Date.now()});
+      toast('✅ ¡Producto publicado en tu tienda!');
+    } else {
+      const endsAt=Date.now()+_spAddDurMs;
+      await fsAdd('storeAuctions',{sellerId:_spCurrentSellerId,name,prodName:name,desc,startPrice:price,currentBid:price,img,currentWinner:'',status:'active',endsAt,createdAt:Date.now()});
+      toast('🔨 ¡Subasta creada!');
+    }
+    spCloseAddSheet();
+    _spLoadStoreItems();
+    _spLoadStoreAuctions();
+  }catch(e){toast('❌ Error: '+e.message);}
+  finally{if(btn){btn.disabled=false;spAddType(_spAddSaleType);}}
+}
+
+// ── Legacy compat: openSeller (mock data) ──────────────────────────────────
+function openSeller(idx){
+  curSeller=idx;
+  const s=SELLERS[idx];
+  // Build synthetic storeData and open
+  _spCurrentSellerId='mock_'+idx;
+  _spIsOwnStore=false;
+  const isLive=true;
+  document.getElementById('sp-hero-img').style.display='none';
+  const avEl=document.getElementById('sp-av-emoji');
+  if(avEl){if(s.logo){avEl.innerHTML=`<img src="${s.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;avEl.style.background='#000';avEl.style.overflow='hidden';}else{avEl.textContent=s.e;avEl.style.background='';avEl.style.overflow='';}}
+  document.getElementById('sp-live-ring').classList.add('on');
+  document.getElementById('sp-live-cover-badge').classList.add('on');
+  const lb=document.getElementById('sp-live-btn');if(lb){lb.classList.add('on');lb.dataset.channel='';}
+  document.getElementById('sp-name').textContent=s.n;
+  document.getElementById('sp-handle').textContent=`@${s.n.toLowerCase().replace(/\s/g,'')}.ve`;
+  document.getElementById('sp-location').innerHTML=`📍 ${['Caracas','Valencia','Maracaibo','Barquisimeto','Maturín'][idx%5]}, Venezuela 🇻🇪`;
+  document.getElementById('sp-bio').textContent=BIOS[idx%BIOS.length];
+  document.getElementById('sp-verified-badge').style.display='';
+  document.getElementById('sp-wa-btn').style.display='none';
+  const fb=document.getElementById('sp-fol-btn');if(fb){fb.textContent=following.has(idx)?'✓ Siguiendo':'+ Seguir';fb.className='sp-follow-btn'+(following.has(idx)?' on':'');}
+  document.getElementById('sp-stat-v').textContent=s.v;
+  document.getElementById('sp-stat-s').textContent=Math.floor(s.v*18+200);
+  document.getElementById('sp-stat-f').textContent=s.f;
+  const rating=(4.5+Math.random()*.5).toFixed(1);
+  document.getElementById('sp-stat-r').textContent=rating;
+  document.getElementById('sp-fab').classList.remove('on');
+  // Mock products
+  const sellerProds=PRODS.filter(p=>p.s===idx).length?PRODS.filter(p=>p.s===idx):PRODS.slice(0,4);
+  _spStoreProducts=sellerProds.map(p=>({_id:'p'+PRODS.indexOf(p),name:p.n,price:p.p,img:p.img,qty:p.live?0:2,status:'active'}));
+  _spRenderProducts(_spStoreProducts);
+  // Mock auctions
+  _spStoreAuctions=[{_id:'a'+idx,prodName:sellerProds[0]?.n||'Artículo especial',startPrice:sellerProds[0]?.p||10,currentBid:Math.floor((sellerProds[0]?.p||10)*1.3),currentWinner:'carlos.ve',endsAt:Date.now()+1800000,status:'active',emoji:'📦'}];
+  _spRenderAuctions(_spStoreAuctions);
+  document.getElementById('sp-count-tienda').textContent=_spStoreProducts.length+' productos';
+  document.getElementById('sp-revs-list').innerHTML=REVIEWS.map(r=>`<div class="sp-review"><div class="sp-rev-header"><div class="sp-rev-av">${r.av}</div><div class="sp-rev-name">${r.name}</div><div class="sp-rev-stars">${'⭐'.repeat(r.stars)}</div><div class="sp-rev-date">${r.date}</div></div><div class="sp-rev-text">${r.text}</div></div>`).join('');
+  spMode('tienda');
+  go('seller');
+}
+
+function spOpenStream(){
+  const btn=document.getElementById('sp-live-btn');
+  const ch=btn?.dataset?.channel;
+  if(ch) openStreamFS(ch);
+  else if(curSeller!==null&&curSeller>=0) openStream(curSeller);
 }
 // ═══ WALLET ═══
 let walletBalance=0;
@@ -4964,14 +5488,14 @@ let cameraStream=null, facingMode='user', bcTimerIv=null, bcSecs=0;
 let bcProdIdx=0, bcSelectedProds=[], bcViewerIv=null, bcChatIv=null;
 let isMuted=false;
 
-// ═══ AGORA RTC ═══
-const AGORA_APP_ID='989149d167ca46ccbd90405fbd706abb';
-const AGORA_TEMP_TOKEN=null; // Token deshabilitado — usar Agora sin App Certificate
-let agoraClient=null, agoraJoined=false;
-let agoraLocalVideo=null, agoraLocalAudio=null;
+// ═══ VIDEO RTC — JITSI (gratis, sin tokens) ═══
+// Jitsi Meet funciona sin servidor propio, sin App Certificate, sin límites.
+// Cada "canal" es una room única en meet.jit.si
+let _jitsiApi = null;
+let _jitsiRoom = '';
 
 function getChannelForSeller(idx){
-  return 'ic_'+idx;
+  return 'InstaCompras-ic-'+idx;
 }
 function getMySellerIdx(){
   if(!window.fbUser)return 0;
@@ -4980,98 +5504,137 @@ function getMySellerIdx(){
   return idx>=0?idx:0;
 }
 
+function _jitsiRoomName(channelName){
+  // Jitsi room names: alphanumeric + hyphens, no spaces
+  return ('InstaCompras-'+channelName).replace(/[^a-zA-Z0-9-]/g,'-');
+}
+
 async function leaveAgoraChannel(){
-  try{
-    if(agoraLocalVideo){agoraLocalVideo.stop();agoraLocalVideo.close();agoraLocalVideo=null;}
-    if(agoraLocalAudio){agoraLocalAudio.stop();agoraLocalAudio.close();agoraLocalAudio=null;}
-    if(agoraClient&&agoraJoined){
-      // Decrement viewer count
-      const ch=window._currentStreamChannel;
-      if(ch){fsGet('streams',ch).then(doc=>{const v=Math.max(0,(doc?.viewerCount||1)-1);fsSet('streams',ch,{viewerCount:v});}).catch(()=>{});}
-      await agoraClient.leave();agoraJoined=false;
-    }
-    agoraClient=null;
-  }catch(e){console.warn('Agora leave:',e);}
+  // Compat alias
+  _leaveJitsi();
   const sv=document.getElementById('sv-agora-video');
   if(sv){sv.style.display='none';sv.innerHTML='';}
   const bc=document.getElementById('bc-agora-video');
   if(bc){bc.style.display='none';bc.innerHTML='';}
 }
 
+function _leaveJitsi(){
+  if(_jitsiApi){
+    try{_jitsiApi.dispose();}catch(e){}
+    _jitsiApi=null;
+  }
+  _jitsiRoom='';
+}
+
+function _makeJitsiApi(room, containerId, isHost){
+  if(typeof JitsiMeetExternalAPI==='undefined'){
+    console.warn('Jitsi API no cargada aún');
+    return null;
+  }
+  const container=document.getElementById(containerId);
+  if(!container) return null;
+
+  const displayName=window.fbUser?.name||window.fbUser?.username||(isHost?'Vendedor':'Viewer');
+
+  const api=new JitsiMeetExternalAPI('meet.jit.si',{
+    roomName: room,
+    parentNode: container,
+    width: '100%',
+    height: '100%',
+    userInfo:{displayName},
+    configOverwrite:{
+      startWithAudioMuted: false,
+      startWithVideoMuted: false,
+      disableDeepLinking: true,
+      prejoinPageEnabled: false,          // entrar directo sin pantalla previa
+      disableInviteFunctions: true,
+      toolbarButtons: isHost
+        ? ['microphone','camera','hangup','tileview']
+        : ['microphone','hangup'],
+      notifications: [],
+      subject: isHost ? '🔴 InstaCompras LIVE' : '',
+    },
+    interfaceConfigOverwrite:{
+      TOOLBAR_ALWAYS_VISIBLE: true,
+      DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+      SHOW_JITSI_WATERMARK: false,
+      SHOW_BRAND_WATERMARK: false,
+      SHOW_POWERED_BY: false,
+      MOBILE_APP_PROMO: false,
+    }
+  });
+
+  return api;
+}
+
 async function joinAsAudience(channelName){
   window._currentStreamChannel=channelName;
-  if(typeof AgoraRTC==='undefined'){toast('⚠️ SDK de stream no disponible');return;}
-  try{
-    await leaveAgoraChannel();
-    agoraClient=AgoraRTC.createClient({mode:'live',codec:'h264'});
-    await agoraClient.setClientRole('audience');
-    await agoraClient.join(AGORA_APP_ID, channelName, AGORA_TEMP_TOKEN, null);
-    agoraJoined=true;
-    agoraClient.on('user-published', async(user,mediaType)=>{
-      await agoraClient.subscribe(user,mediaType);
-      if(mediaType==='video'){
-        const container=document.getElementById('sv-agora-video');
-        if(container){container.style.display='block';user.videoTrack.play(container);}
-        const img=document.getElementById('sv-img');
-        if(img)img.style.opacity='0';
-      }
-      if(mediaType==='audio'){user.audioTrack.play();}
-    });
-    agoraClient.on('user-unpublished',(user,mediaType)=>{
-      if(mediaType==='video'){
-        const container=document.getElementById('sv-agora-video');
-        if(container){container.style.display='none';container.innerHTML='';}
-        const img=document.getElementById('sv-img');
-        if(img)img.style.opacity='1';
-      }
-    });
-    toast('📡 Conectado al live');
-    // Increment viewer count in Firestore
-    fsGet('streams',channelName).then(doc=>{
-      const v=(doc?.viewerCount||0)+1;
-      fsSet('streams',channelName,{viewerCount:v});
-    }).catch(()=>{});
-  }catch(e){
-    console.error('Agora audience:',e);
-    toast('⚠️ No se pudo conectar al stream en vivo');
+  _leaveJitsi();
+  _jitsiRoom=_jitsiRoomName(channelName);
+
+  const container=document.getElementById('sv-agora-video');
+  if(!container) return;
+  container.style.display='block';
+  container.style.background='#000';
+
+  // Hide placeholder image
+  const img=document.getElementById('sv-img');
+  if(img) img.style.opacity='0';
+
+  _jitsiApi=_makeJitsiApi(_jitsiRoom,'sv-agora-video',false);
+  if(!_jitsiApi){
+    // Fallback: embed as iframe directly
+    container.innerHTML=`<iframe src="https://meet.jit.si/${_jitsiRoom}#config.prejoinPageEnabled=false&config.startWithVideoMuted=false&userInfo.displayName=Viewer" style="width:100%;height:100%;border:none" allow="camera;microphone;fullscreen"></iframe>`;
   }
+
+  toast('📡 Conectando al live…');
+
+  // Increment viewer count
+  fsGet('streams',channelName).then(doc=>{
+    const v=(doc?.viewerCount||0)+1;
+    fsSet('streams',channelName,{viewerCount:v});
+  }).catch(()=>{});
 }
 
 async function joinAsHost(channelName){
-  if(typeof AgoraRTC==='undefined'){toast('⚠️ SDK de stream no disponible');return;}
-  try{
-    // Stop getUserMedia preview
-    if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}
-    await leaveAgoraChannel();
-    agoraClient=AgoraRTC.createClient({mode:'live',codec:'h264'});
-    await agoraClient.setClientRole('host');
-    await agoraClient.join(AGORA_APP_ID, channelName, AGORA_TEMP_TOKEN, null);
-    agoraJoined=true;
-    // Create tracks
-    [agoraLocalAudio,agoraLocalVideo]=await AgoraRTC.createMicrophoneAndCameraTracks(
-      {encoderConfig:'music_standard'},
-      {encoderConfig:'720p_1',facingMode}
-    );
-    // Show in broadcast screen
-    const bcHtml=document.getElementById('bc-video');
-    if(bcHtml)bcHtml.style.display='none';
-    const bcAgora=document.getElementById('bc-agora-video');
-    if(bcAgora){bcAgora.style.display='block';agoraLocalVideo.play(bcAgora);}
-    await agoraClient.publish([agoraLocalAudio,agoraLocalVideo]);
-    toast('📡 ¡Estás en vivo!');
-  }catch(e){
-    console.error('Agora host:',e);
-    const msg=e.message||'';
-    if(msg.includes('CAN_NOT_GET_GATEWAY')||msg.includes('token')||msg.includes('dynamic key')){
-      toast('⚠️ Token de Agora expirado — desactiva el App Certificate en console.agora.io');
-    } else if(msg.includes('NOT_SUPPORTED')||msg.includes('MEDIA_NOT_SUPPORT')){
-      toast('⚠️ Cámara no disponible — verifica permisos');
-    } else {
-      toast('⚠️ Error al iniciar live: '+msg.slice(0,60));
-    }
-    const btn=document.getElementById('gl-go-btn');
-    if(btn){btn.textContent='Empezar en Vivo';btn.disabled=false;}
+  _leaveJitsi();
+  _jitsiRoom=_jitsiRoomName(channelName);
+
+  // Stop preview camera (Jitsi will open its own)
+  if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}
+
+  const bcHtml=document.getElementById('bc-video');
+  if(bcHtml) bcHtml.style.display='none';
+
+  const bcAgora=document.getElementById('bc-agora-video');
+  if(bcAgora){
+    bcAgora.style.display='block';
+    bcAgora.style.background='#000';
   }
+
+  _jitsiApi=_makeJitsiApi(_jitsiRoom,'bc-agora-video',true);
+  if(!_jitsiApi){
+    // Fallback iframe
+    if(bcAgora) bcAgora.innerHTML=`<iframe src="https://meet.jit.si/${_jitsiRoom}#config.prejoinPageEnabled=false&config.startWithVideoMuted=false" style="width:100%;height:100%;border:none" allow="camera;microphone;fullscreen"></iframe>`;
+  } else {
+    // Hide Jitsi's own toolbar overlap with bc controls — handled via interfaceConfig
+    _jitsiApi.addEventListeners({
+      videoConferenceJoined: ()=>{
+        toast('📡 ¡Estás en vivo! Los viewers pueden entrar ahora');
+      },
+      participantJoined: (p)=>{
+        addBcMsg('👁️','Sistema',`Un viewer entró al live`);
+        const el=document.getElementById('bc-viewers');
+        if(el) el.textContent=parseInt(el.textContent||'1')+1;
+      },
+      participantLeft: ()=>{
+        const el=document.getElementById('bc-viewers');
+        if(el) el.textContent=Math.max(1,parseInt(el.textContent||'2')-1);
+      }
+    });
+  }
+
+  toast('🎥 Iniciando cámara…');
 }
 
 // Init go-live screen
@@ -5128,19 +5691,8 @@ async function startCamera(){
 
 function flipCamera(){
   facingMode=facingMode==='user'?'environment':'user';
-  // If broadcasting with Agora, recreate the video track
-  if(agoraJoined && agoraLocalVideo){
-    agoraLocalVideo.stop();agoraLocalVideo.close();
-    AgoraRTC.createCameraVideoTrack({encoderConfig:'720p_1',facingMode}).then(async track=>{
-      agoraLocalVideo=track;
-      const bc=document.getElementById('bc-agora-video');
-      if(bc)agoraLocalVideo.play(bc);
-      await agoraClient.unpublish();
-      await agoraClient.publish([agoraLocalAudio,agoraLocalVideo]);
-    }).catch(e=>toast('⚠️ Error al voltear cámara'));
-  } else {
-    startCamera();
-  }
+  // Jitsi handles camera switching internally; for preview just restart
+  startCamera();
 }
 
 function stopCamera(){
@@ -5619,9 +6171,9 @@ function cycleBcProd(){
 
 function toggleMute(){
   isMuted=!isMuted;
-  // Agora track mute
-  if(agoraLocalAudio){agoraLocalAudio.setEnabled(!isMuted);}
-  // Fallback: getUserMedia mute
+  // Jitsi mute
+  if(_jitsiApi){ try{_jitsiApi.executeCommand('toggleAudio');}catch(e){} }
+  // Fallback camera stream
   if(cameraStream){cameraStream.getAudioTracks().forEach(t=>t.enabled=!isMuted);}
   const btn=document.getElementById('bc-mute-btn');
   if(btn){
@@ -6662,6 +7214,10 @@ async function _adminLoadDeps(){
   listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu);font-size:12px">⏳ Cargando depósitos...</div>';
   try{
     const deps=await fsQuery('deposit_requests');
+    if(deps===null || deps===undefined){
+      listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--rd);font-size:12px">❌ Error de permisos — verifica las reglas de Firestore<br><br><button onclick="_adminLoadDeps()" style="background:var(--dk3);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 16px;color:var(--tx);font-family:\'Nunito\',sans-serif;cursor:pointer">🔄 Reintentar</button></div>';
+      return;
+    }
     deps.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
     const pending=deps.filter(d=>d.status==='pending');
     const approved=deps.filter(d=>d.status==='approved');
@@ -6717,8 +7273,8 @@ async function _adminLoadDeps(){
         </div>`:''}
       </div>`).join('');
   }catch(e){
-    listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu)">Error al cargar</div>';
-    console.warn('admin deps:',e);
+    console.warn('admin deps error:',e);
+    listEl.innerHTML=`<div style="text-align:center;padding:32px;color:var(--rd)"><div style="font-size:32px;margin-bottom:10px">⚠️</div><div style="font-size:12px;font-weight:800;margin-bottom:6px">Error al cargar depósitos</div><div style="font-size:11px;color:var(--mu);margin-bottom:14px">${e.message||'Verifica las reglas de Firestore'}</div><button onclick="_adminLoadDeps()" style="background:var(--dk3);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 16px;color:var(--tx);font-family:'Nunito',sans-serif;cursor:pointer">🔄 Reintentar</button></div>`;
   }
 }
 
