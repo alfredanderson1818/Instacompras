@@ -16,7 +16,7 @@
 <meta name="description" content="Marketplace de live shopping venezolano — compra y subasta en tiempo real">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://meet.jit.si/external_api.js" async defer></script>
+<script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.0.js" defer></script>
 <script>
 // ═══ FIREBASE REST API — sin SDK externo ═══
 const FB={
@@ -5488,14 +5488,14 @@ let cameraStream=null, facingMode='user', bcTimerIv=null, bcSecs=0;
 let bcProdIdx=0, bcSelectedProds=[], bcViewerIv=null, bcChatIv=null;
 let isMuted=false;
 
-// ═══ VIDEO RTC — JITSI (gratis, sin tokens) ═══
-// Jitsi Meet funciona sin servidor propio, sin App Certificate, sin límites.
-// Cada "canal" es una room única en meet.jit.si
-let _jitsiApi = null;
-let _jitsiRoom = '';
+// ═══ AGORA RTC ═══
+const AGORA_APP_ID='9f936ae4a49b4158bca1b2e017eb82b9';
+const AGORA_TOKEN=null; // App Certificate desactivado — no se necesita token
+let agoraClient=null, agoraJoined=false;
+let agoraLocalVideo=null, agoraLocalAudio=null;
 
 function getChannelForSeller(idx){
-  return 'InstaCompras-ic-'+idx;
+  return 'ic_'+idx;
 }
 function getMySellerIdx(){
   if(!window.fbUser)return 0;
@@ -5504,137 +5504,91 @@ function getMySellerIdx(){
   return idx>=0?idx:0;
 }
 
-function _jitsiRoomName(channelName){
-  // Jitsi room names: alphanumeric + hyphens, no spaces
-  return ('InstaCompras-'+channelName).replace(/[^a-zA-Z0-9-]/g,'-');
-}
-
 async function leaveAgoraChannel(){
-  // Compat alias
-  _leaveJitsi();
+  try{
+    if(agoraLocalVideo){agoraLocalVideo.stop();agoraLocalVideo.close();agoraLocalVideo=null;}
+    if(agoraLocalAudio){agoraLocalAudio.stop();agoraLocalAudio.close();agoraLocalAudio=null;}
+    if(agoraClient&&agoraJoined){
+      const ch=window._currentStreamChannel;
+      if(ch){fsGet('streams',ch).then(doc=>{const v=Math.max(0,(doc?.viewerCount||1)-1);fsSet('streams',ch,{viewerCount:v});}).catch(()=>{});}
+      await agoraClient.leave();agoraJoined=false;
+    }
+    agoraClient=null;
+  }catch(e){console.warn('Agora leave:',e);}
   const sv=document.getElementById('sv-agora-video');
   if(sv){sv.style.display='none';sv.innerHTML='';}
   const bc=document.getElementById('bc-agora-video');
   if(bc){bc.style.display='none';bc.innerHTML='';}
 }
 
-function _leaveJitsi(){
-  if(_jitsiApi){
-    try{_jitsiApi.dispose();}catch(e){}
-    _jitsiApi=null;
-  }
-  _jitsiRoom='';
-}
-
-function _makeJitsiApi(room, containerId, isHost){
-  if(typeof JitsiMeetExternalAPI==='undefined'){
-    console.warn('Jitsi API no cargada aún');
-    return null;
-  }
-  const container=document.getElementById(containerId);
-  if(!container) return null;
-
-  const displayName=window.fbUser?.name||window.fbUser?.username||(isHost?'Vendedor':'Viewer');
-
-  const api=new JitsiMeetExternalAPI('meet.jit.si',{
-    roomName: room,
-    parentNode: container,
-    width: '100%',
-    height: '100%',
-    userInfo:{displayName},
-    configOverwrite:{
-      startWithAudioMuted: false,
-      startWithVideoMuted: false,
-      disableDeepLinking: true,
-      prejoinPageEnabled: false,          // entrar directo sin pantalla previa
-      disableInviteFunctions: true,
-      toolbarButtons: isHost
-        ? ['microphone','camera','hangup','tileview']
-        : ['microphone','hangup'],
-      notifications: [],
-      subject: isHost ? '🔴 InstaCompras LIVE' : '',
-    },
-    interfaceConfigOverwrite:{
-      TOOLBAR_ALWAYS_VISIBLE: true,
-      DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
-      SHOW_JITSI_WATERMARK: false,
-      SHOW_BRAND_WATERMARK: false,
-      SHOW_POWERED_BY: false,
-      MOBILE_APP_PROMO: false,
-    }
-  });
-
-  return api;
-}
-
 async function joinAsAudience(channelName){
   window._currentStreamChannel=channelName;
-  _leaveJitsi();
-  _jitsiRoom=_jitsiRoomName(channelName);
-
-  const container=document.getElementById('sv-agora-video');
-  if(!container) return;
-  container.style.display='block';
-  container.style.background='#000';
-
-  // Hide placeholder image
-  const img=document.getElementById('sv-img');
-  if(img) img.style.opacity='0';
-
-  _jitsiApi=_makeJitsiApi(_jitsiRoom,'sv-agora-video',false);
-  if(!_jitsiApi){
-    // Fallback: embed as iframe directly
-    container.innerHTML=`<iframe src="https://meet.jit.si/${_jitsiRoom}#config.prejoinPageEnabled=false&config.startWithVideoMuted=false&userInfo.displayName=Viewer" style="width:100%;height:100%;border:none" allow="camera;microphone;fullscreen"></iframe>`;
+  if(typeof AgoraRTC==='undefined'){toast('⚠️ SDK de stream no disponible');return;}
+  try{
+    await leaveAgoraChannel();
+    agoraClient=AgoraRTC.createClient({mode:'live',codec:'h264'});
+    await agoraClient.setClientRole('audience');
+    await agoraClient.join(AGORA_APP_ID, channelName, AGORA_TOKEN, null);
+    agoraJoined=true;
+    agoraClient.on('user-published', async(user,mediaType)=>{
+      await agoraClient.subscribe(user,mediaType);
+      if(mediaType==='video'){
+        const container=document.getElementById('sv-agora-video');
+        if(container){container.style.display='block';user.videoTrack.play(container);}
+        const img=document.getElementById('sv-img');
+        if(img)img.style.opacity='0';
+      }
+      if(mediaType==='audio'){user.audioTrack.play();}
+    });
+    agoraClient.on('user-unpublished',(user,mediaType)=>{
+      if(mediaType==='video'){
+        const container=document.getElementById('sv-agora-video');
+        if(container){container.style.display='none';container.innerHTML='';}
+        const img=document.getElementById('sv-img');
+        if(img)img.style.opacity='1';
+      }
+    });
+    toast('📡 Conectado al live');
+    fsGet('streams',channelName).then(doc=>{
+      const v=(doc?.viewerCount||0)+1;
+      fsSet('streams',channelName,{viewerCount:v});
+    }).catch(()=>{});
+  }catch(e){
+    console.error('Agora audience:',e);
+    toast('⚠️ No se pudo conectar al stream');
   }
-
-  toast('📡 Conectando al live…');
-
-  // Increment viewer count
-  fsGet('streams',channelName).then(doc=>{
-    const v=(doc?.viewerCount||0)+1;
-    fsSet('streams',channelName,{viewerCount:v});
-  }).catch(()=>{});
 }
 
 async function joinAsHost(channelName){
-  _leaveJitsi();
-  _jitsiRoom=_jitsiRoomName(channelName);
-
-  // Stop preview camera (Jitsi will open its own)
-  if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}
-
-  const bcHtml=document.getElementById('bc-video');
-  if(bcHtml) bcHtml.style.display='none';
-
-  const bcAgora=document.getElementById('bc-agora-video');
-  if(bcAgora){
-    bcAgora.style.display='block';
-    bcAgora.style.background='#000';
+  if(typeof AgoraRTC==='undefined'){toast('⚠️ SDK de stream no disponible');return;}
+  try{
+    if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}
+    await leaveAgoraChannel();
+    agoraClient=AgoraRTC.createClient({mode:'live',codec:'h264'});
+    await agoraClient.setClientRole('host');
+    await agoraClient.join(AGORA_APP_ID, channelName, AGORA_TOKEN, null);
+    agoraJoined=true;
+    [agoraLocalAudio,agoraLocalVideo]=await AgoraRTC.createMicrophoneAndCameraTracks(
+      {encoderConfig:'music_standard'},
+      {encoderConfig:'720p_1',facingMode}
+    );
+    const bcHtml=document.getElementById('bc-video');
+    if(bcHtml)bcHtml.style.display='none';
+    const bcAgora=document.getElementById('bc-agora-video');
+    if(bcAgora){bcAgora.style.display='block';agoraLocalVideo.play(bcAgora);}
+    await agoraClient.publish([agoraLocalAudio,agoraLocalVideo]);
+    toast('📡 ¡Estás en vivo!');
+  }catch(e){
+    console.error('Agora host:',e);
+    const msg=e.message||'';
+    if(msg.includes('NOT_SUPPORTED')||msg.includes('MEDIA_NOT_SUPPORT')){
+      toast('⚠️ Cámara no disponible — verifica permisos');
+    } else {
+      toast('⚠️ Error al iniciar live: '+msg.slice(0,80));
+    }
+    const btn=document.getElementById('gl-go-btn');
+    if(btn){btn.textContent='Empezar en Vivo';btn.disabled=false;}
   }
-
-  _jitsiApi=_makeJitsiApi(_jitsiRoom,'bc-agora-video',true);
-  if(!_jitsiApi){
-    // Fallback iframe
-    if(bcAgora) bcAgora.innerHTML=`<iframe src="https://meet.jit.si/${_jitsiRoom}#config.prejoinPageEnabled=false&config.startWithVideoMuted=false" style="width:100%;height:100%;border:none" allow="camera;microphone;fullscreen"></iframe>`;
-  } else {
-    // Hide Jitsi's own toolbar overlap with bc controls — handled via interfaceConfig
-    _jitsiApi.addEventListeners({
-      videoConferenceJoined: ()=>{
-        toast('📡 ¡Estás en vivo! Los viewers pueden entrar ahora');
-      },
-      participantJoined: (p)=>{
-        addBcMsg('👁️','Sistema',`Un viewer entró al live`);
-        const el=document.getElementById('bc-viewers');
-        if(el) el.textContent=parseInt(el.textContent||'1')+1;
-      },
-      participantLeft: ()=>{
-        const el=document.getElementById('bc-viewers');
-        if(el) el.textContent=Math.max(1,parseInt(el.textContent||'2')-1);
-      }
-    });
-  }
-
-  toast('🎥 Iniciando cámara…');
 }
 
 // Init go-live screen
@@ -5691,8 +5645,18 @@ async function startCamera(){
 
 function flipCamera(){
   facingMode=facingMode==='user'?'environment':'user';
-  // Jitsi handles camera switching internally; for preview just restart
-  startCamera();
+  if(agoraJoined&&agoraLocalVideo){
+    agoraLocalVideo.stop();agoraLocalVideo.close();
+    AgoraRTC.createCameraVideoTrack({encoderConfig:'720p_1',facingMode}).then(async track=>{
+      agoraLocalVideo=track;
+      const bc=document.getElementById('bc-agora-video');
+      if(bc)agoraLocalVideo.play(bc);
+      await agoraClient.unpublish();
+      await agoraClient.publish([agoraLocalAudio,agoraLocalVideo]);
+    }).catch(()=>toast('⚠️ Error al voltear cámara'));
+  } else {
+    startCamera();
+  }
 }
 
 function stopCamera(){
@@ -6171,9 +6135,7 @@ function cycleBcProd(){
 
 function toggleMute(){
   isMuted=!isMuted;
-  // Jitsi mute
-  if(_jitsiApi){ try{_jitsiApi.executeCommand('toggleAudio');}catch(e){} }
-  // Fallback camera stream
+  if(agoraLocalAudio){agoraLocalAudio.setEnabled(!isMuted);}
   if(cameraStream){cameraStream.getAudioTracks().forEach(t=>t.enabled=!isMuted);}
   const btn=document.getElementById('bc-mute-btn');
   if(btn){
