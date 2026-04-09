@@ -3133,28 +3133,6 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 // ═══ DATA ═══
 const BG=['bgb','bgp','bgt','bgr'];
 // Real Unsplash images (reliable, no CORS)
-const IMGS={
-  jordan:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80',
-  iphone:'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80',
-  dress:'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400&q=80',
-  gamepad:'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=400&q=80',
-  makeup:'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&q=80',
-  heels:'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80',
-  watch:'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80',
-  kitchen:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&q=80',
-  soccer:'https://images.unsplash.com/photo-1551958219-acbc595b2e36?w=400&q=80',
-  books:'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&q=80',
-  perfume:'https://images.unsplash.com/photo-1541643600914-78b084683702?w=400&q=80',
-  ring:'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&q=80',
-  pan:'https://images.unsplash.com/photo-1556909045-b2d745b37db5?w=400&q=80',
-  baby:'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&q=80',
-  car:'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400&q=80',
-  dog:'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&q=80',
-  headphones:'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80',
-  art:'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=400&q=80',
-  gym:'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80',
-  sale:'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&q=80',
-};
 const SELLERS=[
   {n:'MarisolShop',e:'👠',cat:'Calzado',v:389,p:120,f:'12.4k'},
   {n:'TechVentas',e:'💻',cat:'Tecnología',v:127,p:45,f:'8.2k'},
@@ -3600,7 +3578,6 @@ function expSearch(q){
 }
 
 function buildSellers(q){buildExpScreen();}
-function filterS(q){expSearch(q);}
 
 
 function buildCoPays(){
@@ -3768,7 +3745,6 @@ function likeStream(){
   toast('❤️ ¡Te gustó el stream!');
 }
 function shareStream(){toast('🔗 Link copiado al portapapeles');}
-function bcAddItem(){ bcShowItemPanel(); }
 function quickAdd(pi){
   if(requireAccount('🛒','Para comprar necesitas cuenta','Crea tu cuenta gratis y compra en vivo al instante.'))return;
   addItem(pi,PRODS[pi].sz[0],1);animateCartBadge();toast(`✅ ${PRODS[pi].n} al carrito`);
@@ -3804,14 +3780,6 @@ const PD_VIDEOS={
   headphones:'https://www.youtube.com/embed/jLpYPFnFNBE?autoplay=1&mute=1&loop=1&controls=0&modestbranding=1&playsinline=1&rel=0',
   default:'https://www.youtube.com/embed/LMDSxzTjMM4?autoplay=1&mute=1&loop=1&controls=0&modestbranding=1&playsinline=1&rel=0'
 };
-function pdGetVideo(p){
-  const n=p.n.toLowerCase();
-  if(n.includes('playstation')||n.includes('ps5'))return PD_VIDEOS.ps5;
-  if(n.includes('iphone'))return PD_VIDEOS.iphone;
-  if(n.includes('jordan')||n.includes('nike'))return PD_VIDEOS.jordan;
-  if(n.includes('sony')||n.includes('xm5')||n.includes('auricular')||n.includes('headphone'))return PD_VIDEOS.headphones;
-  return PD_VIDEOS.default;
-}
 function openProd(idx){
   curProd=idx;qty=1;curSz=PRODS[idx].sz[0];
   const p=PRODS[idx];const s=SELLERS[p.s];
@@ -3864,8 +3832,6 @@ function openProd(idx){
   }
   go('prod');
 }
-function chgQty(d){qty=Math.max(1,Math.min(10,qty+d));}
-function selSz(btn,v){curSz=v;}
 function openSellerShop(){
   // Navigate to current stream's seller profile
   if(curStream!==null&&curStream>=0){
@@ -3883,7 +3849,6 @@ function toggleWish(){
   toast(wish.has(curProd)?'❤️ Guardado en favoritos':'💔 Eliminado de favoritos');
 }
 function addCart(){if(curProd===null)return;addItem(curProd,curSz,qty);animateCartBadge();toast(`✅ ${PRODS[curProd].n} (x${qty}) al carrito`);}
-function buyNow(){if(curProd===null)return;addItem(curProd,curSz,qty);go('co');updateCo();}
 
 // ═══ CART ═══
 function addItem(pi,size,q){
@@ -4064,13 +4029,11 @@ function filterCat(el){
   const k=t.split(' ').slice(1).join('').toLowerCase();
   buildGrid(PRODS.filter(p=>SELLERS[p.s].cat.toLowerCase().includes(k)||p.n.toLowerCase().includes(k)));
 }
-function filterS(q){buildSellers(q);}
 function homeSearch(q){
   if(!q){buildGrid();return;}
   buildGrid(PRODS.filter(p=>p.n.toLowerCase().includes(q.toLowerCase())||SELLERS[p.s].n.toLowerCase().includes(q.toLowerCase())));
 }
 // ═══ CHAT REAL ═══
-const AVTS=['😊','🧑','👩','🧔','💁','😎','🤩','🥳','😄'];
 const NAMES=['carlos.VE','luisa_mpn','andres22','yoli_shop','el_pana99','cristi_vzla','pedro_mcs','marleny07','rosmary.ve'];
 const MSGS=['¡Qué precio! 🔥','¿Envían a Valencia?','A1 👌','¿Tienen más tallas?','¡Comprando ahora!','¡Chévere! 🇻🇪','¿Acepta Pago Móvil?','¡Los quiero! 😍','¿Cuánto stock?','¡Oferta increíble! 💯','¿Envían a Maracaibo?','¡Bien chulas! 🍊','¡Dale que sí! ✅'];
 let _chatPollIv=null;
@@ -4807,8 +4770,6 @@ function walletSelPay(i){
 }
 function walletSetAmount(v){document.getElementById('wallet-amount').value=v;walletUpdatePreview();}
 function walletUpdatePreview(){const v=parseFloat(document.getElementById('wallet-amount').value)||0;document.getElementById('wallet-credits-preview').innerHTML=`Recibirás <strong style="color:var(--y)">${v} créditos</strong>`;}
-function walletShowDeposit(){go('deposit');}
-function walletDeposit(){go('deposit');}
 
 // ═══ DEPOSIT PAGE ═══
 function openDeposit(){
@@ -5356,21 +5317,6 @@ function authMode(mode){
   // scroll to top
   document.getElementById('s-register').scrollTop=0;
 }
-function setAccType(type){
-  accType=type;
-  const b=document.getElementById('type-buyer');
-  const s=document.getElementById('type-seller');
-  const sf=document.getElementById('seller-fields');
-  if(type==='buyer'){
-    b.style.borderColor='rgba(255,208,0,.5)';b.children[1].style.color='var(--y)';
-    s.style.borderColor='rgba(255,255,255,.06)';s.children[1].style.color='var(--mu)';
-    sf.style.display='none';
-  } else {
-    s.style.borderColor='rgba(255,208,0,.5)';s.children[1].style.color='var(--y)';
-    b.style.borderColor='rgba(255,255,255,.06)';b.children[1].style.color='var(--mu)';
-    sf.style.display='';
-  }
-}
 function doLogin(){
   const email=document.getElementById('login-email').value.trim();
   const pass=document.getElementById('login-pass').value.trim();
@@ -5489,7 +5435,6 @@ function regSubmit(){
       toast(msgs[e.code]||'❌ '+(e.message||'Error al registrar'));
     });
 }
-function regLogin(){authMode('login');}
 
 // ═══ GO LIVE ═══
 let cameraStream=null, facingMode='user', bcTimerIv=null, bcSecs=0;
@@ -5624,16 +5569,6 @@ function initGoLive(){
 function glSelCat(el){
   document.querySelectorAll('#gl-cats .gl-chip').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
-}
-function glToggleProd(idx,el){
-  if(bcSelectedProds.includes(idx)){
-    if(bcSelectedProds.length===1)return; // keep at least 1
-    bcSelectedProds=bcSelectedProds.filter(i=>i!==idx);
-    el.classList.remove('on');
-  } else {
-    bcSelectedProds.push(idx);
-    el.classList.add('on');
-  }
 }
 
 async function startCamera(){
@@ -5901,19 +5836,6 @@ async function bcCancelFixedSale(){
 }
 
 // Called from Firestore polling when a buyer purchases
-function _bcOnSalePurchase(buyerName, qtyLeft){
-  _bcSaleQtyLeft = qtyLeft;
-  _updateBcSaleQtyBadge(qtyLeft);
-  const saleItemName = document.getElementById('bc-sale-name-display')?.textContent||'item';
-  addBcMsg('🛒', buyerName||'Comprador', `¡Compró "${saleItemName}"! 🔥`);
-  toast(`🛒 ${buyerName} compró — quedan ${qtyLeft}`);
-  if(qtyLeft<=0){
-    setTimeout(()=>{
-      document.getElementById('bc-sale-overlay').style.display='none';
-      _bcActiveSaleId=null;
-    },3000);
-  }
-}
 
 // ═══ FIXED PRICE SALE — BUYER SIDE ═══
 let _currentFixedSaleId  = null;
@@ -6134,12 +6056,6 @@ function updateBcProd(){
   if(pp)pp.textContent=`$${p.p}`;
 }
 
-function cycleBcProd(){
-  const idx=bcSelectedProds.indexOf(bcProdIdx);
-  bcProdIdx=bcSelectedProds[(idx+1)%bcSelectedProds.length];
-  updateBcProd();
-  toast(`🛍️ Mostrando: ${PRODS[bcProdIdx].n}`);
-}
 
 function toggleMute(){
   isMuted=!isMuted;
@@ -6452,13 +6368,6 @@ const RT_NOTIFS=[
 ];
 let rtIdx=0;
 
-function fireRealTimeNotif(){
-  const m=RT_NOTIFS[rtIdx%RT_NOTIFS.length];
-  rtIdx++;
-  pushNotif(m.icon,m.type,m.text,m.action);
-  // Also show an in-app toast banner (non-intrusive)
-  showNotifBanner(m.icon, m.text, m.action);
-}
 
 function showNotifBanner(icon, text, action){
   // Only show if not on notif screen
@@ -6871,28 +6780,6 @@ _ORDER.forEach((idx,i)=>{if(i<PRODS.length&&idx<_origProds.length)PRODS[i]=_orig
 
 // ═══ AUCTION COUNTDOWN TIMER ═══
 let _auctionTiv=null;
-function startAuctionTimer(){
-  clearInterval(_auctionTiv);
-  let secs=180; // 3 minutos
-  const el=document.getElementById('pd-auction-timer');
-  if(!el)return;
-  function tick(){
-    if(secs<=0){
-      clearInterval(_auctionTiv);
-      if(el)el.textContent='0:00';
-      return;
-    }
-    secs--;
-    const m=~~(secs/60);
-    const s=String(secs%60).padStart(2,'0');
-    if(el)el.textContent=m+':'+s;
-    // Rojo pulsante cuando queda menos de 30s
-    const btn=document.getElementById('pd-auction-btn');
-    if(btn&&secs<30){btn.style.borderColor='rgba(255,59,59,.9)';}
-  }
-  tick();
-  _auctionTiv=setInterval(tick,1000);
-}
 
 // ═══ SIMULADOR LIVE STREAM (página producto) ═══
 let _pdChatIv=null,_pdHeartIv=null,_pdViewIv=null;
