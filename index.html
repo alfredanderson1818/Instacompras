@@ -658,28 +658,39 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .srp{font-size:10px;color:var(--mu)}
 
 /* ═══ PROFILE ═══ */
+/* ═══ PROFILE PAGE v2 ═══ */
 #s-prof{background:var(--dk)}
-.prof-banner{height:110px;background:linear-gradient(135deg,#111128,#0d1f4e,#111128);position:relative;flex-shrink:0}
-.prof-edit-banner{position:absolute;bottom:9px;right:12px;background:rgba(0,0,0,.5);border:none;border-radius:18px;padding:4px 10px;font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;color:#fff;cursor:pointer}
-.prof-body{padding:0 16px 16px;position:relative}
-.prof-av{position:absolute;top:-34px;left:16px;width:68px;height:68px;border-radius:50%;background:var(--y);display:flex;align-items:center;justify-content:center;font-size:33px;border:3px solid var(--dk);overflow:hidden;cursor:pointer}.prof-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}.prof-av-edit{position:absolute;top:-34px;left:16px;width:68px;height:68px;border-radius:50%;display:flex;align-items:flex-end;justify-content:center;cursor:pointer;z-index:2;padding-bottom:4px}.prof-av-edit-btn{background:rgba(0,0,0,.65);border-radius:20px;padding:2px 7px;font-size:9px;font-weight:800;color:#fff;backdrop-filter:blur(4px)}
-.prof-btns{display:flex;justify-content:flex-end;padding-top:9px;margin-bottom:32px;gap:7px}
-.prof-btn{background:var(--dk3);border:1.5px solid rgba(255,255,255,.09);border-radius:18px;padding:6px 14px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;color:var(--tx);cursor:pointer;transition:all .15s}
-.prof-btn:hover{border-color:rgba(255,208,0,.4);color:var(--y)}
-.prof-name{font-family:'Bebas Neue',sans-serif;font-size:26px;margin-bottom:2px;letter-spacing:.3px}
-.prof-handle{font-size:12px;color:var(--mu);margin-bottom:13px}
-.prof-stats{display:flex;background:var(--dk3);border-radius:11px;overflow:hidden;border:1px solid rgba(255,255,255,.05);margin-bottom:14px}
-.pst{flex:1;padding:11px 8px;text-align:center;border-right:1px solid rgba(255,255,255,.05)}
-.pst:last-child{border-right:none}
-.pstn{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--y);line-height:1}
-.pstl{font-size:9px;color:var(--mu);font-weight:700;margin-top:2px}
-.pmenu{display:flex;flex-direction:column}
-.pmi{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:all .15s}
-.pmi:hover .pmil{color:var(--y)}
-.pmic{width:36px;height:36px;border-radius:9px;background:var(--dk3);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
-.pmil{font-size:13px;font-weight:700;flex:1;transition:color .15s}
-.pmia{color:var(--mu);font-size:17px}
-.pmib{background:var(--y);color:var(--dk);font-size:9px;font-weight:900;padding:2px 7px;border-radius:9px}
+.prof2-top{display:flex;align-items:flex-end;justify-content:space-between;padding:0 16px;margin-top:-46px;margin-bottom:12px;position:relative;z-index:5}
+.prof2-av{width:88px;height:88px;border-radius:50%;border:4px solid var(--dk);overflow:hidden;background:var(--dk3);display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+.prof2-av-edit{position:absolute;bottom:2px;right:2px;width:24px;height:24px;border-radius:50%;background:var(--y);border:2px solid var(--dk);display:flex;align-items:center;justify-content:center}
+.prof2-actions{display:flex;gap:8px;padding-bottom:4px}
+.prof2-edit-btn{background:var(--dk3);border:1.5px solid rgba(255,255,255,.12);border-radius:11px;padding:9px 16px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s}
+.prof2-edit-btn:active{background:var(--dk4)}
+.prof2-info{padding:0 16px 14px}
+.prof2-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.3px;line-height:1;color:#fff;margin-bottom:5px}
+.prof2-meta{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.prof2-handle{font-size:13px;color:var(--mu);font-weight:700}
+.prof2-type-badge{background:rgba(255,208,0,.12);border:1px solid rgba(255,208,0,.25);border-radius:20px;padding:2px 9px;font-size:9px;font-weight:900;color:var(--y);letter-spacing:.4px;text-transform:uppercase}
+.prof2-bio{font-size:12px;color:rgba(255,255,255,.45);line-height:1.6}
+.prof2-stats{display:flex;align-items:center;margin:0 16px 20px;background:var(--dk3);border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden}
+.prof2-stat{flex:1;padding:15px 6px;text-align:center}
+.prof2-stat-n{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--y);line-height:1;letter-spacing:.3px}
+.prof2-stat-l{font-size:9px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+.prof2-stat-div{width:1px;height:36px;background:rgba(255,255,255,.07);flex-shrink:0}
+.prof2-section{padding:0 16px 4px}
+.prof2-section-label{font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;margin-top:8px}
+.prof2-menu{background:var(--dk2);border-radius:16px;border:1px solid rgba(255,255,255,.06);overflow:hidden;margin-bottom:10px}
+.prof2-item{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;transition:background .15s;border-bottom:1px solid rgba(255,255,255,.04)}
+.prof2-item:last-child{border-bottom:none}
+.prof2-item:active{background:rgba(255,255,255,.03)}
+.prof2-item-ico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.prof2-item-text{flex:1;font-size:14px;font-weight:700;color:var(--tx)}
+.prof2-item-badge{background:rgba(255,208,0,.12);color:var(--y);border-radius:8px;padding:3px 8px;font-size:11px;font-weight:800}
+.prof2-item-badge-dim{background:rgba(255,255,255,.07);color:var(--tx2)}
+.prof2-item-arrow{color:var(--mu);font-size:18px;font-weight:300}
+.prof2-item-highlight{background:rgba(255,208,0,.04)}
+.prof2-logout{display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,59,59,.06);border:1px solid rgba(255,59,59,.14);border-radius:14px;cursor:pointer;font-size:14px;font-weight:800;color:var(--rd);transition:background .15s}
+.prof2-logout:active{background:rgba(255,59,59,.1)}
 
 /* ═══ SELLER PROFILE ═══ */
 /* ═══ SELLER PAGE v2 — REDISEÑO COMPLETO ═══ */
@@ -2123,160 +2134,175 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
   <div class="sb" style="padding-bottom:calc(88px + var(--sab))">
 
-    <!-- BANNER — SVG gradient default, no external URL -->
+    <!-- BANNER -->
     <div id="prof-banner-wrap" style="position:relative;height:calc(160px + var(--sat));overflow:hidden;cursor:pointer" onclick="document.getElementById('prof-banner-input').click()">
       <div id="prof-banner-bg" style="position:absolute;inset:0;background:linear-gradient(135deg,#0a0a0f 0%,#1a1200 30%,#2a1e00 60%,#0f0a00 100%)">
-        <!-- Decorative SVG pattern -->
         <svg width="100%" height="100%" viewBox="0 0 430 160" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;opacity:.5">
           <defs>
             <radialGradient id="bg1" cx="80%" cy="30%"><stop offset="0%" stop-color="#FFD000" stop-opacity=".35"/><stop offset="100%" stop-color="#FFD000" stop-opacity="0"/></radialGradient>
-            <radialGradient id="bg2" cx="20%" cy="80%"><stop offset="0%" stop-color="#FF3B3B" stop-opacity=".2"/><stop offset="100%" stop-color="#FF3B3B" stop-opacity="0"/></radialGradient>
+            <radialGradient id="bg2" cx="20%" cy="80%"><stop offset="0%" stop-color="#FF3B3B" stop-opacity=".18"/><stop offset="100%" stop-color="#FF3B3B" stop-opacity="0"/></radialGradient>
           </defs>
           <rect width="430" height="160" fill="url(#bg1)"/>
           <rect width="430" height="160" fill="url(#bg2)"/>
-          <circle cx="340" cy="40" r="80" fill="none" stroke="rgba(255,208,0,.12)" stroke-width="1"/>
-          <circle cx="340" cy="40" r="120" fill="none" stroke="rgba(255,208,0,.07)" stroke-width="1"/>
-          <circle cx="80" cy="130" r="60" fill="none" stroke="rgba(255,59,59,.1)" stroke-width="1"/>
-          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="52" fill="rgba(255,208,0,.06)" letter-spacing="8">INSTACOMPRAS</text>
+          <circle cx="340" cy="40" r="90" fill="none" stroke="rgba(255,208,0,.1)" stroke-width="1"/>
+          <circle cx="80" cy="130" r="60" fill="none" stroke="rgba(255,208,0,.07)" stroke-width="1"/>
         </svg>
-        <img id="prof-banner-img" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none">
       </div>
-      <!-- Live badge top left -->
-      <div style="position:absolute;top:calc(var(--sat) + 12px);left:14px;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);border-radius:20px;padding:4px 10px;border:1px solid rgba(255,255,255,.1)">
-        <div style="width:6px;height:6px;border-radius:50%;background:var(--rd);animation:pulse-live 2s infinite"></div>
-        <span style="font-size:10px;font-weight:900;color:#fff;letter-spacing:1px" id="prof-type-badge">COMPRADOR</span>
-      </div>
-      <!-- Edit banner hint -->
-      <div style="position:absolute;bottom:10px;right:12px;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border-radius:8px;padding:4px 9px;font-size:10px;font-weight:700;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:4px">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      <img id="prof-banner-img" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none">
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(10,10,15,.8) 100%)"></div>
+      <!-- Camera icon hint -->
+      <div style="position:absolute;bottom:10px;right:12px;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);border-radius:8px;padding:5px 9px;font-size:10px;font-weight:700;color:rgba(255,255,255,.55);display:flex;align-items:center;gap:4px">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
         Cambiar portada
       </div>
     </div>
 
-    <!-- AVATAR + ACTIONS ROW -->
-    <div style="padding:0 16px;position:relative;margin-top:-44px;margin-bottom:12px;display:flex;align-items:flex-end;justify-content:space-between">
+    <!-- AVATAR + ACTIONS -->
+    <div class="prof2-top">
       <!-- Avatar -->
-      <div style="position:relative;cursor:pointer" onclick="document.getElementById('prof-av-input').click()">
-        <div id="prof-av" style="width:84px;height:84px;border-radius:50%;border:3px solid var(--dk);overflow:hidden;background:var(--dk3);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <div id="prof-av-initials" style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--y);letter-spacing:1px">?</div>
+      <div style="position:relative;cursor:pointer;flex-shrink:0" onclick="document.getElementById('prof-av-input').click()">
+        <div id="prof-av" class="prof2-av">
+          <div id="prof-av-initials" style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--y);letter-spacing:1px">?</div>
           <img id="prof-av-img" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;display:none">
         </div>
-        <div style="position:absolute;bottom:2px;right:2px;width:22px;height:22px;border-radius:50%;background:var(--y);border:2px solid var(--dk);display:flex;align-items:center;justify-content:center">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--dk)" stroke-width="3" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <div class="prof2-av-edit">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--dk)" stroke-width="3" stroke-linecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
         </div>
       </div>
-      <!-- Action buttons -->
-      <div style="display:flex;gap:8px;padding-bottom:4px">
-        <button onclick="openProfEdit()" style="background:var(--dk3);border:1.5px solid rgba(255,255,255,.12);border-radius:10px;padding:8px 14px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s">
+      <!-- Buttons -->
+      <div class="prof2-actions">
+        <button onclick="openProfEdit()" class="prof2-edit-btn">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          Editar
-        </button>
-        <button onclick="fbLogout()" style="background:rgba(255,59,59,.1);border:1.5px solid rgba(255,59,59,.25);border-radius:10px;padding:8px 14px;color:var(--rd);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-          Salir
+          Editar perfil
         </button>
       </div>
     </div>
 
-    <!-- NAME + HANDLE -->
-    <div style="padding:0 16px 14px">
-      <div class="prof-name" id="prof-name-display">—</div>
-      <div style="font-size:13px;color:var(--mu);font-weight:700;margin-bottom:8px" id="prof-handle-display">@—</div>
-      <div id="prof-bio-display" style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.55"></div>
+    <!-- NAME + TYPE + BIO -->
+    <div class="prof2-info">
+      <div class="prof2-name" id="prof-name-display">—</div>
+      <div class="prof2-meta">
+        <span class="prof2-handle" id="prof-handle-display">@—</span>
+        <span class="prof2-type-badge" id="prof-type-badge">Comprador</span>
+      </div>
+      <div class="prof2-bio" id="prof-bio-display"></div>
     </div>
 
     <!-- STATS -->
-    <div style="display:flex;margin:0 16px 16px;background:var(--dk3);border-radius:14px;border:1px solid rgba(255,255,255,.06);overflow:hidden">
-      <div style="flex:1;padding:14px 0;text-align:center;border-right:1px solid rgba(255,255,255,.06)">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y)" id="st-buy">0</div>
-        <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Compras</div>
+    <div class="prof2-stats">
+      <div class="prof2-stat">
+        <div class="prof2-stat-n" id="st-buy">0</div>
+        <div class="prof2-stat-l">Compras</div>
       </div>
-      <div style="flex:1;padding:14px 0;text-align:center;border-right:1px solid rgba(255,255,255,.06)">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y)" id="st-fol">0</div>
-        <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Siguiendo</div>
+      <div class="prof2-stat-div"></div>
+      <div class="prof2-stat">
+        <div class="prof2-stat-n" id="st-fol">0</div>
+        <div class="prof2-stat-l">Siguiendo</div>
       </div>
-      <div style="flex:1;padding:14px 0;text-align:center">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y)">$<span id="st-spent">0</span></div>
-        <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Gastado</div>
+      <div class="prof2-stat-div"></div>
+      <div class="prof2-stat">
+        <div class="prof2-stat-n">$<span id="st-spent">0</span></div>
+        <div class="prof2-stat-l">Gastado</div>
       </div>
     </div>
 
     <!-- MENU -->
-    <div style="padding:0 16px;display:flex;flex-direction:column;gap:8px">
+    <div class="prof2-section">
+      <div class="prof2-section-label">Mi cuenta</div>
+      <div class="prof2-menu">
 
-      <div style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px">Mi cuenta</div>
-
-      <div class="pmi" onclick="openWallet()" style="border-radius:13px">
-        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,208,0,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--y)" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+        <div class="prof2-item" onclick="openWallet()">
+          <div class="prof2-item-ico" style="background:rgba(255,208,0,.12)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--y)" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+          </div>
+          <div class="prof2-item-text">Mi Wallet</div>
+          <div class="prof2-item-badge" id="wallet-prof-badge">0 IC</div>
+          <div class="prof2-item-arrow">›</div>
         </div>
-        <div class="pmil">Mi Wallet</div>
-        <div class="pmib" id="wallet-prof-badge" style="background:rgba(255,208,0,.1);color:var(--y);border-radius:8px;padding:3px 8px;font-size:11px">0 IC</div>
-        <div class="pmia">›</div>
-      </div>
 
-      <div class="pmi" onclick="nav('cart')" style="border-radius:13px">
-        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--tx)" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+        <div class="prof2-item" onclick="nav('cart')">
+          <div class="prof2-item-ico" style="background:rgba(255,255,255,.07)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--tx2)" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+          </div>
+          <div class="prof2-item-text">Mi Carrito</div>
+          <div class="prof2-item-badge prof2-item-badge-dim" id="cart-prof-badge" style="display:none">0</div>
+          <div class="prof2-item-arrow">›</div>
         </div>
-        <div class="pmil">Mi Carrito</div>
-        <div class="pmib" id="cart-prof-badge" style="background:rgba(255,255,255,.07);border-radius:8px;padding:3px 8px;font-size:11px">0</div>
-        <div class="pmia">›</div>
-      </div>
 
-      <div class="pmi" onclick="openMyOrders()" style="border-radius:13px">
-        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--tx)" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        <div class="prof2-item" onclick="openMyOrders()">
+          <div class="prof2-item-ico" style="background:rgba(255,255,255,.07)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--tx2)" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          </div>
+          <div class="prof2-item-text">Mis Pedidos</div>
+          <div class="prof2-item-badge prof2-item-badge-dim" id="my-orders-badge" style="display:none"></div>
+          <div class="prof2-item-arrow">›</div>
         </div>
-        <div class="pmil">Mis Pedidos</div>
-        <div class="pmib" id="my-orders-badge" style="background:rgba(255,255,255,.07);border-radius:8px;padding:3px 8px;font-size:11px;display:none"></div>
-        <div class="pmia">›</div>
+
       </div>
-
-      <div id="seller-section-label" style="font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-top:6px;margin-bottom:2px;display:none">Vendedor</div>
-
-      <div class="pmi" id="dash-vendor-btn" onclick="openDash()" style="border-radius:13px;display:none">
-        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,208,0,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--y)" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-        </div>
-        <div class="pmil">Dashboard Vendedor</div>
-        <div class="pmia">›</div>
-      </div>
-
-      <div class="pmi" id="verif-menu-item" onclick="openVerifRequest()" style="border-radius:13px;display:none">
-        <div style="width:36px;height:36px;border-radius:10px;background:rgba(76,175,80,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">🪪</div>
-        <div class="pmil" id="verif-menu-label">Solicitar verificación</div>
-        <div class="pmia">›</div>
-      </div>
-
-      <!-- Upgrade to seller — only visible for buyers -->
-      <div class="pmi" id="upgrade-seller-btn" onclick="openSellerUpgrade()" style="border-radius:13px;display:none">
-        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,208,0,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">📡</div>
-        <div class="pmil" style="color:var(--y)">Quiero Vender en Vivo</div>
-        <div class="pmia" style="color:var(--y)">›</div>
-      </div>
-
-      <!-- Admin button — only visible for admin UID -->
-      <div id="admin-menu-btn" style="display:none" class="pmi" onclick="openAdmin()" style="border-radius:13px;background:rgba(255,208,0,.05);border:1px solid rgba(255,208,0,.15)">
-        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,208,0,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">⚡</div>
-        <div class="pmil" style="color:var(--y)">Panel Admin</div>
-        <div id="admin-menu-badge" style="display:none;background:var(--rd);color:#fff;font-size:10px;font-weight:900;padding:2px 8px;border-radius:20px"></div>
-        <div class="pmia">›</div>
-      </div>
-
-      <!-- Sign out -->
-      <div style="margin-top:10px;padding:14px 16px;background:rgba(255,59,59,.06);border:1px solid rgba(255,59,59,.15);border-radius:13px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="fbLogout()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--rd)" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-        <div style="flex:1;font-size:14px;font-weight:800;color:var(--rd)">Cerrar sesión</div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,59,59,.5)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-
     </div>
+
+    <!-- VENDEDOR SECTION -->
+    <div class="prof2-section" id="seller-section-label" style="display:none">
+      <div class="prof2-section-label">Vendedor</div>
+      <div class="prof2-menu">
+
+        <div class="prof2-item" id="dash-vendor-btn" onclick="openDash()" style="display:none">
+          <div class="prof2-item-ico" style="background:rgba(255,208,0,.1)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--y)" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          </div>
+          <div class="prof2-item-text">Dashboard Vendedor</div>
+          <div class="prof2-item-arrow">›</div>
+        </div>
+
+        <div class="prof2-item" id="verif-menu-item" onclick="openVerifRequest()" style="display:none">
+          <div class="prof2-item-ico" style="background:rgba(76,175,80,.1);font-size:18px">🪪</div>
+          <div class="prof2-item-text" id="verif-menu-label">Solicitar verificación</div>
+          <div class="prof2-item-arrow">›</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- UPGRADE TO SELLER -->
+    <div class="prof2-section" id="upgrade-seller-section" style="display:none">
+      <div class="prof2-menu">
+        <div class="prof2-item prof2-item-highlight" id="upgrade-seller-btn" onclick="openSellerUpgrade()">
+          <div class="prof2-item-ico" style="background:rgba(255,208,0,.15);font-size:18px">🛍️</div>
+          <div>
+            <div class="prof2-item-text" style="color:var(--y)">Quiero vender</div>
+            <div style="font-size:10px;color:var(--mu);font-weight:700;margin-top:1px">Abre tu tienda gratis</div>
+          </div>
+          <div class="prof2-item-arrow" style="color:var(--y)">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="prof2-section" id="admin-menu-section" style="display:none">
+      <div class="prof2-menu">
+        <div class="prof2-item" id="admin-menu-btn" onclick="openAdmin()">
+          <div class="prof2-item-ico" style="background:rgba(255,208,0,.12);font-size:18px">⚡</div>
+          <div class="prof2-item-text" style="color:var(--y)">Panel Admin</div>
+          <div class="prof2-item-badge" id="admin-menu-badge" style="display:none"></div>
+          <div class="prof2-item-arrow" style="color:var(--y)">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGOUT -->
+    <div style="padding:0 16px 8px">
+      <div class="prof2-logout" onclick="fbLogout()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--rd)" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        <span>Cerrar sesión</span>
+      </div>
+    </div>
+
   </div>
 
-  <!-- Modal editar perfil -->
+  <!-- EDIT PROFILE MODAL -->
   <div id="prof-edit-modal" style="position:absolute;inset:0;z-index:200;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);display:none;align-items:flex-end;justify-content:center">
-    <div style="width:100%;background:var(--dk2);border-radius:24px 24px 0 0;padding:24px 20px 40px;border-top:1px solid rgba(255,255,255,.08)">
+    <div style="width:100%;background:var(--dk2);border-radius:24px 24px 0 0;padding:24px 20px calc(36px + var(--sab));border-top:1px solid rgba(255,255,255,.08)">
+      <div style="width:32px;height:3px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 20px"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px">Editar Perfil</div>
         <button onclick="closeProfEdit()" style="background:var(--dk3);border:1px solid rgba(255,255,255,.08);border-radius:50%;width:32px;height:32px;color:var(--mu);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
