@@ -127,17 +127,26 @@ async function fsAdd(col,data){
     return fromFS(await r.json());
   }catch(e){return null;}
 }
-async function fsQuery(col,filters=[]){
+async function fsQuery(col,filters=[],_throw=false){
   try{
     const url='https://firestore.googleapis.com/v1/projects/'+FB.projectId+'/databases/(default)/documents:runQuery';
     const makeFilter=f=>({fieldFilter:{field:{fieldPath:f.field},op:f.op||'EQUAL',value:toFSVal(f.value)}});
     const where=filters.length===0?undefined:filters.length===1?makeFilter(filters[0]):{compositeFilter:{op:'AND',filters:filters.map(makeFilter)}};
     const q={structuredQuery:{from:[{collectionId:col}],...(where?{where}:{}),limit:100}};
-    const r=await fetch(url,{method:'POST',headers:fsHeaders(),body:JSON.stringify(q)});
-    if(!r.ok)return[];
+    let r=await fetch(url,{method:'POST',headers:fsHeaders(),body:JSON.stringify(q)});
+    if((r.status===401||r.status===403)&&window.fbToken){
+      await _refreshToken();
+      r=await fetch(url,{method:'POST',headers:fsHeaders(),body:JSON.stringify(q)});
+    }
+    if(!r.ok){
+      const err=await r.json().catch(()=>({}));
+      const msg='HTTP '+r.status+': '+(err.error?.message||'Sin permisos');
+      if(_throw)throw new Error(msg);
+      return[];
+    }
     const res=await r.json();
     return res.filter(x=>x.document).map(x=>fromFS(x.document));
-  }catch(e){return[];}
+  }catch(e){if(_throw)throw e;return[];}
 }
 function fsId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
 
@@ -7069,11 +7078,8 @@ async function _adminLoadDeps(){
   const listEl=document.getElementById('admin-dep-list');
   listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu);font-size:12px">⏳ Cargando depósitos...</div>';
   try{
-    const deps=await fsQuery('deposit_requests');
-    if(deps===null || deps===undefined){
-      listEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--rd);font-size:12px">❌ Error de permisos — verifica las reglas de Firestore<br><br><button onclick="_adminLoadDeps()" style="background:var(--dk3);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 16px;color:var(--tx);font-family:\'Nunito\',sans-serif;cursor:pointer">🔄 Reintentar</button></div>';
-      return;
-    }
+    // _throw=true so we get the real error instead of silent []
+    const deps=await fsQuery('deposit_requests',[],true);
     deps.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
     const pending=deps.filter(d=>d.status==='pending');
     const approved=deps.filter(d=>d.status==='approved');
@@ -7130,7 +7136,15 @@ async function _adminLoadDeps(){
       </div>`).join('');
   }catch(e){
     console.warn('admin deps error:',e);
-    listEl.innerHTML=`<div style="text-align:center;padding:32px;color:var(--rd)"><div style="font-size:32px;margin-bottom:10px">⚠️</div><div style="font-size:12px;font-weight:800;margin-bottom:6px">Error al cargar depósitos</div><div style="font-size:11px;color:var(--mu);margin-bottom:14px">${e.message||'Verifica las reglas de Firestore'}</div><button onclick="_adminLoadDeps()" style="background:var(--dk3);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 16px;color:var(--tx);font-family:'Nunito',sans-serif;cursor:pointer">🔄 Reintentar</button></div>`;
+    const isPermErr=e.message&&(e.message.includes('403')||e.message.includes('PERMISSION')||e.message.includes('permisos'));
+    listEl.innerHTML=`
+      <div style="text-align:center;padding:32px;color:var(--rd)">
+        <div style="font-size:32px;margin-bottom:10px">${isPermErr?'🔒':'⚠️'}</div>
+        <div style="font-size:13px;font-weight:900;margin-bottom:6px;color:#fff">${isPermErr?'Sin permisos de lectura':'Error al cargar depósitos'}</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:6px;word-break:break-all">${e.message||'Error desconocido'}</div>
+        ${isPermErr?'<div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:16px;line-height:1.6">Las reglas de Firestore deben permitir<br>lectura de <code>deposit_requests</code> al admin</div>':''}
+        <button onclick="_adminLoadDeps()" style="background:var(--dk3);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px 20px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer">🔄 Reintentar</button>
+      </div>`;
   }
 }
 
