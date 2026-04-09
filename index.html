@@ -547,7 +547,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .pdv2-more-name{font-size:11px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
 .pdv2-more-price{font-family:"Bebas Neue",sans-serif;font-size:18px;color:var(--y)}
 /* Sticky buy bar */
-.pdv2-bar{position:absolute;bottom:0;left:0;right:0;background:rgba(10,10,15,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.08);padding:10px 16px calc(10px + var(--sab));display:flex;align-items:center;gap:10px;z-index:20}
+.pdv2-bar{flex-shrink:0;background:rgba(10,10,15,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.08);padding:10px 16px calc(10px + var(--sab));display:flex;align-items:center;gap:10px}
 .pdv2-bar-price{font-family:"Bebas Neue",sans-serif;font-size:24px;color:var(--y);letter-spacing:.5px;flex-shrink:0}
 .pdv2-bar-actions{display:flex;gap:8px;flex:1}
 .pdv2-cart-btn{flex:1;background:var(--dk3);border:1.5px solid rgba(255,208,0,.35);border-radius:11px;padding:12px 10px;font-family:"Nunito",sans-serif;font-size:12px;font-weight:900;cursor:pointer;color:var(--y);transition:all .15s}
@@ -1675,9 +1675,9 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
   <div class="top">
     <div class="logo">
       <div style="display:flex;align-items:center;gap:8px">
-        <div style="width:4px;height:28px;background:var(--y);border-radius:2px;flex-shrink:0"></div>
+        <div style="width:5px;height:34px;background:var(--y);border-radius:2px;flex-shrink:0"></div>
         <div>
-          <div style="font-family:system-ui,sans-serif;font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px;line-height:1">InstaCompras</div>
+          <div style="font-family:system-ui,sans-serif;font-size:25px;font-weight:900;color:#fff;letter-spacing:-0.8px;line-height:1">InstaCompras</div>
           <div style="display:flex;align-items:center;gap:5px;margin-top:2px">
             <div style="width:6px;height:6px;border-radius:50%;background:var(--rd);flex-shrink:0;animation:pulse-live 2s infinite"></div>
             <div style="font-size:9px;font-weight:800;color:var(--rd);letter-spacing:3px">EN VIVO</div>
@@ -1802,7 +1802,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 <!-- PRODUCT -->
 <div id="s-prod" class="scr">
-  <div class="sb" style="padding-bottom:calc(100px + var(--sab))">
+  <div class="sb">
 
     <!-- HERO IMAGE -->
     <div class="pdv2-hero" id="pd-hero">
@@ -2106,12 +2106,6 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
   <div class="exp-cat-bar" id="exp-cats"></div>
 
   <div class="sb" style="padding-bottom:calc(80px + var(--sab))">
-    <!-- DESTACADOS -->
-    <div class="exp-sh" id="exp-sh-feat">
-      <div class="exp-sh-t">⭐ Destacados</div>
-    </div>
-    <div class="exp-fg" id="exp-featured-grid"></div>
-
     <!-- TODAS -->
     <div class="exp-sh" id="exp-sh-all">
       <div class="exp-sh-t">🏪 Todas las Tiendas</div>
@@ -2698,7 +2692,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     </div>
   </div>
 
-  <div class="sb" style="padding-bottom:calc(100px + var(--sab))">
+  <div class="sb">
     <div class="gl-form">
 
       <!-- Título -->
@@ -3462,28 +3456,12 @@ function _expImg2(item){
 }
 
 function renderExpSections(list){
-  // ── DESTACADOS grid (sin live, sin viendo) ──
-  const featEl=document.getElementById('exp-featured-grid');
-  if(featEl){
-    featEl.innerHTML=list.slice(0,6).map(item=>{
-      const {s}=item;
-      const img=_expImg(item);
-      const avHtml=s.logo?`<img src="${s.logo}" style="width:100%;height:100%;object-fit:cover">`:`<span style="font-size:20px">${s.e}</span>`;
-      return `<div class="exp-fc" onclick="_expOpenSeller(${JSON.stringify(item).replace(/"/g,'&quot;')})">
-        ${img?`<img class="exp-fc-img" src="${img}" loading="lazy" onerror="this.style.background='var(--dk4)'">`:`<div class="exp-fc-img" style="display:flex;align-items:center;justify-content:center;font-size:44px;background:var(--dk4)">${s.e}</div>`}
-        <div class="exp-fc-grad"></div>
-        <div class="exp-fc-av" style="${s.logo?'background:#000;':'background:var(--dk4);'}">${avHtml}</div>
-        <div class="exp-fc-body">
-          <div class="exp-fc-name">${s.n}${s.verified?` <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--y)" stroke="none"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`:''}</div>
-          <div class="exp-fc-cat">${s.cat}</div>
-          <div class="exp-fc-bottom">
-            <div class="exp-fc-fol">${typeof s.f==='number'?s.f.toLocaleString():s.f} seg.</div>
-            <div class="exp-fc-price">$${s.p}</div>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-  }
+  // Ordenar: tiendas con imagen/logo primero, sin imagen al final
+  list=[...list].sort((a,b)=>{
+    const aHasImg=!!(_expImg(a)||a.s.logo);
+    const bHasImg=!!(_expImg(b)||b.s.logo);
+    return (bHasImg?1:0)-(aHasImg?1:0);
+  });
   // ── TODAS LAS TIENDAS list (sin EN VIVO, sin viendo) ──
   const allEl=document.getElementById('exp-all-list');
   const countEl=document.getElementById('exp-count');
@@ -3532,12 +3510,11 @@ function expSearch(q){
   }
   const isFiltered=q||(expActiveCat&&expActiveCat!=='🔥 Todo');
   // Show/hide hero sections
-  ['exp-sh-feat','exp-featured-grid'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.style.display=isFiltered?'none':(id==='exp-featured-grid'?'grid':'');
-  });
+  // No featured grid section
   const countEl=document.getElementById('exp-count');
   if(countEl) countEl.textContent=list.length+' tiendas';
+  // Ordenar: con imagen primero
+  list=[...list].sort((a,b)=>{const aI=!!(_expImg(a)||a.s.logo);const bI=!!(_expImg(b)||b.s.logo);return (bI?1:0)-(aI?1:0);});
   const allEl=document.getElementById('exp-all-list');
   if(allEl){
     allEl.innerHTML=list.map(item=>{
