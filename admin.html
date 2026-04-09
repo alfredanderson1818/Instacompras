@@ -248,7 +248,26 @@ async function fDl(c,i){
     return true;
   }catch(e){toast('❌ '+e.message);return false;}
 }
-async function fQ(c){try{const h=hd();const r=await fetch(`https://firestore.googleapis.com/v1/projects/${FB.projectId}/databases/(default)/documents:runQuery`,{method:'POST',headers:h,body:JSON.stringify({structuredQuery:{from:[{collectionId:c}],limit:500}})});const d=await r.json();if(!Array.isArray(d)){console.warn('fQ error',c,d);return[];}return d.filter(x=>x.document).map(x=>fd(x.document));}catch(e){console.error('fQ',c,e);return[];}}
+async function fQ(c){
+  try{
+    const h=hd();
+    if(!tk){console.warn('fQ: sin token para',c);return[];}
+    const r=await fetch(`https://firestore.googleapis.com/v1/projects/${FB.projectId}/databases/(default)/documents:runQuery`,{
+      method:'POST',headers:h,
+      body:JSON.stringify({structuredQuery:{from:[{collectionId:c}],limit:500}})
+    });
+    if(r.status===403||r.status===401){
+      console.error('fQ 403 en colección',c,'— revisa reglas Firestore');
+      // Mostrar banner de reglas si aún no está visible
+      const rb=document.getElementById('rules-banner');
+      if(rb)rb.style.display='flex';
+      return[];
+    }
+    const d=await r.json();
+    if(!Array.isArray(d)){console.warn('fQ error',c,d);return[];}
+    return d.filter(x=>x.document).map(x=>fd(x.document));
+  }catch(e){console.error('fQ',c,e);return[];}
+}
 
 // Auth — usa Firebase email+password para obtener token real con permisos de escritura
 async function doLogin(){
@@ -266,6 +285,15 @@ async function doLogin(){
       localStorage.setItem('adm_email',e);
       document.getElementById('login').style.display='none';
       document.getElementById('app').style.display='flex';
+      // Mostrar UID del admin en el modal de reglas
+      fetch(`${FB.authUrl}:lookup?key=${FB.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idToken:d.idToken})}).then(r=>r.json()).then(info=>{
+        const uid=info.users?.[0]?.localId||d.localId||'—';
+        const el=document.getElementById('admin-uid-display');
+        if(el)el.textContent=uid;
+        // Auto-update rules code with actual UID
+        const rc=document.getElementById('rules-code');
+        if(rc)rc.textContent=rc.textContent.replace('REEMPLAZA_CON_TU_UID_ADMIN',uid);
+      }).catch(()=>{});
       refreshAll();
     } else {
       er.textContent=d.error?.message==='EMAIL_NOT_FOUND'||d.error?.message==='INVALID_PASSWORD'||d.error?.message?.includes('INVALID_LOGIN_CREDENTIALS')?'Credenciales incorrectas':(d.error?.message||'Error de autenticación');
@@ -416,6 +444,96 @@ async function rPH(){const h=await fQ('push_history');h.sort((a,b)=>(b.createdAt
 
 let _tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('on'),2500);}
 tryR();
+function copyRules(){
+  const text=document.getElementById('rules-code').textContent;
+  navigator.clipboard.writeText(text).then(()=>toast('✅ Reglas copiadas')).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('✅ Copiado');
+  });
+}
 </script>
+<!-- RULES BANNER -->
+<div id="rules-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9998;background:#FF4757;color:#fff;padding:10px 16px;font-size:12px;font-weight:700;align-items:center;gap:10px;flex-wrap:wrap">
+  <span>⚠️ <strong>Firestore: sin permisos</strong> para leer algunas colecciones.</span>
+  <span style="opacity:.85">Agrega las reglas abajo en Firebase Console → Firestore → Rules</span>
+  <button onclick="document.getElementById('rules-modal').style.display='flex'" style="background:#fff;color:#FF4757;border:none;border-radius:6px;padding:4px 10px;font-weight:900;cursor:pointer;font-size:11px">Ver Reglas →</button>
+  <button onclick="document.getElementById('rules-banner').style.display='none'" style="background:transparent;border:none;color:#fff;cursor:pointer;font-size:16px;margin-left:auto">✕</button>
+</div>
+
+<!-- RULES MODAL -->
+<div id="rules-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);align-items:center;justify-content:center">
+  <div style="background:#131320;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px;max-width:520px;width:90%;max-height:80vh;overflow-y:auto">
+    <div style="font-size:16px;font-weight:900;margin-bottom:4px">🔐 Reglas de Firestore necesarias</div>
+    <div style="font-size:11px;color:#606078;margin-bottom:16px">Copia esto en <a href="https://console.firebase.google.com/project/instacompras-fe791/firestore/rules" target="_blank" style="color:#FFD000">Firebase Console → Firestore → Rules</a></div>
+    <pre id="rules-code" style="background:#0D0D14;border-radius:10px;padding:16px;font-size:11px;color:#E8E8EC;overflow-x:auto;white-space:pre-wrap;border:1px solid rgba(255,255,255,.06);line-height:1.6">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admin tiene acceso total
+    function isAdmin() {
+      return request.auth != null &&
+        request.auth.uid in [
+          'REEMPLAZA_CON_TU_UID_ADMIN'
+        ];
+    }
+
+    // Acceso admin total
+    match /{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // Usuarios: lectura pública, escritura propia
+    match /users/{uid} {
+      allow read: if true;
+      allow write: if request.auth.uid == uid || isAdmin();
+    }
+
+    // Órdenes: solo comprador, vendedor o admin
+    match /orders/{id} {
+      allow read: if request.auth != null &&
+        (request.auth.uid == resource.data.buyerId ||
+         request.auth.uid == resource.data.sellerId ||
+         isAdmin());
+      allow write: if request.auth != null || isAdmin();
+    }
+
+    // Depósitos: solo el usuario dueño o admin
+    match /deposit_requests/{id} {
+      allow read, write: if request.auth != null &&
+        (request.auth.uid == resource.data.uid || isAdmin());
+    }
+
+    // Wallet txs
+    match /wallet_txs/{id} {
+      allow read, write: if request.auth != null &&
+        (request.auth.uid == resource.data.uid || isAdmin());
+    }
+
+    // Productos y tiendas: lectura pública
+    match /products/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /stores/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Streams
+    match /streams/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}</pre>
+    <div style="font-size:11px;color:#A0A0B0;margin:12px 0 8px">Tu UID de admin (el que debes poner arriba):</div>
+    <div id="admin-uid-display" style="background:#0D0D14;border-radius:8px;padding:10px 14px;font-family:monospace;font-size:12px;color:#FFD000;border:1px solid rgba(255,208,0,.2);word-break:break-all">Cargando...</div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button onclick="copyRules()" style="flex:1;background:#FFD000;color:#0D0D14;border:none;border-radius:10px;padding:12px;font-weight:900;cursor:pointer;font-size:13px">📋 Copiar Reglas</button>
+      <button onclick="document.getElementById('rules-modal').style.display='none'" style="background:rgba(255,255,255,.07);color:#E8E8EC;border:none;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
