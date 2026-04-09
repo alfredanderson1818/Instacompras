@@ -248,7 +248,7 @@ async function fDl(c,i){
     return true;
   }catch(e){toast('❌ '+e.message);return false;}
 }
-async function fQ(c){try{const r=await fetch(`https://firestore.googleapis.com/v1/projects/${FB.projectId}/databases/(default)/documents:runQuery`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({structuredQuery:{from:[{collectionId:c}]}})});const d=await r.json();return d.filter(x=>x.document).map(x=>fd(x.document));}catch(e){return[];}}
+async function fQ(c){try{const h=hd();const r=await fetch(`https://firestore.googleapis.com/v1/projects/${FB.projectId}/databases/(default)/documents:runQuery`,{method:'POST',headers:h,body:JSON.stringify({structuredQuery:{from:[{collectionId:c}],limit:500}})});const d=await r.json();if(!Array.isArray(d)){console.warn('fQ error',c,d);return[];}return d.filter(x=>x.document).map(x=>fd(x.document));}catch(e){console.error('fQ',c,e);return[];}}
 
 // Auth — usa Firebase email+password para obtener token real con permisos de escritura
 async function doLogin(){
