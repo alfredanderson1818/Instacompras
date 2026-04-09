@@ -4822,8 +4822,11 @@ function depConfirm(){
   const ref=document.getElementById('dep-ref')?.value?.trim()||'';
   const note=document.getElementById('dep-note')?.value?.trim()||'';
   if(uid){
+    const btn=document.querySelector('#s-deposit button');
+    if(btn){btn.textContent='⏳ Enviando...';btn.disabled=true;}
     fsAdd('deposit_requests',{
       userId:uid,
+      uid:uid,
       userName:window.fbUser?.name||window.fbUser?.username||'Usuario',
       userEmail:window.fbUser?.email||'',
       amount:v,
@@ -4832,11 +4835,21 @@ function depConfirm(){
       note,
       status:'pending',
       createdAt:Date.now()
-    }).then(()=>{
-      toast('📋 Solicitud registrada — te notificaremos cuando sea aprobada');
-    }).catch(()=>{});
+    }).then(res=>{
+      if(btn){btn.textContent='📋 Enviar Solicitud';btn.disabled=false;}
+      if(res){
+        toast('📋 Solicitud registrada — te notificaremos cuando sea aprobada');
+        setTimeout(()=>goBack(),1200);
+      } else {
+        toast('❌ Error al guardar — verifica tu conexión');
+      }
+    }).catch(e=>{
+      if(btn){btn.textContent='📋 Enviar Solicitud';btn.disabled=false;}
+      toast('❌ Error: '+(e.message||'intenta de nuevo'));
+    });
+  } else {
+    toast('❌ Debes iniciar sesión para solicitar recarga');
   }
-  setTimeout(()=>goBack(),1500);
 }
 // ═══ AUCTION ═══
 // ═══ SUBASTAS MULTI-USUARIO ═══
