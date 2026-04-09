@@ -557,7 +557,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 
 /* ═══ CART ═══ */
-#s-cart{background:var(--dk)}
+#s-cart{background:var(--dk);padding-bottom:calc(58px + var(--sab))}
 .cart-hdr{padding:calc(var(--sat) + 14px) 16px 14px;font-family:'Bebas Neue',sans-serif;font-size:22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
 .cart-clr{font-family:'Nunito',sans-serif;font-size:12px;color:var(--rd);font-weight:700;cursor:pointer}
 .cart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--mu);padding:50px 20px;text-align:center}
@@ -3584,7 +3584,7 @@ function go(id,push=true){
   if(push&&hist[hist.length-1]!==id)hist.push(id);
   // Stop home poll when leaving home
   if(id!=='home')clearInterval(_homePollIv);
-  const hide=['stream','co','ok','onboard','register','seller','wallet','deposit','dash','notif','track','my-orders','admin'].includes(id);
+  const hide=['stream','co','ok','onboard','register','prod','seller','wallet','deposit','dash','notif','track','my-orders','golive','broadcast','admin'].includes(id);
   document.getElementById('nav').className='nav'+(hide?' hide':'');
   ['home','exp','cart','prof'].forEach(n=>document.getElementById('ni-'+n)?.classList.toggle('on',n===id));
 }
