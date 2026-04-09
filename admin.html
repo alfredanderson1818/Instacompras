@@ -164,7 +164,7 @@ tr:hover td{background:rgba(255,255,255,.01)}
 </style>
 </head>
 <body>
-<div id="login"><div class="lc"><div class="lc-brand"><div class="lc-bar"></div><div><div class="lc-name">InstaCompras</div><div class="lc-live"><div class="lc-dot"></div><div class="lc-tag">EN VIVO</div></div></div></div><div class="lc-sub">Panel Admin</div><input class="li" id="l-e" placeholder="Usuario" autofocus><input class="li" id="l-p" type="password" placeholder="Contraseña" onkeydown="if(event.key==='Enter')doLogin()"><button class="lb" id="l-b" onclick="doLogin()">Iniciar Sesión</button><div class="le" id="l-err"></div></div></div>
+<div id="login"><div class="lc"><div class="lc-brand"><div class="lc-bar"></div><div><div class="lc-name">InstaCompras</div><div class="lc-live"><div class="lc-dot"></div><div class="lc-tag">EN VIVO</div></div></div></div><div class="lc-sub">Panel Admin</div><input class="li" id="l-e" placeholder="Email de admin" type="email" autofocus><input class="li" id="l-p" type="password" placeholder="Contraseña" onkeydown="if(event.key==='Enter')doLogin()"><button class="lb" id="l-b" onclick="doLogin()">Iniciar Sesión</button><div class="le" id="l-err"></div></div></div>
 <div id="app">
 <div class="sb" id="sidebar">
 <div class="sb-hd"><div class="sb-br"><div class="sb-br-bar"></div><div><div class="sb-br-name">InstaCompras</div><div class="sb-br-row"><div class="sb-br-dot"></div><div class="sb-br-live">EN VIVO</div><div class="sb-br-badge">ADMIN</div></div></div></div></div>
@@ -223,15 +223,90 @@ function fd(d){if(!d||!d.fields)return{};const o=Object.fromEntries(Object.entri
 function hd(){const h={'Content-Type':'application/json'};if(tk)h['Authorization']='Bearer '+tk;return h;}
 // Reads WITHOUT token (public), writes WITH token
 async function fG(c,i){try{const r=await fetch(`${FB.dbUrl}/${c}/${i}`);return r.ok?fd(await r.json()):null;}catch(e){return null;}}
-async function fS(c,i,d){try{const m=Object.keys(d).map(k=>'updateMask.fieldPaths='+encodeURIComponent(k)).join('&');const r=await fetch(`${FB.dbUrl}/${c}/${i}?${m}`,{method:'PATCH',headers:hd(),body:JSON.stringify(tf(d))});return r.ok?fd(await r.json()):null;}catch(e){return null;}}
-async function fA(c,d){try{const r=await fetch(`${FB.dbUrl}/${c}`,{method:'POST',headers:hd(),body:JSON.stringify(tf(d))});return r.ok?fd(await r.json()):null;}catch(e){return null;}}
-async function fDl(c,i){try{await fetch(`${FB.dbUrl}/${c}/${i}`,{method:'DELETE',headers:hd()});return true;}catch(e){return false;}}
+async function fS(c,i,d){
+  if(!tk){toast('❌ Sin sesión. Recarga e inicia sesión.');return null;}
+  try{
+    const m=Object.keys(d).map(k=>'updateMask.fieldPaths='+encodeURIComponent(k)).join('&');
+    const r=await fetch(`${FB.dbUrl}/${c}/${i}?${m}`,{method:'PATCH',headers:hd(),body:JSON.stringify(tf(d))});
+    if(!r.ok){const err=await r.json().catch(()=>({}));toast('❌ Error al guardar: '+(err?.error?.message||r.status));return null;}
+    return fd(await r.json());
+  }catch(e){toast('❌ '+e.message);return null;}
+}
+async function fA(c,d){
+  if(!tk){toast('❌ Sin sesión. Recarga e inicia sesión.');return null;}
+  try{
+    const r=await fetch(`${FB.dbUrl}/${c}`,{method:'POST',headers:hd(),body:JSON.stringify(tf(d))});
+    if(!r.ok){const err=await r.json().catch(()=>({}));toast('❌ Error al crear: '+(err?.error?.message||r.status));return null;}
+    return fd(await r.json());
+  }catch(e){toast('❌ '+e.message);return null;}
+}
+async function fDl(c,i){
+  if(!tk){toast('❌ Sin sesión. Recarga e inicia sesión.');return false;}
+  try{
+    const r=await fetch(`${FB.dbUrl}/${c}/${i}`,{method:'DELETE',headers:hd()});
+    if(!r.ok){const err=await r.json().catch(()=>({}));toast('❌ Error al eliminar: '+(err?.error?.message||r.status));return false;}
+    return true;
+  }catch(e){toast('❌ '+e.message);return false;}
+}
 async function fQ(c){try{const r=await fetch(`https://firestore.googleapis.com/v1/projects/${FB.projectId}/databases/(default)/documents:runQuery`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({structuredQuery:{from:[{collectionId:c}]}})});const d=await r.json();return d.filter(x=>x.document).map(x=>fd(x.document));}catch(e){return[];}}
 
-// Auth
-async function doLogin(){const e=document.getElementById('l-e').value.trim(),p=document.getElementById('l-p').value,b=document.getElementById('l-b'),er=document.getElementById('l-err');if(!e||!p){er.textContent='Ingresa usuario y contraseña';return;}b.disabled=true;b.textContent='...';er.textContent='';if(e==='admin'&&p==='admin'){try{const r=await fetch(`${FB.authUrl}:signUp?key=${FB.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({returnSecureToken:true})});const d=await r.json();if(d.idToken)tk=d.idToken;}catch(e){}localStorage.setItem('adm','1');document.getElementById('login').style.display='none';document.getElementById('app').style.display='flex';refreshAll();}else{er.textContent='Credenciales incorrectas';b.disabled=false;b.textContent='Iniciar Sesión';}}
-function doLogout(){localStorage.removeItem('adm');location.reload();}
-function tryR(){if(localStorage.getItem('adm')==='1'){document.getElementById('login').style.display='none';document.getElementById('app').style.display='flex';fetch(`${FB.authUrl}:signUp?key=${FB.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({returnSecureToken:true})}).then(r=>r.json()).then(d=>{if(d.idToken)tk=d.idToken;refreshAll();}).catch(()=>refreshAll());return true;}return false;}
+// Auth — usa Firebase email+password para obtener token real con permisos de escritura
+async function doLogin(){
+  const e=document.getElementById('l-e').value.trim(),p=document.getElementById('l-p').value,b=document.getElementById('l-b'),er=document.getElementById('l-err');
+  if(!e||!p){er.textContent='Ingresa email y contraseña';return;}
+  b.disabled=true;b.textContent='...';er.textContent='';
+  try{
+    const r=await fetch(`${FB.authUrl}:signInWithPassword?key=${FB.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p,returnSecureToken:true})});
+    const d=await r.json();
+    if(d.idToken){
+      tk=d.idToken;
+      // Guardar refresh token para restaurar sesión
+      localStorage.setItem('adm','1');
+      localStorage.setItem('adm_rt',d.refreshToken||'');
+      localStorage.setItem('adm_email',e);
+      document.getElementById('login').style.display='none';
+      document.getElementById('app').style.display='flex';
+      refreshAll();
+    } else {
+      er.textContent=d.error?.message==='EMAIL_NOT_FOUND'||d.error?.message==='INVALID_PASSWORD'||d.error?.message?.includes('INVALID_LOGIN_CREDENTIALS')?'Credenciales incorrectas':(d.error?.message||'Error de autenticación');
+      b.disabled=false;b.textContent='Iniciar Sesión';
+    }
+  }catch(ex){er.textContent='Error de red';b.disabled=false;b.textContent='Iniciar Sesión';}
+}
+
+async function refreshToken(){
+  const rt=localStorage.getItem('adm_rt');
+  if(!rt)return false;
+  try{
+    const r=await fetch(`https://securetoken.googleapis.com/v1/token?key=${FB.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({grant_type:'refresh_token',refresh_token:rt})});
+    const d=await r.json();
+    if(d.id_token){tk=d.id_token;localStorage.setItem('adm_rt',d.refresh_token||rt);return true;}
+  }catch(e){}
+  return false;
+}
+
+function doLogout(){localStorage.removeItem('adm');localStorage.removeItem('adm_rt');localStorage.removeItem('adm_email');tk=null;location.reload();}
+
+function tryR(){
+  if(localStorage.getItem('adm')==='1'){
+    document.getElementById('login').style.display='none';
+    document.getElementById('app').style.display='flex';
+    // Restaurar token via refresh_token
+    refreshToken().then(ok=>{
+      if(!ok){
+        // Si falla, mostrar login nuevamente
+        document.getElementById('login').style.display='flex';
+        document.getElementById('app').style.display='none';
+        localStorage.removeItem('adm');
+        document.getElementById('l-err').textContent='Sesión expirada, vuelve a iniciar sesión';
+      } else {
+        refreshAll();
+      }
+    });
+    return true;
+  }
+  return false;
+}
 
 // Sidebar
 function toggleSB(){document.getElementById('sidebar').classList.toggle('open');}
