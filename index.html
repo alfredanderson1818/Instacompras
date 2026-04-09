@@ -2589,7 +2589,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
       <div class="wallet-balance-usd" id="wallet-bal-usd">≈ $25.00 USD</div>
       <div class="wallet-hero-actions">
         <button class="wallet-action-btn primary" onclick="openDeposit()">+ Recargar</button>
-        <button class="wallet-action-btn secondary" onclick="toast('💬 Soporte: @instacompras.ve')">? Ayuda</button>
+        <button class="wallet-action-btn secondary" onclick="toast('💬 Soporte: @instacompras.ve')">Ayuda</button>
       </div>
     </div>
 
@@ -2599,36 +2599,9 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
       <div>Tus créditos están <span>protegidos</span>. Al ganar una subasta, se descuentan automáticamente. Sin cargo previo.</div>
     </div>
 
-    <!-- Deposit amount -->
-    <div style="padding:0 16px;margin-bottom:4px">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;margin-bottom:12px">Recargar Créditos</div>
-    </div>
-    <div class="wallet-amount-wrap">
-      <div class="wallet-amount-label">Monto en USD</div>
-      <div class="wallet-amount-row">
-        <div class="wallet-amount-prefix">$</div>
-        <input class="wallet-amount-input" type="number" placeholder="0" id="wallet-amount" min="1" oninput="walletUpdatePreview()">
-        <div class="wallet-amount-suffix">USD</div>
-      </div>
-      <div style="font-size:11px;color:var(--mu);margin-top:6px" id="wallet-credits-preview">Recibirás <strong style="color:var(--y)">0 créditos</strong></div>
-      <div class="wallet-presets">
-        <div class="wallet-preset" onclick="walletSetAmount(5)">$5</div>
-        <div class="wallet-preset" onclick="walletSetAmount(10)">$10</div>
-        <div class="wallet-preset" onclick="walletSetAmount(20)">$20</div>
-        <div class="wallet-preset" onclick="walletSetAmount(50)">$50</div>
-        <div class="wallet-preset" onclick="walletSetAmount(100)">$100</div>
-      </div>
-    </div>
-
-    <!-- Payment method -->
-    <div style="padding:0 16px;margin-bottom:10px">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;margin-bottom:12px">Método de Pago</div>
-    </div>
-    <div class="wallet-methods" id="wallet-methods"></div>
-
-    <div style="padding:0 16px 0">
-      <button style="width:100%;background:var(--y);color:var(--dk);border:none;border-radius:13px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .2s;margin-bottom:12px" onclick="openDeposit()">+ Recargar Créditos</button>
-      <div style="font-size:11px;color:var(--mu);text-align:center;line-height:1.6">1 USD = 1 InstaCredito · Mínimo $1 USD<br>Los créditos no tienen fecha de vencimiento</div>
+    <div style="padding:0 16px 16px">
+      <button style="width:100%;background:var(--y);color:var(--dk);border:none;border-radius:13px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .2s" onclick="openDeposit()">+ Recargar Créditos</button>
+      <div style="font-size:11px;color:var(--mu);text-align:center;margin-top:8px;line-height:1.6">1 USD = 1 InstaCredito · Mínimo $1 USD<br>Los créditos no tienen fecha de vencimiento</div>
     </div>
 
     <!-- Transaction history -->
@@ -4699,10 +4672,6 @@ function spOpenStream(){
 let walletBalance=0;
 const WALLET_METHODS=[
   {i:'🏦',n:'Pago Móvil',d:'Transferencia instantánea'},
-  {i:'💜',n:'Zelle',d:'Cuenta USA verificada'},
-  {i:'₿',n:'Binance Pay',d:'USDT / BTC / BNB'},
-  {i:'⬡',n:'Reserve',d:'Sin comisión'},
-  {i:'💵',n:'Efectivo USD',d:'En persona · Caracas'},
 ];
 let walletSelMethod=0;
 function _txDate(ts){
