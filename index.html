@@ -310,7 +310,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .ibtn:hover{background:var(--dk4)}
 
 /* TOAST */
-.toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--y);color:var(--dk);padding:9px 18px;border-radius:22px;font-weight:800;font-size:12px;opacity:0;transition:opacity .28s cubic-bezier(.34,1.3,.64,1),transform .28s cubic-bezier(.34,1.3,.64,1);pointer-events:none;z-index:999;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis}
+.toast{position:fixed;bottom:calc(82px + var(--sab));left:50%;transform:translateX(-50%) translateY(12px);background:var(--y);color:var(--dk);padding:9px 18px;border-radius:22px;font-weight:800;font-size:12px;opacity:0;transition:opacity .28s cubic-bezier(.34,1.3,.64,1),transform .28s cubic-bezier(.34,1.3,.64,1);pointer-events:none;z-index:999;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* Button tap feedback */
@@ -438,7 +438,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 /* Viewer + live pills */
 .sv-pills{position:absolute;top:14px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:5}
 /* Bottom overlay: seller + stats */
-.sv-bottom-overlay{position:absolute;bottom:0;left:0;right:0;padding:12px 14px 14px;z-index:5}
+.sv-bottom-overlay{position:absolute;bottom:0;left:0;right:0;padding:12px 14px calc(14px + var(--sab));z-index:5}
 .sv-stats-row{display:flex;gap:8px;margin-bottom:10px}
 .sv-stat{background:rgba(0,0,0,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:800;color:#fff;display:flex;align-items:center;gap:4px}
 .sv-seller-row{display:flex;align-items:center;gap:10px}
@@ -477,7 +477,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .sendbtn:active{transform:scale(.88)}
 .giftbtn{width:36px;height:36px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.12);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:transform .15s}
 .giftbtn:active{transform:scale(.88)}
-.sv-prods{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 80px}
+.sv-prods{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px calc(80px + var(--sab))}
 .sv-prod-card{background:var(--dk3);border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid rgba(255,255,255,.05);transition:transform .18s}
 .sv-prod-card:active{transform:scale(.96)}
 .sv-prod-img{width:100%;height:100px;overflow:hidden;background:var(--dk4);position:relative;display:flex;align-items:center;justify-content:center;font-size:40px}
@@ -577,7 +577,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .cq{font-size:13px;font-weight:900;min-width:18px;text-align:center}
 .crm{font-size:17px;cursor:pointer;color:var(--mu);transition:color .15s;padding:3px}
 .crm:hover{color:var(--rd)}
-.cart-ft{padding:14px 16px;border-top:1px solid var(--dk3);flex-shrink:0;background:var(--dk2)}
+.cart-ft{padding:14px 16px calc(14px + var(--sab));border-top:1px solid var(--dk3);flex-shrink:0;background:var(--dk2)}
 .cart-sub{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
 .cart-sub-l{font-size:12px;color:var(--mu);font-weight:700}
 .cart-sub-v{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--y)}
@@ -611,10 +611,8 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .exp-lc:active .exp-lc-img{transform:scale(1.08)}
 .exp-lc-grad{position:absolute;inset:0;background:linear-gradient(175deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.0) 30%,rgba(0,0,0,.85) 70%,rgba(0,0,0,.95) 100%)}
 .exp-lc-top{position:absolute;top:9px;left:9px;right:9px;display:flex;justify-content:space-between;align-items:center;z-index:3}
-.exp-lc-live{background:var(--rd);border-radius:20px;padding:3px 8px;font-size:8px;font-weight:900;color:#fff;letter-spacing:.8px;display:flex;align-items:center;gap:3px}
-.exp-lc-live-dot{width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse-live 1.2s infinite}
 .exp-lc-v{background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border-radius:8px;padding:2px 7px;font-size:9px;font-weight:800;color:#fff}
-.exp-lc-bottom{position:absolute;bottom:0;left:0;right:0;padding:8px 10px 10px;z-index:3}
+.exp-lc-bottom{position:absolute;bottom:0;left:0;right:0;padding:8px 10px calc(10px + var(--sab));z-index:3}
 .exp-lc-av{width:30px;height:30px;border-radius:9px;overflow:hidden;background:var(--dk3);border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:5px}
 .exp-lc-name{font-size:11px;font-weight:900;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
 .exp-lc-price{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--y)}
@@ -626,8 +624,6 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .exp-fc:active .exp-fc-img{transform:scale(1.08)}
 .exp-fc-grad{position:absolute;top:0;left:0;right:0;height:160px;background:linear-gradient(to bottom,rgba(0,0,0,.0) 30%,rgba(0,0,0,.85))}
 .exp-fc-av{position:absolute;top:115px;left:10px;width:38px;height:38px;border-radius:11px;overflow:hidden;background:var(--dk3);border:2.5px solid var(--dk3);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 12px rgba(0,0,0,.5)}
-.exp-fc-live{position:absolute;top:8px;left:8px;width:8px;height:8px;border-radius:50%;background:var(--rd);box-shadow:0 0 8px rgba(255,59,59,.7);animation:pulse-live 1.5s infinite}
-.exp-fc-vbadge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);border-radius:8px;padding:2px 7px;font-size:8px;font-weight:800;color:#fff;display:flex;align-items:center;gap:3px}
 .exp-fc-body{padding:26px 10px 12px}
 .exp-fc-name{font-size:12px;font-weight:900;color:#fff;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .exp-fc-cat{font-size:9px;color:var(--mu);font-weight:800;letter-spacing:.3px;margin-bottom:8px;text-transform:uppercase}
@@ -941,7 +937,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .co-summary-name{font-size:12px;color:var(--mu);flex:1;margin-right:8px}
 .co-summary-val{font-size:12px;font-weight:800}
 /* sticky total + button */
-.co-footer{position:sticky;bottom:0;background:var(--dk);padding:12px 16px 16px;border-top:1px solid rgba(255,255,255,.06)}
+.co-footer{position:sticky;bottom:0;background:var(--dk);padding:12px 16px calc(16px + var(--sab));border-top:1px solid rgba(255,255,255,.06)}
 .co-tot-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
 .co-tot-l{font-size:13px;font-weight:700;color:var(--mu)}
 .co-tot-v{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--y);line-height:1}
@@ -1191,7 +1187,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 /* ═══ SUCCESS redesigned ═══ */
 #s-ok{background:var(--dk);overflow-y:auto}
-.ok-wrap{text-align:center;padding:32px 24px 48px;display:flex;flex-direction:column;align-items:center}
+.ok-wrap{text-align:center;padding:32px 24px calc(48px + var(--sab));display:flex;flex-direction:column;align-items:center}
 .ok-checkmark{margin-top:calc(var(--sat) + 20px);width:80px;height:80px;border-radius:50%;background:rgba(255,208,0,.12);border:2px solid rgba(255,208,0,.3);display:flex;align-items:center;justify-content:center;margin-bottom:20px;animation:check-pop .6s cubic-bezier(.34,1.56,.64,1)}
 @keyframes check-pop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
 .ok-check-inner{font-size:36px;animation:check-spin .5s .15s cubic-bezier(.34,1.56,.64,1) both}
@@ -1222,7 +1218,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 /* content card at bottom */
 .ob-content{position:absolute;z-index:2;width:100%;top:0;bottom:0;pointer-events:none}
 .ob-text{position:absolute;top:46%;left:0;right:0;padding:0 28px;text-align:center;transform:translateY(-50%);pointer-events:none}
-.ob-actions{position:absolute;bottom:0;left:0;right:0;padding:0 28px 36px;text-align:center;pointer-events:all}
+.ob-actions{position:absolute;bottom:0;left:0;right:0;padding:0 28px calc(36px + var(--sab));text-align:center;pointer-events:all}
 .ob-icon{font-size:42px;margin-bottom:12px;animation:ob-ico-in .5s .1s cubic-bezier(.34,1.56,.64,1) both}
 @keyframes ob-ico-in{from{transform:scale(0) rotate(-10deg);opacity:0}to{transform:none;opacity:1}}
 .ob-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.5px;color:#fff;line-height:1.1;margin-bottom:8px;animation:ob-txt-in .5s .2s both;text-shadow:0 2px 20px rgba(0,0,0,.5)}
@@ -1271,7 +1267,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .reg-terms span{color:rgba(255,208,0,.6)}
 .modal-ovl{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
 .modal-ovl.on{opacity:1;pointer-events:all}
-.msheet{background:var(--dk2);border-radius:22px 22px 0 0;padding:18px 18px 36px;width:100%;max-width:430px;transform:translateY(100%);transition:transform .32s cubic-bezier(.34,1.56,.64,1);position:relative}
+.msheet{background:var(--dk2);border-radius:22px 22px 0 0;padding:18px 18px calc(36px + var(--sab));width:100%;max-width:430px;transform:translateY(100%);transition:transform .32s cubic-bezier(.34,1.56,.64,1);position:relative}
 .modal-ovl.on .msheet{transform:none}
 .mhandle{width:38px;height:4px;background:rgba(255,255,255,.13);border-radius:2px;margin:0 auto 18px}
 .mtitle{font-family:'Bebas Neue',sans-serif;font-size:24px;margin-bottom:5px}
@@ -1315,7 +1311,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 .bc-act{width:46px;height:46px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:20px;gap:1px;transition:transform .15s}
 .bc-act:active{transform:scale(.88)}
 .bc-act-l{font-size:7px;font-weight:800;color:rgba(255,255,255,.8);line-height:1}
-.bc-bottom{position:absolute;bottom:0;left:0;right:0;z-index:5;padding:0 12px 20px}
+.bc-bottom{position:absolute;bottom:0;left:0;right:0;z-index:5;padding:0 12px calc(20px + var(--sab))}
 .bc-prod-bar{background:rgba(10,10,15,.88);backdrop-filter:blur(12px);border-radius:13px;padding:10px 13px;display:flex;align-items:center;gap:10px;margin-bottom:10px;border:1px solid rgba(255,208,0,.2)}
 .bc-pt{width:42px;height:42px;border-radius:8px;overflow:hidden;background:var(--dk4);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px}
 .bc-pt img{width:100%;height:100%;object-fit:cover}
@@ -1476,7 +1472,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 <!-- LOGIN / REGISTER -->
 <!-- LOGIN / REGISTER (new) -->
 <div id="s-register" class="scr">
-  <div style="display:flex;flex-direction:column;padding-bottom:40px;min-height:100%">
+  <div style="display:flex;flex-direction:column;padding-bottom:calc(40px + var(--sab));min-height:100%">
 
     <!-- Logo top -->
     <div style="padding:24px 24px 0;display:flex;align-items:center;gap:10px">
@@ -1595,7 +1591,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 <!-- DEPOSIT (wallet recharge page) -->
 <div id="s-deposit" class="scr">
-  <div style="flex:1;overflow-y:auto;scrollbar-width:none;padding-bottom:40px">
+  <div style="flex:1;overflow-y:auto;scrollbar-width:none;padding-bottom:calc(40px + var(--sab))">
     <div style="padding:calc(var(--sat) + 14px) 16px;display:flex;align-items:center;gap:12px;flex-shrink:0">
       <button onclick="goBack()" style="width:34px;height:34px;border-radius:50%;background:var(--dk3);border:1px solid rgba(255,255,255,.07);color:var(--tx);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">←</button>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;flex:1">Recargar Créditos</div>
@@ -1806,7 +1802,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
 
 <!-- PRODUCT -->
 <div id="s-prod" class="scr">
-  <div class="sb" style="padding-bottom:100px">
+  <div class="sb" style="padding-bottom:calc(100px + var(--sab))">
 
     <!-- HERO IMAGE -->
     <div class="pdv2-hero" id="pd-hero">
@@ -2109,17 +2105,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
   <!-- Category chips -->
   <div class="exp-cat-bar" id="exp-cats"></div>
 
-  <div class="sb" style="padding-bottom:80px">
-    <!-- EN VIVO -->
-    <div class="exp-sh" id="exp-sh-live">
-      <div class="exp-sh-t">
-        <div style="width:8px;height:8px;border-radius:50%;background:var(--rd);animation:pulse-live 1.2s infinite;box-shadow:0 0 8px rgba(255,59,59,.6)"></div>
-        En Vivo Ahora
-      </div>
-      <div class="exp-sh-a">Ver todos →</div>
-    </div>
-    <div class="exp-ls" id="exp-live-strip"></div>
-
+  <div class="sb" style="padding-bottom:calc(80px + var(--sab))">
     <!-- DESTACADOS -->
     <div class="exp-sh" id="exp-sh-feat">
       <div class="exp-sh-t">⭐ Destacados</div>
@@ -2141,7 +2127,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
   <input type="file" id="prof-av-input" accept="image/*" style="display:none" onchange="profUploadAv(this)">
   <input type="file" id="prof-banner-input" accept="image/*" style="display:none" onchange="profUploadBanner(this)">
 
-  <div class="sb" style="padding-bottom:88px">
+  <div class="sb" style="padding-bottom:calc(88px + var(--sab))">
 
     <!-- BANNER — SVG gradient default, no external URL -->
     <div id="prof-banner-wrap" style="position:relative;height:calc(160px + var(--sat));overflow:hidden;cursor:pointer" onclick="document.getElementById('prof-banner-input').click()">
@@ -2348,7 +2334,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <div class="notif-title">Notificaciones</div>
     <div class="notif-clear" onclick="clearNotifs()">Limpiar todo</div>
   </div>
-  <div class="sb" style="padding-bottom:80px" id="notif-list"></div>
+  <div class="sb" style="padding-bottom:calc(80px + var(--sab))" id="notif-list"></div>
 </div>
 
 <!-- ORDER TRACKING -->
@@ -2358,7 +2344,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <div class="track-title">Seguimiento</div>
     <div style="font-size:11px;font-weight:800;color:var(--mu)" id="track-order-num">#IC-00000</div>
   </div>
-  <div class="sb" style="padding-bottom:80px">
+  <div class="sb" style="padding-bottom:calc(80px + var(--sab))">
     <!-- Product card -->
     <div class="track-order-card">
       <div class="track-prod-row">
@@ -2414,7 +2400,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <div style="font-size:19px;cursor:pointer" onclick="toast('⚙️ Configuración de tienda')">⚙️</div>
   </div>
 
-  <div class="sb" style="padding-bottom:80px">
+  <div class="sb" style="padding-bottom:calc(80px + var(--sab))">
     <!-- Revenue hero -->
     <div class="dash-hero">
       <div class="dash-hero-row">
@@ -2516,7 +2502,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <div class="co-step"><div class="co-step-dot">4</div><div class="co-step-lbl">Listo</div></div>
   </div>
   <div class="co-items-scroll" id="co-thumbs"></div>
-  <div class="sb" style="padding-bottom:120px">
+  <div class="sb" style="padding-bottom:calc(120px + var(--sab))">
     <div class="co-sec">
       <div class="co-sec-t">📦 Entrega</div>
       <div class="co-card">
@@ -2582,7 +2568,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <div style="font-size:11px;font-weight:800;color:var(--mu);cursor:pointer" onclick="go('wallet-history')">Historial</div>
   </div>
 
-  <div class="sb" style="padding-bottom:80px">
+  <div class="sb" style="padding-bottom:calc(80px + var(--sab))">
     <!-- Balance card -->
     <div class="wallet-hero">
       <div class="wallet-hero-label">InstaCreditos disponibles</div>
@@ -2712,7 +2698,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     </div>
   </div>
 
-  <div class="sb" style="padding-bottom:100px">
+  <div class="sb" style="padding-bottom:calc(100px + var(--sab))">
     <div class="gl-form">
 
       <!-- Título -->
@@ -3011,7 +2997,7 @@ body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;backgroun
     <button onclick="_adminLoadDeps()" style="background:var(--dk3);border:1px solid rgba(255,255,255,.07);border-radius:50%;width:34px;height:34px;color:var(--mu);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">🔄</button>
   </div>
 
-  <div class="sb" style="padding-bottom:88px">
+  <div class="sb" style="padding-bottom:calc(88px + var(--sab))">
     <!-- Stats row -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:16px 16px 0">
       <div style="background:var(--dk3);border-radius:14px;padding:14px 12px;text-align:center;border:1px solid rgba(255,255,255,.06)">
@@ -3427,22 +3413,18 @@ async function buildExpScreen(){
   // Fetch real stores from Firestore
   try{
     const fsStores=await fsQuery('stores');
-    const fsStreams=await fsQuery('streams',[{field:'isLive',value:true}]);
-    const liveChannels=new Set(fsStreams.map(s=>s.channelName||s._id));
-    // Map FS stores to seller-like objects
+    // Map FS stores to seller-like objects (sin live/viewers)
     _expFsSellers=fsStores.map(st=>({
       s:{
         n:st.shopName||st.ownerName||'Tienda',
-        e:'📡',
+        e:'🛍️',
         cat:st.category||'General',
-        v:st.viewerCount||0,
+        v:0,
         f:st.followers||0,
         p:st.minPrice||0,
         logo:st.avatar||'',
-        verified:st.isVerified||false,
-        live:liveChannels.has(st.channelName||st._id)||st.isLive||false,
-        viewers:st.viewerCount||0,
-        channelName:st.channelName||''
+        verified:st.isVerified||st.verified||false,
+        live:false
       },
       i:'fs_'+st._id,
       fs:true,
@@ -3480,33 +3462,7 @@ function _expImg2(item){
 }
 
 function renderExpSections(list){
-  // Sort: live first
-  list=[...list].sort((a,b)=>(b.s.live?1:0)-(a.s.live?1:0));
-  const liveList=list.filter(x=>x.s.live||x.s.v>50);
-  const showList=liveList.length?liveList:list;
-  // ── EN VIVO strip ──
-  const liveEl=document.getElementById('exp-live-strip');
-  if(liveEl){
-    liveEl.innerHTML=showList.slice(0,10).map(item=>{
-      const {s}=item;
-      const img=_expImg(item);
-      const avHtml=s.logo?`<img src="${s.logo}" style="width:100%;height:100%;object-fit:cover">`:`<span style="font-size:14px">${s.e}</span>`;
-      return `<div class="exp-lc" onclick="_expOpenSeller(${JSON.stringify(item).replace(/"/g,'&quot;')})">
-        ${img?`<img class="exp-lc-img" src="${img}" loading="lazy" onerror="this.style.display='none'">`:`<div class="exp-lc-img" style="display:flex;align-items:center;justify-content:center;font-size:40px;background:var(--dk4)">${s.e}</div>`}
-        <div class="exp-lc-grad"></div>
-        <div class="exp-lc-top">
-          <div class="exp-lc-live"><div class="exp-lc-live-dot"></div>LIVE</div>
-          <div class="exp-lc-v">👁 ${s.v||s.viewers||0}</div>
-        </div>
-        <div class="exp-lc-bottom">
-          <div class="exp-lc-av">${avHtml}</div>
-          <div class="exp-lc-name">${s.n}</div>
-          <div class="exp-lc-price">desde $${s.p}</div>
-        </div>
-      </div>`;
-    }).join('');
-  }
-  // ── FEATURED GRID ──
+  // ── DESTACADOS grid (sin live, sin viendo) ──
   const featEl=document.getElementById('exp-featured-grid');
   if(featEl){
     featEl.innerHTML=list.slice(0,6).map(item=>{
@@ -3516,8 +3472,6 @@ function renderExpSections(list){
       return `<div class="exp-fc" onclick="_expOpenSeller(${JSON.stringify(item).replace(/"/g,'&quot;')})">
         ${img?`<img class="exp-fc-img" src="${img}" loading="lazy" onerror="this.style.background='var(--dk4)'">`:`<div class="exp-fc-img" style="display:flex;align-items:center;justify-content:center;font-size:44px;background:var(--dk4)">${s.e}</div>`}
         <div class="exp-fc-grad"></div>
-        ${s.live?'<div class="exp-fc-live"></div>':''}
-        <div class="exp-fc-vbadge">👁 ${s.v||0}</div>
         <div class="exp-fc-av" style="${s.logo?'background:#000;':'background:var(--dk4);'}">${avHtml}</div>
         <div class="exp-fc-body">
           <div class="exp-fc-name">${s.n}${s.verified?` <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--y)" stroke="none"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`:''}</div>
@@ -3530,7 +3484,7 @@ function renderExpSections(list){
       </div>`;
     }).join('');
   }
-  // ── ALL SELLERS list ──
+  // ── TODAS LAS TIENDAS list (sin EN VIVO, sin viendo) ──
   const allEl=document.getElementById('exp-all-list');
   const countEl=document.getElementById('exp-count');
   if(countEl) countEl.textContent=list.length+' tiendas';
@@ -3541,16 +3495,16 @@ function renderExpSections(list){
       const imgs=[img1,img2].filter(Boolean);
       const avHtml=s.logo?`<img src="${s.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:11px">`:`<span style="font-size:22px">${s.e}</span>`;
       const thumbs=imgs.map(u=>`<img class="exp-ar-thumb" src="${u}" loading="lazy" onerror="this.style.display='none'">`).join('');
+      const fol=typeof s.f==='number'?s.f.toLocaleString():s.f;
       return `<div class="exp-ar" onclick="_expOpenSeller(${JSON.stringify(item).replace(/"/g,'&quot;')})">
         <div class="exp-ar-av" style="${s.logo?'background:#000;':'background:var(--dk4);'}">${avHtml}</div>
         ${imgs.length>=2?`<div class="exp-ar-imgs">${thumbs}</div>`:''}
         <div class="exp-ar-info">
           <div class="exp-ar-name">${s.n}${s.verified?`<svg width="12" height="12" viewBox="0 0 24 24" fill="var(--y)" stroke="none"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`:''}</div>
-          <div class="exp-ar-sub">${s.cat}${s.live?' · 🔴 EN VIVO':''} · ${typeof s.f==='number'?s.f.toLocaleString():s.f} seg.</div>
+          <div class="exp-ar-sub">${s.cat} · ${fol} seg.</div>
         </div>
         <div class="exp-ar-right">
           <div class="exp-ar-price">$${s.p}</div>
-          <div class="exp-ar-vw"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${s.v||0}</div>
         </div>
       </div>`;
     }).join('');
@@ -3578,12 +3532,10 @@ function expSearch(q){
   }
   const isFiltered=q||(expActiveCat&&expActiveCat!=='🔥 Todo');
   // Show/hide hero sections
-  ['exp-sh-live','exp-sh-feat','exp-live-strip','exp-featured-grid'].forEach(id=>{
+  ['exp-sh-feat','exp-featured-grid'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el) el.style.display=isFiltered?'none':'';
+    if(el) el.style.display=isFiltered?'none':(id==='exp-featured-grid'?'grid':'');
   });
-  if(document.getElementById('exp-featured-grid')) document.getElementById('exp-featured-grid').style.display=isFiltered?'none':'grid';
-  if(document.getElementById('exp-live-strip')) document.getElementById('exp-live-strip').style.display=isFiltered?'none':'flex';
   const countEl=document.getElementById('exp-count');
   if(countEl) countEl.textContent=list.length+' tiendas';
   const allEl=document.getElementById('exp-all-list');
@@ -3599,11 +3551,10 @@ function expSearch(q){
         ${imgs.length>=2?`<div class="exp-ar-imgs">${thumbs}</div>`:''}
         <div class="exp-ar-info">
           <div class="exp-ar-name">${s.n}${s.verified?`<svg width="12" height="12" viewBox="0 0 24 24" fill="var(--y)" stroke="none"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`:''}</div>
-          <div class="exp-ar-sub">${s.cat}${s.live?' · 🔴 EN VIVO':''} · ${typeof s.f==='number'?s.f.toLocaleString():s.f} seg.</div>
+          <div class="exp-ar-sub">${s.cat} · ${typeof s.f==='number'?s.f.toLocaleString():s.f} seg.</div>
         </div>
         <div class="exp-ar-right">
           <div class="exp-ar-price">$${s.p}</div>
-          <div class="exp-ar-vw"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${s.v||0}</div>
         </div>
       </div>`;
     }).join('');
