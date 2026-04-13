@@ -1,12 +1,73 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#0A0A0F" rx="112"/>
-  <!-- Gold background glow -->
-  <circle cx="256" cy="256" r="180" fill="rgba(255,208,0,0.08)"/>
-  <!-- IC letters -->
-  <text x="256" y="295" text-anchor="middle" font-family="Arial Black, sans-serif" font-weight="900" font-size="180" fill="#FFD000" letter-spacing="-8">IC</text>
-  <!-- Live dot -->
-  <circle cx="390" cy="130" r="36" fill="#FF3B3B"/>
-  <circle cx="390" cy="130" r="22" fill="#fff"/>
-  <!-- Live ring animation hint -->
-  <circle cx="390" cy="130" r="36" fill="none" stroke="#FF3B3B" stroke-width="8" opacity="0.4"/>
+  <defs>
+    <radialGradient id="gg" cx="50%" cy="52%" r="54%">
+      <stop offset="0%" stop-color="#201A00"/>
+      <stop offset="65%" stop-color="#0E0E18"/>
+      <stop offset="100%" stop-color="#09090E"/>
+    </radialGradient>
+    <linearGradient id="gld" x1="5%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#FFF176"/>
+      <stop offset="35%" stop-color="#FFD000"/>
+      <stop offset="100%" stop-color="#7A5800"/>
+    </linearGradient>
+    <radialGradient id="signalGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FF3B3B" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#FF3B3B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Outer frame -->
+  <rect width="512" height="512" fill="#09090E" rx="112"/>
+
+  <!-- Center ambient glow -->
+  <circle cx="248" cy="272" r="200" fill="url(#gg)"/>
+
+  <!-- Inner circle ring (thin) -->
+  <circle cx="248" cy="272" r="196" fill="none" stroke="#FFD000" stroke-width="1" opacity="0.18"/>
+
+  <!-- Circuit traces — right -->
+  <line x1="444" y1="272" x2="478" y2="272" stroke="#FFD000" stroke-width="1.5" opacity="0.2"/>
+  <circle cx="478" cy="272" r="5" fill="none" stroke="#FFD000" stroke-width="1.5" opacity="0.2"/>
+  <circle cx="478" cy="272" r="2" fill="#FFD000" opacity="0.2"/>
+
+  <!-- Circuit traces — left -->
+  <line x1="52" y1="272" x2="30" y2="272" stroke="#FFD000" stroke-width="1.5" opacity="0.15"/>
+  <circle cx="30" cy="272" r="4" fill="none" stroke="#FFD000" stroke-width="1.5" opacity="0.15"/>
+
+  <!-- Circuit traces — bottom-right L -->
+  <circle cx="430" cy="400" r="2.5" fill="#FFD000" opacity="0.22"/>
+  <line x1="430" y1="400" x2="430" y2="440" stroke="#FFD000" stroke-width="1.5" opacity="0.14"/>
+  <line x1="430" y1="440" x2="370" y2="440" stroke="#FFD000" stroke-width="1.5" opacity="0.14"/>
+
+  <!-- Circuit traces — top-left L -->
+  <circle cx="82" cy="145" r="2.5" fill="#FFD000" opacity="0.2"/>
+  <line x1="82" y1="145" x2="82" y2="100" stroke="#FFD000" stroke-width="1.5" opacity="0.12"/>
+  <line x1="82" y1="100" x2="130" y2="100" stroke="#FFD000" stroke-width="1.5" opacity="0.12"/>
+
+  <!-- Micro circuit dots (texture) -->
+  <circle cx="145" cy="228" r="1.8" fill="#FFD000" opacity="0.14"/>
+  <circle cx="165" cy="335" r="1.8" fill="#FFD000" opacity="0.12"/>
+  <circle cx="350" cy="380" r="1.8" fill="#FFD000" opacity="0.13"/>
+  <circle cx="338" cy="185" r="1.8" fill="#FFD000" opacity="0.11"/>
+
+  <!-- IC Letters -->
+  <text x="246" y="332" text-anchor="middle"
+    font-family="'Arial Black', 'Arial Bold', Impact, Haettenschweiler, sans-serif"
+    font-weight="900" font-size="212" fill="url(#gld)"
+    letter-spacing="-10">IC</text>
+
+  <!-- Signal indicator — soft glow halo behind arcs -->
+  <circle cx="395" cy="136" r="70" fill="url(#signalGlow)"/>
+
+  <!-- Signal arcs (WiFi-style, pointing up) centered at (395, 136) -->
+  <!-- Outer arc r=58 -->
+  <path d="M 337,136 A 58,58 0 0,0 453,136" fill="none" stroke="#FF3B3B" stroke-width="4" stroke-linecap="round" opacity="0.3"/>
+  <!-- Middle arc r=41 -->
+  <path d="M 354,136 A 41,41 0 0,0 436,136" fill="none" stroke="#FF3B3B" stroke-width="6" stroke-linecap="round" opacity="0.62"/>
+  <!-- Inner arc r=24 -->
+  <path d="M 371,136 A 24,24 0 0,0 419,136" fill="none" stroke="#FF3B3B" stroke-width="8.5" stroke-linecap="round" opacity="0.9"/>
+  <!-- Center dot -->
+  <circle cx="395" cy="136" r="13" fill="#FF3B3B"/>
+  <circle cx="395" cy="136" r="7" fill="#FF7575"/>
+  <circle cx="395" cy="134" r="3.5" fill="#FFAAAA" opacity="0.9"/>
 </svg>
